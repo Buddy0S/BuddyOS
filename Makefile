@@ -1,4 +1,4 @@
-PREFIX = arm-linux-gnueabi-
+PREFIX = arm-none-eabi-
 CFLAGS = -c -nostdlib -nostartfiles -nodefaultlibs -fno-builtin
 
 BUILD_DIR = build/
