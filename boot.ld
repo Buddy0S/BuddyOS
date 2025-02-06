@@ -2,7 +2,7 @@ MEMORY
 {
   sram   (rwx)  : ORIGIN = 0x402F0400, LENGTH = 0x0000FC00
   stack  (rwx)  : ORIGIN = 0x402F8000, LENGTH = 0x00008000
-  ocmc_ram (rwx)  : ORIGIN = 0x40300000, LENGTH = 0x0000FFFF
+  ocmc_ram (rwx)  : ORIGIN = 0x40300000, LENGTH = 0x00010000
 }
 
 
@@ -20,7 +20,7 @@ SECTIONS
         LONG(SIZEOF(.data) - 0x8);
         LONG(__sram_start__);
         . = 0x8;
-        *(.text.main);
+        build/init.o(.text);
         *(.text);
     }
 }

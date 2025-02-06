@@ -3,8 +3,13 @@
 #include <stdint.h>
 
 #define __GPIO1_start__ 0x4804C000
-#define RESET_USERLED1 0x4804C190
-#define SET_USERLED1 0x4804C194
+#define SET_LED_OFFSET 0x194
+#define RESET_LED_OFFSET 0x190
+
+#define GLBL_GPIO_CLOCK 0x44E00000
+
+#define SET_USERLED1 __GPIO1_start__ + SET_LED_OFFSET
+#define RESET_USERLED1 __GPIO1_start__ + RESET_LED_OFFSET
 
 #define LED0 21
 #define LED1 22
@@ -19,7 +24,7 @@ int main(void) {
 void initLED(void){
 
     /* set global register clock */
-    *(volatile uint32_t*)((volatile char*)0x44E000AC) = 0x2;
+    *(volatile uint32_t*)((volatile char*)GLBL_GPIO_CLOCK + 0xAC) = 0x2;
     /* turn all gpio pins to output mode */
     *(volatile uint32_t*)((volatile char*)__GPIO1_start__ + 0x134) = 0x0;
 

@@ -35,5 +35,5 @@ Team00.img: MLO
 	bash create_header.sh
 	dd if=MLO of=Team00.img bs=512 seek=1 conv=notrunc,sync status=none	
 
-objdump: MLO
-	$(PREFIX)objdump -D -b binary -m arm $<
+objdump: Team00.img
+	$(PREFIX)objdump -D -b binary -m arm MLO
