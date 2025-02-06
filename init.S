@@ -12,6 +12,6 @@ init:
 
    ldr sp, =__stack_start__
 
-   bl buddy
+   bl main
 
    @sub sp,sp,#0x1FFF	@8kB public stack

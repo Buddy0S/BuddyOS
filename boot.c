@@ -8,6 +8,10 @@
 #define LED2 23
 #define LED3 24
 
+int main(void) {
+    buddy();
+}
+
 void buddy(void) {
 
     volatile int i;
