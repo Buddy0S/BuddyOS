@@ -1,6 +1,6 @@
 
 #include <stdint.h>
-#define UART0_OFFSET 0
+#define UART0_OFFSET 0x44E09000
 #define UART_SYSC 0x54
 #define UART_SYSS 0x58
 #define UART_LCR 0xC
@@ -10,11 +10,11 @@
 #define UART_TCR 0x18
 #define UART_EFR 0x8
 #define UART_TLR 0x1C
-#define UART_MDR1 0
-#define UART_MDR3 0
-#define UART_IER 0
-#define UART_DLL 0
-#define UART_DLH 0
+#define UART_MDR1 0x20
+#define UART_MDR3 0x80
+#define UART_IER 0x4
+#define UART_DLL 0x0
+#define UART_DLH 0x4
 
 void uart0_init(void) {
 
