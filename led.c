@@ -11,11 +11,17 @@ inline void initLED(void){
 }
 
 inline void LEDon(int led){
-    *(volatile uint32_t*)((volatile char*)SET_USERLED1) = (uint32_t)(0x1 << led);
+
+    volatile uint32_t LEDstatus = *(volatile uint32_t*)((volatile char*)SET_USERLED1);
+
+    *(volatile uint32_t*)((volatile char*)SET_USERLED1) = LEDstatus | (uint32_t)(0x1 << led);
 }
 
 inline void LEDoff(int led){
-    *(volatile uint32_t*)((volatile char*)RESET_USERLED1) = (uint32_t)(0x1 << led);
+
+    volatile uint32_t LEDstatus = *(volatile uint32_t*)((volatile char*)RESET_USERLED1);
+
+    *(volatile uint32_t*)((volatile char*)RESET_USERLED1) = LEDstatus | (uint32_t)(0x1 << led);
 }
 
 
