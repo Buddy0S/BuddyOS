@@ -19,7 +19,8 @@
 #define LED3 24
 
 int main(void) {
-    buddy();
+    /* literally no point in doing this rn but it works */
+    set_registers((uint32_t)buddy, 0);
 }
 /* 
  * argument 1 is in r0 takes function
@@ -32,9 +33,9 @@ int main(void) {
  * branches to function in r0
  *
  * */
-__attribute__((naked)) static void set_registers(uint32_t pc, uint32_t sp) {
+__attribute__((naked, noreturn)) static void set_registers(uint32_t pc, uint32_t sp) {
     __asm("            \n\
-            mov sp, r1 \n\
+            @mov sp, r1 \n\
             bx r0     \n\
     ");
 }
