@@ -10,6 +10,8 @@ init:
    orr r0, r0, #0xC0 @ disable IRQ
    msr cpsr, r0
 
-   bl main @ tbh technically not necessary
+   ldr sp, =__stack_start__
+
+   bl buddy
 
    @sub sp,sp,#0x1FFF	@8kB public stack
