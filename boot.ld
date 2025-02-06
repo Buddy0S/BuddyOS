@@ -10,6 +10,7 @@ __sram_start__ = ORIGIN(sram);
 __sram_size__ = LENGTH(sram);
 __stack_start__ = ORIGIN(ocmc_ram) - 1;
 __stack_size__ = LENGTH(stack);
+ENTRY(__sram_start__);
 
 SECTIONS 
 {
@@ -19,6 +20,7 @@ SECTIONS
         LONG(SIZEOF(.data) - 0x8);
         LONG(__sram_start__);
         . = 0x8;
+        *(.text.main);
         *(.text);
     }
 }

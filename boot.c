@@ -29,13 +29,10 @@ __attribute__((naked)) static void set_registers(uint32_t pc, uint32_t sp) {
     ");
 }
 
-static inline void set_bit_sram(uint32_t addr, unsigned int bit) {
-        *(uint32_t*)((volatile char*)addr) |= 1 << bit;
-}
-
 void buddy(void) {
-        *(volatile uint32_t*)((volatile char*)__GPIO1_start__ + 0x134) = 0x0;
-    while(1){
-        *(volatile uint32_t*)((volatile char*)RESET_USERLED1) = 0xFFFFFFFF;
-    }
+    *(volatile uint32_t*)((volatile char*)0x44E000AC) = 0x2;
+    *(volatile uint32_t*)((volatile char*)__GPIO1_start__ + 0x134) = 0x0;
+    *(volatile uint32_t*)((volatile char*)SET_USERLED1) = 0xFFFFFFFF;
+
+    while(1);
 }
