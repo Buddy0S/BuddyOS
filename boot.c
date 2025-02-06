@@ -7,6 +7,17 @@
 #define SET_USERLED1 0x4804C194
 
 int main(void) {
+    /* set global register clock */
+    *(volatile uint32_t*)((volatile char*)0x44E000AC) = 0x2;
+    /* turn all gpio pins to output mode */
+    *(volatile uint32_t*)((volatile char*)__GPIO1_start__ + 0x134) = 0x0;
+    /* enable all pins */
+    *(volatile uint32_t*)((volatile char*)SET_USERLED1) = (uint32_t)0xFFFFFFFF;
+    *(volatile uint32_t*)((volatile char*)SET_USERLED1) = 1 << 23;
+    *(volatile uint32_t*)((volatile char*)SET_USERLED1) = 1 << 22;
+    *(volatile uint32_t*)((volatile char*)SET_USERLED1) = 1 << 21;
+
+
     set_registers((uint32_t)buddy, __stack_start__);
     while(1);
 }
