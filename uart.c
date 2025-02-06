@@ -1,15 +1,17 @@
 
 #include <stdint.h>
 #define UART0_OFFSET 0
-#define UART_SYSC 0
-#define UART_SYSS 0
-#define UART_LCR 0
-#define UART_MCR 0
-#define UART_FCR 0
-#define UART_SCR 0
-#define UART_EFR 0
-#define UART_TLR 0
+#define UART_SYSC 0x54
+#define UART_SYSS 0x58
+#define UART_LCR 0xC
+#define UART_MCR 0x10
+#define UART_FCR 0x8
+#define UART_SCR 0x40
+#define UART_TCR 0x18
+#define UART_EFR 0x8
+#define UART_TLR 0x1C
 #define UART_MDR1 0
+#define UART_MDR3 0
 #define UART_IER 0
 #define UART_DLL 0
 #define UART_DLH 0
@@ -112,11 +114,46 @@ void uart0_init(void) {
     *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) |= enhanced_en_bit;
 
     /* load protocol formatting */
-    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) &= ~(0x3 << 6);
+    /* lowkey i dont understand any of it so im putting 0 again */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x0;
+
+    /* set baud mode */
+    /* this is 16x with autobauding */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MDR1) |= 0x2;
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MDR3) &= ~0x2;
 
 
+    /* next is enabling hw control mode */
+
+    /* save lcr value then set to 0x00BF to enter config b mode */
+    old_lcr = *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR);
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x00BF;
+
+    /* save en bit then set it to 1 */
+    enhanced_en_bit = *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) & (0x1 << 4);
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) |= (0x1 << 4);
+
+    /* enter config mode a */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x0080;
+
+    /* set tcr_tlr bit to gain access to fcr register */
+    tcr_tlr_bit = *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MCR) & (0x1 << 6);
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MCR) |= (0x1 << 6);
+
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_TCR) = 0x10;
 
 
+    /* set auto rts and cts */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) |= (0x1 << 7);
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) |= (0x1 << 6);
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) &= ~enhanced_en_bit;
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) |= enhanced_en_bit;
+
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x0080;
+
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MCR) &= ~tcr_tlr_bit;
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MCR) |= tcr_tlr_bit;
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = old_lcr;
 
 
 }
