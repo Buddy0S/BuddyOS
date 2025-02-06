@@ -9,5 +9,3 @@ init:
    msr cpsr, r0
 
    @sub sp,sp,#0x1FFF	@8kB public stack
-
-	bl main

@@ -26,7 +26,7 @@ $(BUILD_DIR)boot.o : boot.c memory_map.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) boot.c -o $@
 
 $(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)boot.o $(BUILD_DIR)init.o | $(BIN_DIR)
-	$(PREFIX)ld -T $^ -o $@
+	$(PREFIX)ld -flto -T $^ -o $@
 
 MLO : $(BIN_DIR)boot.out
 	$(PREFIX)objcopy -S -O binary $< $@
