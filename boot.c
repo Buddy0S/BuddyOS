@@ -34,6 +34,7 @@ static inline void set_bit_sram(uint32_t addr, unsigned int bit) {
 }
 
 void buddy(void) {
+        *(volatile uint32_t*)((volatile char*)__GPIO1_start__ + 0x134) = 0x0;
     while(1){
         *(volatile uint32_t*)((volatile char*)RESET_USERLED1) = 0xFFFFFFFF;
     }

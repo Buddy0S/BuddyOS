@@ -1,5 +1,5 @@
 PREFIX = arm-none-eabi-
-CFLAGS = -c -nostdlib -nostartfiles -nodefaultlibs -fno-builtin
+CFLAGS = -c -nostdlib -nostartfiles -nodefaultlibs -fno-builtin -fno-stack-protector -fomit-frame-pointer 
 
 BUILD_DIR = build/
 BIN_DIR = bin/
