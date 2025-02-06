@@ -41,11 +41,44 @@ void LEDoff(int led){
 
 void buddy(void) {
 
-    initLED();
-    
-    LEDon(LED0);
+    volatile int i;
+    volatile int T = 500000;
 
-    LEDon(LED2);
+    initLED();
+    while(1){
+    	
+	LEDon(LED0);
+
+    	for (i = 0; i < T; i++);
+
+    	LEDon(LED1);
+
+    	for (i = 0; i < T; i++);
+
+    	LEDon(LED2);
+
+    	for (i = 0; i < T; i++);
+
+    	LEDon(LED3);
+
+    	for (i = 0; i < T; i++);
+
+    	LEDoff(LED0);
+
+    	for (i = 0; i < T; i++);
+
+    	LEDoff(LED1);
+
+    	for (i = 0; i < T; i++);
+
+    	LEDoff(LED2);
+
+    	for (i = 0; i < T; i++);
+
+    	LEDoff(LED3);
+
+	for (i = 0; i < T; i++);
+    }
 
     while(1);
 }
