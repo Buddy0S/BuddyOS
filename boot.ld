@@ -8,7 +8,7 @@ MEMORY
 
 __sram_start__ = ORIGIN(sram);
 __sram_size__ = LENGTH(sram);
-__stack_start__ = ORIGIN(ocmc_ram) - 1;
+__stack_start__ = ORIGIN(ocmc_ram);
 __stack_size__ = LENGTH(stack);
 ENTRY(init);
 

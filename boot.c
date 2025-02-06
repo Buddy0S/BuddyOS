@@ -10,7 +10,7 @@
 
 int main(void) {
     /* literally no point in doing this rn but it works */
-    set_registers((uint32_t)buddy, 0);
+    set_registers((uint32_t)buddy, (uint32_t)&__stack_start__);
 }
 /* 
  * argument 1 is in r0 takes function
@@ -25,7 +25,7 @@ int main(void) {
  * */
 __attribute__((naked, noreturn)) static void set_registers(uint32_t pc, uint32_t sp) {
     __asm("            \n\
-            @mov sp, r1 \n\
+            mov sp, r1 \n\
             bx r0     \n\
     ");
 }
