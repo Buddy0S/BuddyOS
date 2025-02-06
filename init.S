@@ -1,6 +1,8 @@
 
 .global init
 
+.extern __stack_start__
+
 init:
    mrs r0, cpsr
    bic r0, r0, #0x1F @ clear mode bits
