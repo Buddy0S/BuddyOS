@@ -1,5 +1,5 @@
 PREFIX = arm-none-eabi-
-CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a
+CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0
 
 BUILD_DIR = build/
 BIN_DIR = bin/
@@ -19,10 +19,13 @@ $(BUILD_DIR) :
 $(BIN_DIR) :
 	mkdir -p $(BIN_DIR)
 
+$(BUILD_DIR)init.o : init.S | $(BUILD_DIR)
+	$(PREFIX)as init.S -o $@
+
 $(BUILD_DIR)boot.o : boot.c memory_map.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) boot.c -o $@
 
-$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)boot.o | $(BIN_DIR)
+$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)boot.o $(BUILD_DIR)init.o | $(BIN_DIR)
 	$(PREFIX)ld -T $^ -o $@
 
 MLO : $(BIN_DIR)boot.out
