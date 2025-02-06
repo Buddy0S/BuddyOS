@@ -30,8 +30,7 @@ MLO : $(BIN_DIR)boot.out
 
 Team00.img: MLO
 	bash create_header.sh
-	dd if=MLO of=Team00.img iflag=fullblock conv=sync seek=1 status=none
-	echo 'label: dos' | /sbin/sfdisk Team00.img
+	dd if=MLO of=Team00.img bs=512 seek=1 conv=notrunc,sync status=none	
 
 objdump: MLO
 	$(PREFIX)objdump -D -b binary -m arm $<
