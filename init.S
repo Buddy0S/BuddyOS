@@ -6,13 +6,31 @@
 
 .global init
 
-.extern __stack_start__
+.extern __stack_SVC_start__
+.extern __stack_IRQ_start__
+.extern __stack_FRQ_start__
 
 @section 2.14 cortex a8 manual
 @cpsr current program status register 
 @ first 5 bits are mode bits
 @ bits 6 and 7 are FRQ and IRQ disable
 init:
+
+   @set stack for IRQ mode
+   mrs r0, cpsr
+   bic r0, r0, #0x1F @ clear mode bits
+   orr r0, r0, #0x12 @ set IRQ mode
+   msr cpsr, r0
+
+   ldr sp, =__stack_IRQ_start__
+
+   @set stack for FRQ mode
+   mrs r0, cpsr
+   bic r0, r0, #0x1F @ clear mode bits
+   orr r0, r0, #0x11 @ set FRQ mode
+   msr cpsr, r0
+
+   ldr sp, =__stack_FRQ_start__
 
    @ set stack pointer for SVC mode and dsiable interrupts
    mrs r0, cpsr
@@ -21,7 +39,7 @@ init:
    orr r0, r0, #0xC0 @ disable IRQ and FRQ
    msr cpsr, r0
 
-   ldr sp, =__stack_start__
+   ldr sp, =__stack_SVC_start__
 
    bl main
 
