@@ -9,6 +9,10 @@
 #define UART_SCR 0
 #define UART_EFR 0
 #define UART_TLR 0
+#define UART_MDR1 0
+#define UART_IER 0
+#define UART_DLL 0
+#define UART_DLH 0
 
 void uart0_init(void) {
 
@@ -67,11 +71,48 @@ void uart0_init(void) {
     *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MCR) |= tcr_tlr_bit;
     *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = old_lcr;
 
+    /* finished initial setup of uart */
+    /* next is programming the baud rate and more interrupt settings */
 
+    /* disable uart temporarily */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MDR1) |= 0x7;
 
+    /* enter config mode b */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x00BF;
 
+    /* save en bit then set it to 1 */
+    enhanced_en_bit = *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) & (0x1 << 4);
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) |= (0x1 << 4);
 
+    /* enter operational mode */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x0000;
 
+    /* clear ier register */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_IER) = 0x0000;
+
+    /* enter config mode b */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x00BF;
+
+    /* give divisor values for baud rate */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_DLL) = 0x1A;
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_DLH) = 0x00;
+
+    /* reenter operational mode */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x0000;
+
+    /* enable interrupt flags in ier register */
+    /* for now just gonna use 0x0000  for polling */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_IER) = 0x0000;
+
+    /* reenter config mode b */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x00BF;
+
+    /* restore saved en bit */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) &= ~enhanced_en_bit;
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_EFR) |= enhanced_en_bit;
+
+    /* load protocol formatting */
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) &= ~(0x3 << 6);
 
 
 
