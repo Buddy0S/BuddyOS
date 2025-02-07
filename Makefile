@@ -4,7 +4,7 @@ CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0
 BUILD_DIR = build/
 BIN_DIR = bin/
 
-OUTPUT = Team00.img
+OUTPUT = BuddyOS.img
 
 .PHONY: all clean objdump
 
@@ -34,9 +34,14 @@ $(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)boot.o $(BUILD_DIR)led.o $(BUILD_DIR)in
 MLO : $(BIN_DIR)boot.out
 	$(PREFIX)objcopy -S -O binary $< $@
 
-Team00.img: MLO
-	bash create_header.sh
-	dd if=MLO of=Team00.img bs=512 seek=1 conv=notrunc,sync status=none	
+BuddyOS.img: MLO
+	dd if=/dev/zero of=BuddyOS.img bs=512 count=2880
+	mkfs.fat -F 12 BuddyOS.img
+	mcopy -i BuddyOS.img MLO "::MLO"
+		
 
-objdump: Team00.img
+objdump: BuddyOS.img
 	$(PREFIX)objdump -D -b binary -m arm MLO
+
+verify: BuddyOS.img
+	mdir -i BuddyOS.img ::
