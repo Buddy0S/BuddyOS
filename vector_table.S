@@ -56,6 +56,7 @@ irq_interrupt:
 
     subs pc, lr, #4 @ restore execution
 
+
 fiq_interrupt:
     b loop
 

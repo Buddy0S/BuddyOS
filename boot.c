@@ -8,6 +8,10 @@ int main(void) {
 
     init_interrupts();
 
+    initLED();
+
+    enable_interrupts();
+
     buddy();
     
 }
@@ -17,7 +21,6 @@ void buddy(void) {
     volatile int i;
     volatile int T = 500000;
 
-    initLED();
     while(1){
     	
 	LEDon(LED0);
@@ -53,5 +56,4 @@ void buddy(void) {
         for (i = 0; i < T; i++);
     }
 
-    while(1);
 }

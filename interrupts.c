@@ -18,20 +18,49 @@
  * */
 void init_interrupts(void){
 
-    /* Unmasking all interrupts for now */
+    /* soft reset INTC*/
+    *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_SYSCONFIG) |= 0x2;
 
-    *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR0) = 0xFFFFFFFF;
+    /* spin until reset finished */
+    while (!((*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_SYSSTATUS)) & 0x1)){}
 
-    *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR1) = 0xFFFFFFFF;
+   
+    /* Unmasking interrupts that we need */
 
-    *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = 0xFFFFFFFF;
+    //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR0) = 0xFFFFFFFF;
 
-    *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR3) = 0xFFFFFFFF;
+    //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR1) = 0xFFFFFFFF;
+
+    //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = 0xFFFFFFFF;
+
+    //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR3) = 0xFFFFFFFF;
 }
 
 
 void interrupt_handler(){
 
-  LEDon(LED1);
+  //LEDon(LED1);
+
+}
+
+/* Renables interrupts by clearing the 
+ * IRQ and FIQ disable bits in cpsr
+ * */
+void enable_interrupts(void){
+
+    asm(" mrs r1, cpsr   \n\t"
+        " bic r1, #0xC0  \n\t"
+        " msr cpsr, r1 \n\t");
+    
+}
+
+/* disables interrupts by seting the
+ * IRQ and FIQ disable bits in cpsr
+ * */
+void disable_interrupts(void){
+
+    asm(" mrs r1, cpsr   \n\t"
+        " orr r1, #0xC0  \n\t"
+        " msr cpsr, r1 \n\t");
 
 }

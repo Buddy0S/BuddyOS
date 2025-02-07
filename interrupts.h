@@ -5,6 +5,8 @@
 
 /* Interrupt Controler offsets */
 #define INTC_SYSCONFIG 0x10
+#define INTC_SYSSTATUS 0x14
+
 #define INTC_IDLE 0x50
 
 #define INTC_MIR0 0x84
@@ -28,3 +30,7 @@
 /*TI manual 6.2.1*/
 
 void init_interrupts(void);
+
+void enable_interrupts(void);
+
+void disable_interrupts(void);
