@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "interrupts.h"
 #include "led.h"
+#include "timer.h"
 
 /*TI manual 6.2.1
  * Skiping Steps 1 and 2
@@ -31,15 +32,59 @@ void init_interrupts(void){
 
     //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR1) = 0xFFFFFFFF;
 
-    //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = 0xFFFFFFFF;
+    *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = (0x1 << 2);
 
     //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR3) = 0xFFFFFFFF;
 }
 
 
+void timer_isr(){
+
+    volatile int i;
+    volatile int T = 500000;
+
+    LEDoff(LED0);
+
+    LEDoff(LED1);
+
+    LEDoff(LED2);
+
+    LEDoff(LED3);
+
+    /*for (i = 0; i < T; i++);
+
+    LEDoff(LED0);
+
+    LEDoff(LED1);
+
+    LEDoff(LED2);
+
+    LEDoff(LED3);
+
+    for (i = 0; i < T; i++);
+    */
+
+}
+
 void interrupt_handler(){
 
-  //LEDon(LED1);
+    /* get interrupt number */
+    volatile uint32_t irqnum = *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_IRQ) & 0x7F; 
+
+    /* TIMER 0 interrrupt*/
+    if (irqnum == 66){
+   
+	    
+        *(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_IRQ_STATUS) = 0x2;
+
+        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 2);	
+
+        //timer_isr();
+
+        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
+
+    
+	}
 
 }
 
