@@ -3,7 +3,7 @@
 @ ARM V7 Vector Table
 @ https://developer.arm.com/documentation/den0013/d/Exception-Handling/Exception-priorities?lang=en#CEGHDCAE
 
-.balign 32
+.balign 4
 vector_table:
     b init                   @ Used for Reset
     b undefined_instruction

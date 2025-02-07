@@ -7,6 +7,7 @@
 .extern __stack_SVC_start__
 .extern __stack_IRQ_start__
 .extern __stack_FRQ_start__
+.extern __sram_start__
 
 @section 2.14 cortex a8 manual
 @cpsr current program status register 
@@ -40,8 +41,9 @@ init:
    ldr sp, =__stack_SVC_start__
 
    @ load vector table into vector table base address register
+   @ our vector table is loaded at the start of sram
    @ Cortex a8 manual 3.2.68
-   ldr r0, =vector_table
+   ldr r0, =__sram_start__
    mcr p15, #0, r0, c12, c0, #0
 
    @ jump to main

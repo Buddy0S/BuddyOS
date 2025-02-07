@@ -16,17 +16,22 @@ __stack_IRQ_start__ = ORIGIN(stack_SVC);
 __stack_IRQ_size__ = LENGTH(stack_IRQ);
 __stack_FRQ_start__ = ORIGIN(stack_IRQ);
 __stack_FRQ_size__ = LENGTH(stack_FRQ);
-ENTRY(boot);
+
+/* enter at reset vector */
+ENTRY(vector_table);
 
 SECTIONS 
 {
     . = 0x0;
+    .header :
+    {
+        LONG(SIZEOF(.data));
+        LONG(__sram_start__);
+    }
     .data :
     {
-        LONG(SIZEOF(.data) - 0x8);
-        LONG(__sram_start__);
-        build/boot.o(.text);
         build/vector_table.o(.text);
+        . = ALIGN(4);
         build/init.o(.text);
         build/main.o(.text.main);
         *(.text);
