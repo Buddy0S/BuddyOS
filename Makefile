@@ -25,16 +25,20 @@ $(BUILD_DIR)vector_table.o : vector_table.S | $(BUILD_DIR)
 $(BUILD_DIR)init.o : init.S | $(BUILD_DIR)
 	$(PREFIX)as init.S -o $@
 
+
 $(BUILD_DIR)main.o : main.c memory_map.h led.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) main.c -o $@
 
 $(BUILD_DIR)led.o : led.c memory_map.h led.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) led.c -o $@
 
+$(BUILD_DIR)uart.o : uart.c memory_map.h uart.h | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) uart.c -o $@
+
 $(BUILD_DIR)interrupt.o : interrupts.c interrupts.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) interrupts.c -o $@
 
-$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o | $(BIN_DIR)
+$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o | $(BIN_DIR)
 	$(PREFIX)ld -flto -T $^ -o $@
 
 MLO : $(BIN_DIR)boot.out

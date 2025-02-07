@@ -115,7 +115,7 @@ void uart0_init(void) {
 
     /* load protocol formatting */
     /* lowkey i dont understand any of it so im putting 0 again */
-    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x0;
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = 0x0003;
 
     /* set baud mode */
     /* this is 16x with autobauding */
@@ -154,6 +154,10 @@ void uart0_init(void) {
     *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MCR) &= ~tcr_tlr_bit;
     *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_MCR) |= tcr_tlr_bit;
     *(volatile uint32_t*)((volatile char*)UART0_OFFSET + UART_LCR) = old_lcr;
+}
 
+void uart0_putch(char c) {
+
+    *(volatile uint32_t*)((volatile char*)UART0_OFFSET) = c;
 
 }

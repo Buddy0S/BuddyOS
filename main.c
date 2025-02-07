@@ -1,7 +1,8 @@
-#include "led.h"
 #include <stdint.h>
 #include "interrupts.h"
 #include "timer.h"
+#include "led.h"
+#include "uart.h"
 
 void initTimer(){
 
@@ -25,7 +26,7 @@ void initTimer(){
 
    /* Enable interrupt */
    /* when interrupt is enabled i think execution HALTs, need to fix this*/
-  //*(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_IRQ_ENABLE) |= 0x2;
+   *(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_IRQ_ENABLE) |= 0x2;
 
    *(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_TCLR) |= 0x1;
 
@@ -39,36 +40,37 @@ void buddy(void) {
     volatile int T = 500000;
 
     while(1){
-    	
-	LEDon(LED0);
 
-    	for (i = 0; i < T; i++);
+        LEDon(LED0);
+        uart0_putch('T');
 
-    	LEDon(LED1);
+        for (i = 0; i < T; i++);
 
-    	for (i = 0; i < T; i++);
+        LEDon(LED1);
 
-    	LEDon(LED2);
+        for (i = 0; i < T; i++);
 
-    	for (i = 0; i < T; i++);
+        LEDon(LED2);
 
-    	LEDon(LED3);
+        for (i = 0; i < T; i++);
 
-    	for (i = 0; i < T; i++);
+        LEDon(LED3);
 
-    	LEDoff(LED0);
+        for (i = 0; i < T; i++);
 
-    	for (i = 0; i < T; i++);
+        LEDoff(LED0);
 
-    	LEDoff(LED1);
+        for (i = 0; i < T; i++);
 
-    	for (i = 0; i < T; i++);
+        LEDoff(LED1);
 
-    	LEDoff(LED2);
+        for (i = 0; i < T; i++);
 
-    	for (i = 0; i < T; i++);
+        LEDoff(LED2);
 
-    	LEDoff(LED3);
+        for (i = 0; i < T; i++);
+
+        LEDoff(LED3);
 
         for (i = 0; i < T; i++);
     }
@@ -81,12 +83,14 @@ int main(void) {
 
     initLED();
 
+    uart0_init();
+
     initTimer();
 
     enable_interrupts();
 
     buddy();
-    
+
 }
 
 
