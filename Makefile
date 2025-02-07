@@ -31,7 +31,10 @@ $(BUILD_DIR)boot.o : boot.c memory_map.h led.h | $(BUILD_DIR)
 $(BUILD_DIR)led.o : led.c memory_map.h led.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) led.c -o $@
 
-$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)boot.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o | $(BIN_DIR)
+$(BUILD_DIR)interrupt.o : interrupts.c interrupts.h | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) interrupts.c -o $@
+
+$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)boot.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o | $(BIN_DIR)
 	$(PREFIX)ld -flto -T $^ -o $@
 
 MLO : $(BIN_DIR)boot.out

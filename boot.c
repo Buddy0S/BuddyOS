@@ -2,13 +2,12 @@
 #include "led.h"
 #include "memory_map.h"
 #include <stdint.h>
-
-#define LED0 21
-#define LED1 22
-#define LED2 23
-#define LED3 24
+#include "interrupts.h"
 
 int main(void) {
+
+    init_interrupts();
+
     buddy();
 }
 

@@ -10,6 +10,11 @@
 #define SET_USERLED1 __GPIO1_start__ + SET_LED_OFFSET
 #define RESET_USERLED1 __GPIO1_start__ + RESET_LED_OFFSET
 
+#define LED0 21
+#define LED1 22
+#define LED2 23
+#define LED3 24
+
 void initLED(void);
 void LEDon(int led);
 void LEDoff(int led);
