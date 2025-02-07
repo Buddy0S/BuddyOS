@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "interrupts.h"
+#include "led.h"
 
 /*TI manual 6.2.1
  * Skiping Steps 1 and 2
@@ -26,4 +27,11 @@ void init_interrupts(void){
     *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = 0xFFFFFFFF;
 
     *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR3) = 0xFFFFFFFF;
+}
+
+
+void interrupt_handler(){
+
+  LEDon(LED1);
+
 }

@@ -9,6 +9,7 @@ int main(void) {
     init_interrupts();
 
     buddy();
+    
 }
 
 void buddy(void) {
