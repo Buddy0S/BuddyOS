@@ -1,4 +1,3 @@
-#include "boot.h"
 #include "led.h"
 #include <stdint.h>
 #include "interrupts.h"
@@ -32,20 +31,6 @@ void initTimer(){
 
    while (*(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_TWPS) & (0x1)) {}
 
-}
-
-int main(void) { 
-
-    init_interrupts();
-
-    initLED();
-
-    initTimer();
-
-    enable_interrupts();
-
-    buddy();
-    
 }
 
 void buddy(void) {
@@ -89,3 +74,19 @@ void buddy(void) {
     }
 
 }
+
+int main(void) { 
+
+    init_interrupts();
+
+    initLED();
+
+    initTimer();
+
+    enable_interrupts();
+
+    buddy();
+    
+}
+
+

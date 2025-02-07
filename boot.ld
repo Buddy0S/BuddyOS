@@ -16,7 +16,7 @@ __stack_IRQ_start__ = ORIGIN(stack_SVC);
 __stack_IRQ_size__ = LENGTH(stack_IRQ);
 __stack_FRQ_start__ = ORIGIN(stack_IRQ);
 __stack_FRQ_size__ = LENGTH(stack_FRQ);
-ENTRY(init);
+ENTRY(boot);
 
 SECTIONS 
 {
@@ -25,8 +25,10 @@ SECTIONS
     {
         LONG(SIZEOF(.data) - 0x8);
         LONG(__sram_start__);
-        . = 0x8;
+        build/boot.o(.text);
+        build/vector_table.o(.text);
         build/init.o(.text);
+        build/main.o(.text.main);
         *(.text);
     }
 }

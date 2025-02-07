@@ -2,8 +2,6 @@
 @ FIQ mode 0x11
 @ SVC mode 0x13
 
-
-
 .global init
 
 .extern __stack_SVC_start__
