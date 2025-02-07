@@ -41,5 +41,12 @@ init:
 
    ldr sp, =__stack_SVC_start__
 
+   @ load vector table into vector table base address register
+   @ Cortex a8 manual 3.2.68
+   ldr r0, =vector_table
+   mcr p15, #0, r0, c12, c0, #0
+
+   @ jump to main
    bl main
+
 
