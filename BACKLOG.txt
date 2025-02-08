@@ -1,0 +1,8 @@
+*Note even if you made minor contribution to a section 
+or spent time trying to get it work add your name to it
+
+# TODO
+
+Setup emulation:
+ - Abdullah
+
