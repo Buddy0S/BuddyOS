@@ -1,4 +1,6 @@
-*Note even if you made minor contribution to a section add your name to it
+*Note even if you made minor contribution to a section 
+or spent time trying to get it work add your name to it
+
 
 # DONE
 
@@ -10,6 +12,10 @@ boot off sd -- DONE
 
 blink LEDs -- DONE
 - Alexei
+
+set stacks for each cpu mode -- DONE
+- Alexei
+- Marwan
 
 load vector table -- DONE
 - Marwan
@@ -24,6 +30,7 @@ set up timer interrupt -- DONE
 init UART -- DONE
 - Alexei
 - Aaron
+- Noah
 
 UART output -- DONE
 - Aaron
