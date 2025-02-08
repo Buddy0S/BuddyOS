@@ -1,4 +1,4 @@
-#include "memory.h"
+#include "include/memory/memory.h"
 
 /* Define UART0 transmit register address (UART0 + offset) */
 #define UART0_THR (UART0 + UART_THR)
@@ -18,7 +18,7 @@ void uart_print(const char *str) {
 }
 
 void kernel_main(void) {
-    uart_print("Welcome to My Kernel!\n");
+    uart_print("Kernel working\n");
     /* Loop forever to keep the kernel running */
     while (1) { }
 }
@@ -27,3 +27,4 @@ void kernel_main(void) {
 void _start(void) {
     kernel_main();
 }
+~                 
