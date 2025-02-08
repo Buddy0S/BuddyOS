@@ -1,25 +1,31 @@
-# Set the cross-compiler prefix
-CROSS = arm-none-eabi-
-CC = $(CROSS)gcc
-LD = $(CROSS)ld
-OBJCOPY = $(CROSS)objcopy
-
-# Compiler flags:
-CFLAGS = -nostdlib -ffreestanding -Wall -O2 -marm -mcpu=cortex-a8 -nostartfiles -Iinclude/memory/
-
+# Toolchain
+CC = arm-none-eabi-gcc
+LD = arm-none-eabi-ld
+OBJCOPY = arm-none-eabi-objcopy
+CFLAGS = -nostdlib -ffreestanding -Wall -O2 -marm -mcpu=cortex-a8 -I../include/
 LDFLAGS = -T linker.ld
 
-all: kernel.img
+# Source files
+SRC = kernel.c
+OBJ = $(SRC:.c=.o)
 
-kernel.elf: kernel.o
-	$(LD) $(LDFLAGS) -o $@ kernel.o
+# Output binary name
+OUTPUT = kernel.elf
+BIN = kernel.bin
 
-kernel.o: kernel.c include/memory/memory.h
-	$(CC) $(CFLAGS) -c kernel.c -o kernel.o
+# Build Rules
+all: $(BIN)
 
-kernel.img: kernel.elf
-	$(OBJCOPY) -O binary kernel.elf kernel.img
+$(OBJ): $(SRC)
+	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OUTPUT): $(OBJ)
+	$(LD) $(LDFLAGS) $^ -o $@
+
+$(BIN): $(OUTPUT)
+	$(OBJCOPY) -O binary $< $@
+
+# Clean the build
 clean:
-	rm -f *.o kernel.elf kernel.img
+	rm -f $(OBJ) $(OUTPUT) $(BIN)
 

@@ -1,4 +1,4 @@
-#include "include/memory/memory.h"
+#include "../include/memory/memory.h"
 
 /* Define UART0 transmit register address (UART0 + offset) */
 #define UART0_THR (UART0 + UART_THR)
@@ -26,5 +26,4 @@ void kernel_main(void) {
 /* _start is the entry point that our linker script gonna reference */
 void _start(void) {
     kernel_main();
-}
-~                 
+} 
