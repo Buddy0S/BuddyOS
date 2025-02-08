@@ -61,8 +61,7 @@ int main(void) {
 
     enable_interrupts();
 
-    buddy();
-    //
+    //buddy();
 
     while(1);
 

@@ -43,39 +43,47 @@ void init_interrupts(void){
     //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR3) = 0xFFFFFFFF;
 }
 
+int ledmode = 0;
 
 void timer_isr(){
 
     volatile int i;
     volatile int T = 500000;
 
-    LEDon(LED0);
+    if (ledmode == 0){
+        LEDon(LED0);
 
-    LEDon(LED1);
+        LEDon(LED1);
 
-    LEDon(LED2);
+        LEDon(LED2);
 
-    LEDon(LED3);
+        LEDon(LED3);
 
-    for (i = 0; i < T; i++);
+	ledmode = 1;
+	
+    }
 
-    LEDoff(LED0);
+    else if (ledmode == 1){
+        LEDoff(LED0);
 
-    LEDoff(LED1);
+        LEDoff(LED1);
 
-    LEDoff(LED2);
+        LEDoff(LED2);
 
-    LEDoff(LED3);
+        LEDoff(LED3);
 
-    for (i = 0; i < T; i++);
+	ledmode = 0;
+    }
+
+   
+
     
 
 }
 
 void UART0_isr(){
 
-
-    char rec = *(volatile uint8_t*)0x44E09000;
+    char rec = *(volatile uint8_t*)UART0_BASE;
 
     uart0_putch(rec);
 }
@@ -93,7 +101,7 @@ void interrupt_handler(){
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 2);	
 
-        //timer_isr();
+        timer_isr();
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
 
@@ -106,8 +114,6 @@ void interrupt_handler(){
        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 8); 
 
        UART0_isr();       
-       
-       timer_isr();
 
        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
 	
