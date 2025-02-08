@@ -81,6 +81,11 @@ void uart0_init(void) {
     *(volatile uint8_t*)(UART0_BASE + UART_FCR) = 0x7;
     *(volatile uint8_t*)(UART0_BASE + UART_LCR) = 0x3;
     *(volatile uint8_t*)(UART0_BASE + UART_MDR1) &= ~(0x7);
+
+    #define IER_UART 0x4
+
+    *(volatile uint32_t*)(UART0_BASE + IER_UART) = 0x1;
+    *(volatile uint8_t*)(UART0_BASE + UART_MDR1) = 0x0;
     
 
 }

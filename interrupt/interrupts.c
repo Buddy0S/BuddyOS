@@ -2,6 +2,7 @@
 #include "interrupts.h"
 #include "led.h"
 #include "timer.h"
+#include "uart.h"
 
 /*TI manual 6.2.1
  * Skiping Steps 1 and 2
@@ -32,7 +33,12 @@ void init_interrupts(void){
 
     //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR1) = 0xFFFFFFFF;
 
+
+    /* timer0 interrupt*/
     *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = (0x1 << 2);
+
+    /* UART0 interrupt */
+    *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = (0x1 << 8);
 
     //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR3) = 0xFFFFFFFF;
 }
@@ -66,6 +72,14 @@ void timer_isr(){
 
 }
 
+void UART0_isr(){
+
+
+    char rec = *(volatile uint8_t*)0x44E09000;
+
+    uart0_putch(rec);
+}
+
 void interrupt_handler(){
 
     /* get interrupt number */
@@ -79,12 +93,25 @@ void interrupt_handler(){
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 2);	
 
-        timer_isr();
+        //timer_isr();
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
 
     
-	}
+    }
+
+    /* UART 0 interrupt*/
+    if (irqnum == 72){
+    
+       *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 8); 
+
+       UART0_isr();       
+       
+       timer_isr();
+
+       *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
+	
+    }
 
 }
 
