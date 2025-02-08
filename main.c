@@ -42,7 +42,7 @@ void buddy(void) {
     while(1){
 
         LEDon(LED0);
-        uart0_putch('T');
+       // uart0_putch('T');
 
         for (i = 0; i < T; i++);
 
@@ -83,13 +83,16 @@ int main(void) {
 
     initLED();
 
-    uart0_init();
+    //uart0_init();
 
     initTimer();
 
     enable_interrupts();
 
-    buddy();
+    //buddy();
+    //
+
+    while(1);
 
 }
 

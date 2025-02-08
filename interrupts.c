@@ -43,15 +43,15 @@ void timer_isr(){
     volatile int i;
     volatile int T = 500000;
 
-    LEDoff(LED0);
+    LEDon(LED0);
 
-    LEDoff(LED1);
+    LEDon(LED1);
 
-    LEDoff(LED2);
+    LEDon(LED2);
 
-    LEDoff(LED3);
+    LEDon(LED3);
 
-    /*for (i = 0; i < T; i++);
+    for (i = 0; i < T; i++);
 
     LEDoff(LED0);
 
@@ -62,7 +62,7 @@ void timer_isr(){
     LEDoff(LED3);
 
     for (i = 0; i < T; i++);
-    */
+    
 
 }
 
@@ -79,7 +79,7 @@ void interrupt_handler(){
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 2);	
 
-        //timer_isr();
+        timer_isr();
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
 
