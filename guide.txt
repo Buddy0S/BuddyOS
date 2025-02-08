@@ -1,12 +1,14 @@
 1) Make sure you're in the same environment that you did the simulation for A1 in,
-   so have qemu-system-arm, and have the bootpartition
+   so what I did is I just cp'ed my bootpartition and qemu-system-arm to a different directory
 
 2) Follow the steps from https://github.com/marwan475/Qemu-Beagle to make the sd card image
-   for mine, I just called it sdcard.img
+   for mine, I just called it sdcard.img, or you could just cp the beaglebone.img to
+   the directory youre using for this simulation, and rename it to sdcard.img by doing
+   mv beaglebone.img sdcard.img
 
 3) Run make in the kernel folder, it made kernel.bin
 
-4) Take the uEnv.txt I have on the GitLab, and replace the one in bootpartition with it
+4) Take the uEnv.txt I have on the GitLab, and replace the one in bootpartition/ with it
 
 5) In bootpartition, you should only have uEnv.txt, MLO, and u-boot.bin, remove anything else
 
