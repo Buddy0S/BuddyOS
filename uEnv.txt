@@ -1,0 +1,6 @@
+kernel_file=kernel.bin
+loadaddr=0x80000000
+bootargs="console=ttyO0,115200"
+
+loadkernel=load mmc 0:1 ${loadaddr} ${kernel_file}
+bootcmd=run loadkernel; go ${loadaddr}
