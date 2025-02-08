@@ -1,3 +1,5 @@
+*Note even if you made minor contribution to a section add your name to it
+
 # DONE
 
 initial setup -- DONE
