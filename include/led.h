@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LED_H
+#define LED_H
 
 #define __GPIO1_start__ 0x4804C000
 #define SET_LED_OFFSET 0x194
@@ -18,3 +19,5 @@
 void initLED(void);
 void LEDon(int led);
 void LEDoff(int led);
+
+#endif

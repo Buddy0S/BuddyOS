@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INTERRUPT_H
+#define INTERRUPT_H
 
 /* Interrupt Controler base address */
 #define INTERRUPTC_BASE 0x48200000
@@ -42,3 +43,5 @@ void init_interrupts(void);
 void enable_interrupts(void);
 
 void disable_interrupts(void);
+
+#endif

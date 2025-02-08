@@ -14,3 +14,5 @@
 
 #define CM_WKUP_CONTROL 0x4
 #define CM_WKUP_TIMER0 0x10
+
+void initTimer();
