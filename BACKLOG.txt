@@ -1,0 +1,61 @@
+# DONE
+
+initial setup -- DONE
+- Alexei
+
+boot off sd -- DONE
+- Alexei
+
+blink LEDs -- DONE
+- Alexei
+
+load vector table -- DONE
+- Marwan
+- Alexei
+
+set up interrupt handling -- DONE
+- Marwan
+
+set up timer interrupt -- DONE
+- Marwan
+
+init UART -- DONE
+- Alexei
+- Aaron
+
+UART output -- DONE
+- Aaron
+- Alexei
+
+UART input -- DONE
+- Marwan 
+    - did interrupt get char
+    - polling get char needs to be done (optional)
+
+# TODO
+
+set register function:
+- make it cleaner to set register instead of all that casting
+
+UART terminal functions:
+- print string
+- new line (maybe)
+- clear screen (maybe)
+
+init clocks:
+- MPU PLL 
+- CORE PLL
+- PERIPHERAL PLL
+- DDR PLL
+
+init sdram:
+- sdram starts at 0x80000000
+
+setup mmc loading:
+- be able to load blocks / sectors from sd card
+
+FAT load kernel:
+- load kernel.bin using FAT 12 filesystem to start of sdram
+
+contex switch to kernel:
+- jump / hand execution to kernel
