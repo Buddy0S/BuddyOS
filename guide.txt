@@ -1,0 +1,41 @@
+1) Make sure you're in the same environment that you did the simulation for A1 in,
+   so have qemu-system-arm, and have the bootpartition
+
+2) Follow the steps from https://github.com/marwan475/Qemu-Beagle to make the sd card image
+   for mine, I just called it sdcard.img
+
+3) Run make in the kernel folder, it made kernel.bin
+
+4) Take the uEnv.txt I have on the GitLab, and replace the one in bootpartition with it
+
+5) In bootpartition, you should only have uEnv.txt, MLO, and u-boot.bin, remove anything else
+
+5) Adding files to sd img:
+
+mkdir /mnt/beagle
+sudo losetup --partscan /dev/loop0 sdcard.img
+sudo mount /dev/loop0p1 /mnt/beagle
+sudo cp bootpartition/* /mnt/beagle
+
+6)
+
+sudo losetup --partscan /dev/loop0 sdcard.img
+sudo mount /dev/loop0p1 /mnt/beagle
+
+Copy the new kernel.bin to the boot partition:
+sudo cp kernel/kernel.bin /mnt/beagle
+
+sudo umount /mnt/beagle
+sudo losetup -d /dev/loop0
+
+7) Run ./qemu-system-arm -M beagle -cpu cortex-a8 -m 512M -sd ./sdcard.img \
+ -clock unix -serial stdio -usb -device usb-kbd -k /usr/share/qemu/keymaps/en-us
+
+8) Cancel autoboot, and run the following commands:
+
+mmc dev 0
+fatload mmc 0:1 0x80000000 kernel.bin
+go 0x80000000 
+
+Honestly I think the issue just lies on the fact that the memory mapping for QEMU is diff
+from what we have in memory.h for the hardware
