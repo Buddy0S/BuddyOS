@@ -1,6 +1,3 @@
-#ifndef TIMER_H 
-#define TIMER_H
-
 #include "timer.h"
 #include <stdint.h>
 
@@ -34,4 +31,4 @@ void initTimer(){
 
 }
 
-#endif
+

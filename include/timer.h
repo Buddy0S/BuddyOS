@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TIMER_H
+#define TIMER_H
 
 #define DMTIMER0_BASE 0x44E05000
 
@@ -16,3 +17,5 @@
 #define CM_WKUP_TIMER0 0x10
 
 void initTimer();
+
+#endif
