@@ -43,7 +43,7 @@ UART input -- DONE
 
 # TODO
 
-set register function:
+set register function: -- INPROGRESS (AARON)
 - make it cleaner to set register instead of all that casting
 
 UART terminal functions:
