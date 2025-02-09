@@ -8,3 +8,5 @@ Setup emulation: (kinda works)
  - Kevin
     - Attempting to get kernel to actually run on QEMU
     - something is probably wrong with the stack 
+- Marwan
+    - setup qemu using realview-a8 following discusion post
