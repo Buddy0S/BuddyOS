@@ -48,12 +48,17 @@ set register function: -- DONE
 
 # TODO
 
-UART terminal functions:
-- print string
+UART terminal functions -- IN PROGRESS
+- print string 
+    - Noah
 - new line (maybe)
 - clear screen (maybe)
 
-init clocks:
+init clocks -- IN PROGRESS
+
+- MEMMAP - DONE
+    - Marwan
+
 - MPU PLL 
 - CORE PLL
 - PERIPHERAL PLL
