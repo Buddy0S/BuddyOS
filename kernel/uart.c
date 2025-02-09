@@ -1,4 +1,4 @@
-#include "qemu-mem.h"
+#include "qemu/uart.h"
 
 void uart_putc(char c) {
     volatile unsigned int *uart_dr = (unsigned int *)(UART0 + UART_DR);

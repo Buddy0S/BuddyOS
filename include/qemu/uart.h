@@ -1,7 +1,7 @@
 /* memory map for realview pb a8 */
 
-#ifndef QEMU_MEM_H
-#define QEMU_MEM_H
+#ifndef UART_H
+#define UART_H
 
 #define UART0       0x10009000
 
