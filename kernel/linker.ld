@@ -23,5 +23,12 @@ SECTIONS
         *(.bss*)
         *(COMMON)
     }
+
+    .stack : {
+    . = ALIGN(4);
+    __stack_start = .;
+    . += 0x1000; /* Define stack size */
+    __stack_end = .;
+    }
 }
 
