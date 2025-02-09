@@ -2,33 +2,36 @@ ENTRY(_start)
 
 SECTIONS
 {
-    /* Start the code at address 0x8000.
-       Kevin adjust this to where U-Boot is set to actually load the kernel.
-    */
+    /* Start execution at 0x80000000 */
     . = 0x80000000;
 
-    .text : {
+    /* Ensure the text segment (code) is aligned to 4KB */
+    .text ALIGN(4K) : {
         *(.text*)
     }
 
-    .rodata : {
+    /* Read-only data segment */
+    .rodata ALIGN(4K) : {
         *(.rodata*)
     }
 
-    .data : {
+    /* Initialized data segment */
+    .data ALIGN(4K) : {
         *(.data*)
     }
 
-    .bss : {
+    /* Uninitialized data segment */
+    .bss ALIGN(4K) : {
+        _bss_start = .;
         *(.bss*)
-        *(COMMON)
+        _bss_end = .;
     }
 
-    .stack : {
-    . = ALIGN(4);
-    __stack_start = .;
-    . += 0x1000; /* Define stack size */
-    __stack_end = .;
+    /* Stack Section */
+    .stack ALIGN(4) : {
+        _stack_bottom = .;
+        . += 0x1000; /* Allocate 4KB stack */
+        _stack_top = .;
     }
 }
 
