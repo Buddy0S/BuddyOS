@@ -1,14 +1,18 @@
-#include "../include/memory/qemu-mem.h"
+#define UART0 0x10009000  // Base address of UART0 for realview-pb-a8
 
-/* Define UART1 transmit register address (UART1 + offset) */
+void uart_putc(char c) {
+    volatile unsigned int *UART0_DR = (unsigned int *)(UART0);
+    *UART0_DR = c;
+}
 
-/* we are using uart1 because omap35x does not have uart0 lol
-   also we are definitley not setting it up correctly */
-#define UART1_THR (UART1 + UART_THR)
-
-void kernel_main(void) {
-    volatile unsigned int *uart_thr = (unsigned int *)UART1_THR;
-    while (1) {
-        *uart_thr = 'p';
+void uart_puts(const char *s) {
+    while (*s) {
+        uart_putc(*s++);
     }
 }
+
+void kernel_main() {
+    uart_puts("Sup bro\n");
+    while (1);
+}
+
