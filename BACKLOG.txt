@@ -41,10 +41,12 @@ UART input -- DONE
     - did interrupt get char
     - polling get char needs to be done (optional)
 
-# TODO
+set register function: -- DONE
+- Aaron
+    - made it cleaner to set register instead of all that casting
+    - function headers are in include/reg.h
 
-set register function: -- INPROGRESS (AARON)
-- make it cleaner to set register instead of all that casting
+# TODO
 
 UART terminal functions:
 - print string
