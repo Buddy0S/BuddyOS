@@ -1,8 +1,10 @@
-#define UART0 0x10009000  // Base address of UART0 for realview-pb-a8
+#include "../include/memory/qemu-mem.h"
+
+#define UART0_DR (UART0 + UART_DR)
 
 void uart_putc(char c) {
-    volatile unsigned int *UART0_DR = (unsigned int *)(UART0);
-    *UART0_DR = c;
+    volatile unsigned int *uart_dr = (unsigned int *)(UART0_DR);
+    *uart_dr = c;
 }
 
 void uart_puts(const char *s) {
@@ -12,7 +14,7 @@ void uart_puts(const char *s) {
 }
 
 void kernel_main() {
-    uart_puts("Sup bro\n");
+    uart_puts("welcome to buddyOS\n");
     while (1);
 }
 
