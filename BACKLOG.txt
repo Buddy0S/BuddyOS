@@ -7,3 +7,7 @@ Setup emulation:
  - Abdullah
  - Kevin
     - Attempting to get kernel to actually run on QEMU
+
+Initialize UART for QEMU:
+    - Kevin:
+        - Use the OMAP35x manual to init the uart because uboot not doing jack
