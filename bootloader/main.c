@@ -63,8 +63,11 @@ int main(void) {
 
     //buddy();
 
-    while(1);
+    const char* initializeMsg = "BuddyOS...initialized...";
 
+    uart0_puts(initializeMsg);
+
+    while (1);
 }
 
 

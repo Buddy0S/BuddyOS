@@ -35,5 +35,6 @@
 
 void uart0_init(void);
 void uart0_putch(char c);
+void uart0_puts(const char* str);
 
 #endif
