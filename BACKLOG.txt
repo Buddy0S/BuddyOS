@@ -3,10 +3,15 @@ or spent time trying to get it work add your name to it
 
 # TODO
 
-Setup emulation: (kinda works)
+Setup emulation:
  - Abdullah
  - Kevin
     - Attempting to get kernel to actually run on QEMU
     - something is probably wrong with the stack 
 - Marwan
     - setup qemu using realview-a8 following discusion post
+
+Reformatted project directory:
+    - Kevin
+
+
