@@ -3,7 +3,7 @@ or spent time trying to get it work add your name to it
 
 # TODO
 
-Setup emulation:
+Setup emulation: DONE (kinda)
  - Abdullah
  - Kevin
     - Attempting to get kernel to actually run on QEMU
@@ -11,7 +11,13 @@ Setup emulation:
 - Marwan
     - setup qemu using realview-a8 following discusion post
 
-Reformatted project directory:
+Reformatted project directory: DONE
     - Kevin
+
+Memory management:
+    - Kevin:
+        - Memory sections
+        - allocate/deallocate
+        - BUDDY ALLOCATION FOR BUDDYOS???
 
 
