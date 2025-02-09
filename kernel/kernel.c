@@ -1,11 +1,14 @@
-#include "../include/memory/memory.h"
+#include "../include/memory/qemu-mem.h"
 
-/* Define UART0 transmit register address (UART0 + offset) */
-#define UART0_THR (UART0 + UART_THR)
+/* Define UART1 transmit register address (UART1 + offset) */
 
-/* Function to send one character over UART0 */
+/* we are using uart1 because omap35x does not have uart0 lol
+   also we are definitley not setting it up correctly */
+#define UART1_THR (UART1 + UART_THR)
+
+/* Function to send one character over UART1 */
 void uart_send(char c) {
-    volatile unsigned int *uart_thr = (unsigned int *)UART0_THR;
+    volatile unsigned int *uart_thr = (unsigned int *)UART1_THR;
     /* In a full implementation, we're gonna have to check the UART status register here. */
     *uart_thr = c;
 }

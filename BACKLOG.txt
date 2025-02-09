@@ -5,4 +5,5 @@ or spent time trying to get it work add your name to it
 
 Setup emulation:
  - Abdullah
-
+ - Kevin
+    - Attempting to get kernel to actually run on QEMU
