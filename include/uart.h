@@ -8,7 +8,6 @@
 #define UART_DR     0x000
 
 void uart_putc(char c);
-void uart_putc(char c);
-
+void uart_puts(const char *s);
 
 #endif
