@@ -17,7 +17,6 @@ __stack_IRQ_size__ = LENGTH(stack_IRQ);
 __stack_FRQ_start__ = ORIGIN(stack_IRQ);
 __stack_FRQ_size__ = LENGTH(stack_FRQ);
 
-__vector_load__ = __sram_start__ + SIZEOF(.header);
 /* enter at reset vector */
 ENTRY(vector_table);
 
