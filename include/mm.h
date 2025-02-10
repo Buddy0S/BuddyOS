@@ -14,16 +14,4 @@
 #define ALLOC_START         (KERNEL_START + KERNEL_TOTAL)
 #define ALLOC_END           0x8FFFFFFF
 
-/*
- * data struct to store memory blocks
- */
-struct mem_block {
-    bool used;
-    uint32_t addr;
-    struct free_list *next;
-
-};
-
-
-
 #endif
