@@ -70,9 +70,10 @@ int main(void) {
 
     //buddy();
 
+    const char* test = "testing!";
     const char* initializeMsg = "BuddyOS...initialized...";
 
-    bmemcpy((void*)0x80000000, initializeMsg, 25);
+    bmemcpy((void*)0x80000000, initializeMsg - 8 , 25);
 
     uart0_puts((char*)0x80000000);
 
