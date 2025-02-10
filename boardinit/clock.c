@@ -2,6 +2,10 @@
 #include "reg.h"
 #include <stdint.h>
 
+#define MPU_FREQ 1000
+#define PER_FREQ 960
+#define DDR_FREQ 400
+
 void pll_to_bypass(uint32_t clckmode, uint32_t idlest){
 
     uint32_t reg;    
@@ -42,7 +46,26 @@ void pll_lock(uint32_t clckmode, uint32_t idlest){
 
 void set_clock_frequency(uint32_t clcksel, int multi, int div){
 
-    /* 24MHz * multi / div + 1 */
+    /* 
+     * TI manual 8.1.6.3 explains what these PLLs are
+     * esential using an input freq we can generate a custom
+     * output freq with only one input freq/clock
+     * 
+     * CLKOUT = (M / (N+1))*CLKINP*(1/M2)
+     *
+     * m is multi
+     * n is div
+     * - these 2 are set in CM_CLCKSEL_DPLL
+     * m2 is set in m2 divider
+     * CLKINP is the refrence input clock
+     *
+     *The standard external clock frequency source for the BeagleBone Black is 24 MHz. 
+     * 
+     * so we can set the freq of a PLL 2 anyhting in the multi
+     * as long as it is under locking max
+     *
+     * (24*(multi/23+1)/M2)
+     * */
 
     uint32_t freq = (multi << 8) | (div);	
     WRITE32(clcksel,freq);
@@ -60,26 +83,6 @@ void set_divider(uint32_t divider, uint32_t set, uint32_t clear){
     WRITE32(divider,reg);
 }
 
-/* TI manual 8.1.6.7.1 */
-void CORE_PLL_INIT(){
-
-    /* Switch to bypass mode*/
-    pll_to_bypass(CM_CLKMODE_DPLL_CORE, CM_IDLEST_DPLL_CORE);
-
-    /* Configure Multiply and divide */
-    set_clock_frequency(CM_CLKSEL_DPLL_CORE, 500, 23);
-
-    /* Set dividers */
-    set_divider(CM_DIV_M4_DPLL_CORE,10,0x1F);
-
-    set_divider(CM_DIV_M5_DPLL_CORE,8,0x1F);
-
-    set_divider(CM_DIV_M6_DPLL_CORE,4,0x1F);
-
-    /* Lock PLL*/
-    pll_lock(CM_CLKMODE_DPLL_CORE, CM_IDLEST_DPLL_CORE);
-   
-}
 
 /* TI manual 8.1.6.9.1 */
 void MPU_PLL_INIT(){
@@ -87,8 +90,12 @@ void MPU_PLL_INIT(){
     /* Switch to bypass mode*/
     pll_to_bypass(CM_CLKMODE_DPLL_MPU, CM_IDLEST_DPLL_MPU);
 
+    /* TI manual 8.1.6.11 for example frequencys and M2 value*/
+    /* it says locking freq is 1200 */
+    /* our cpu only ranges from 300 - 1000*/
+
     /* Configure Multiply and divide */
-    set_clock_frequency(CM_CLKSEL_DPLL_MPU, 1000, 23);
+    set_clock_frequency(CM_CLKSEL_DPLL_MPU, MPU_FREQ, 23);
 
     /* Set dividers */
     set_divider(CM_DIV_M2_DPLL_MPU,1,0x1F);
@@ -103,10 +110,14 @@ void PER_PLL_INIT(){
     /* Switch to bypass mode*/
     pll_to_bypass(CM_CLKMODE_DPLL_PER, CM_IDLEST_DPLL_PER);
 
+    /* TI manual 8.1.6.8 for example frequencys and M2 value*/
+    /* Max freq is 960 */
+
     /* Configure Multiply and divide */
-    set_clock_frequency(CM_CLKSEL_DPLL_PER, 960, 23);
+    set_clock_frequency(CM_CLKSEL_DPLL_PER, PER_FREQ , 23);
 
     /* Set dividers */
+    /* want it to equal 192 */
     set_divider(CM_DIV_M2_DPLL_PER,5,0x7F);
 
     /* Lock PLL*/
@@ -119,8 +130,13 @@ void DDR_PLL_INIT(){
     /* Switch to bypass mode*/
     pll_to_bypass(CM_CLKMODE_DPLL_DDR, CM_IDLEST_DPLL_DDR);
 
+    /* TI manual 8.1.6.11 for example frequencys and M2 value*/
+    /* Max freq is 532 */
+    /* it says that 532 is max but Table 5-5 on the datasheet 
+     * says that 400 mhz is the max for ddr3 ram*/
+
     /* Configure Multiply and divide */
-    set_clock_frequency(CM_CLKSEL_DPLL_DDR, 400, 23);
+    set_clock_frequency(CM_CLKSEL_DPLL_DDR, DDR_FREQ , 23);
 
     /* Set dividers */
     set_divider(CM_DIV_M2_DPLL_DDR,1,0x1F);
@@ -131,7 +147,6 @@ void DDR_PLL_INIT(){
 
 void initClocks(){
 
-    CORE_PLL_INIT();
     MPU_PLL_INIT();
     PER_PLL_INIT();
     DDR_PLL_INIT();
