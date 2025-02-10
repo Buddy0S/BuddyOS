@@ -37,4 +37,6 @@
 
 #define CM_DIV_M2_DPLL_DDR (CM_WKUP_BASE + 0xA0)
 
+void initClocks();
+
 #endif

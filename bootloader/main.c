@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "led.h"
 #include "uart.h"
+#include "clock.h"
 
 void buddy(void) {
 
@@ -50,6 +51,8 @@ void buddy(void) {
 }
 
 int main(void) { 
+
+    initClocks();
 
     init_interrupts();
 

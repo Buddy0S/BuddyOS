@@ -128,3 +128,11 @@ void DDR_PLL_INIT(){
     /* Lock PLL*/
     pll_lock(CM_CLKMODE_DPLL_DDR, CM_IDLEST_DPLL_DDR);
 }
+
+void initClocks(){
+
+    CORE_PLL_INIT();
+    MPU_PLL_INIT();
+    PER_PLL_INIT();
+    DDR_PLL_INIT();
+}

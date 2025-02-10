@@ -46,6 +46,14 @@ set register function: -- DONE
     - made it cleaner to set register instead of all that casting
     - function headers are in include/reg.h
 
+init clocks -- DONE
+- Marwan
+    - MPU PLL 
+    - CORE PLL
+    - PERIPHERAL PLL
+    - DDR PLL
+
+
 # TODO
 
 UART terminal functions -- IN PROGRESS
@@ -60,19 +68,6 @@ UART terminal functions -- IN PROGRESS
   - print numbers
   - print hex
   - print newline
-
-init clocks -- IN PROGRESS
-
-- MEMMAP - DONE
-    - Marwan
-
-- MPU PLL 
-- CORE PLL
-- PERIPHERAL PLL
-- DDR PLL
-
-  - Marwan
-     - Working on this rn
 
 init sdram:
 - sdram starts at 0x80000000
