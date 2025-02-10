@@ -25,15 +25,27 @@ SECTIONS
     . = 0x0;
     .header :
     {
-        LONG(SIZEOF(.data));
+        LONG(SIZEOF(.text) + SIZEOF(.bss) + SIZEOF(.data) + SIZEOF(.rodata));
         LONG(__sram_start__);
     }
-    .data :
+    .text :
     {
         build/vector_table.o(.text);
         . = ALIGN(4);
         build/init.o(.text);
         build/main.o(.text.main);
         *(.text);
+    }
+    .rodata :
+    {
+        *(.rodata);
+    }
+    .bss :
+    {
+        *(.bss);
+    }
+    .data :
+    {
+        *(.data);
     }
 }
