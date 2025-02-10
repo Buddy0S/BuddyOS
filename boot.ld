@@ -17,35 +17,42 @@ __stack_IRQ_size__ = LENGTH(stack_IRQ);
 __stack_FRQ_start__ = ORIGIN(stack_IRQ);
 __stack_FRQ_size__ = LENGTH(stack_FRQ);
 
+__vector_load__ = __sram_start__ + SIZEOF(.header);
 /* enter at reset vector */
 ENTRY(vector_table);
 
 SECTIONS 
 {
-    . = 0x0;
     .header :
     {
         LONG(SIZEOF(.text) + SIZEOF(.bss) + SIZEOF(.data) + SIZEOF(.rodata));
-        LONG(__sram_start__);
-    }
+        LONG(__sram_start__ + 8);
+    } > sram
+    . = __sram_start__ + 8;
+    . = ALIGN(32);
+    __vector_load__ = .;
     .text :
-    {
-        build/vector_table.o(.text);
+    {    
+	build/vector_table.o(.text);    
         . = ALIGN(4);
         build/init.o(.text);
         build/main.o(.text.main);
         *(.text);
-    }
+    } > sram
     .rodata :
     {
+	. = ALIGN(4);
         *(.rodata);
-    }
+    } > sram
     .bss :
     {
+	. = ALIGN(4);    
         *(.bss);
-    }
+    } > sram
     .data :
     {
+	. = ALIGN(4);    
         *(.data);
-    }
+    } > sram
 }
+
