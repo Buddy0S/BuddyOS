@@ -49,10 +49,12 @@ set register function: -- DONE
 init clocks -- DONE
 - Marwan
     - MPU PLL 
-    - CORE PLL
+    - CORE PLL -- did not do this one
     - PERIPHERAL PLL
     - DDR PLL
 
+init sdram -- DONE
+- Alexei
 
 # TODO
 
@@ -69,8 +71,6 @@ UART terminal functions -- IN PROGRESS
   - print hex
   - print newline
 
-init sdram:
-- sdram starts at 0x80000000
 
 setup mmc loading:
 - be able to load blocks / sectors from sd card
