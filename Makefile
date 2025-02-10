@@ -45,7 +45,13 @@ $(BUILD_DIR)interrupt.o : interrupt/interrupts.c $(INCLUDE)interrupts.h | $(BUIL
 $(BUILD_DIR)timer.o : peripherals/timer.c $(INCLUDE)timer.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) peripherals/timer.c -o $@
 
-$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o $(BUILD_DIR)clock.o | $(BIN_DIR)
+$(BUILD_DIR)memcpy.o : misc/memcpy.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) misc/memcpy.c -o $@
+
+$(BUILD_DIR)ddr.o : boardinit/ddr.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) boardinit/ddr.c -o $@
+
+$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o $(BUILD_DIR)clock.o $(BUILD_DIR)ddr.o $(BUILD_DIR)memcpy.o | $(BIN_DIR)
 	$(PREFIX)ld -flto -T $^ -o $@
 
 MLO : $(BIN_DIR)boot.out

@@ -1,9 +1,11 @@
 #include <stdint.h>
 #include "interrupts.h"
+#include "memcpy.h"
 #include "timer.h"
 #include "led.h"
 #include "uart.h"
 #include "clock.h"
+#include "ddr.h"
 
 void buddy(void) {
 
@@ -56,6 +58,8 @@ int main(void) {
 
     init_interrupts();
 
+    init_ddr();
+
     initLED();
 
     uart0_init();
@@ -68,7 +72,9 @@ int main(void) {
 
     const char* initializeMsg = "BuddyOS...initialized...";
 
-    uart0_puts(initializeMsg);
+    bmemcpy((void*)0x80000000, initializeMsg, 25);
+
+    uart0_puts((char*)0x80000000);
 
     while (1);
 }
