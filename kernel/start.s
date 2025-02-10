@@ -25,7 +25,7 @@ _start:
 context_switch:
     ldr r0, = current_pcb
     ldr r1, [r0]         /* r1 = current_pcb */
-    cmp r1, 
+    cmp r1, #0 
     beq load_next        /* If no current process, skip saving */
 
     push {r0-r12, lr}    /* Save registers onto current process stack */
