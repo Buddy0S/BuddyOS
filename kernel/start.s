@@ -23,7 +23,7 @@ _start:
  * We save/restore 14 registers: r0–r12 and lr.
  */
 context_switch:
-    ldr r0, =current_pcb
+    ldr r0, = current_pcb
     ldr r1, [r0]         /* r1 = current_pcb */
     cmp r1, 
     beq load_next        /* If no current process, skip saving */
@@ -31,9 +31,14 @@ context_switch:
     push {r0-r12, lr}    /* Save registers onto current process stack */
     str sp, [r1]         /* Update current_pcb->stack_ptr */
 
-/* Load the next process */
 load_next:
-
+    ldr r0, =next_pcb
+    ldr r1, [r0]         /* r1 = next_pcb */
+    ldr sp, [r1]         /* Set SP to next_pcb->stack_ptr */
+    ldr r0, = current_pcb
+    str r1, [r0]         /* current_pcb = next_pcb */
+    pop {r0-r12, lr}     /* Restore registers from new process's stack */
+    bx lr
 
 /* In the real system, wherever on the RAM where we allocated the stack
    is where this would be set to*/
