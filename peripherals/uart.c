@@ -74,6 +74,12 @@ void uart0_puts(const char* str) {
          uart0_putch(*str);
 	 str++;
     }
+    uart0_putch('\r');
+}
+
+void uart0_putsln(const char* str) {
+    uart0_puts(str);
+    uart0_putch('\n');
 }
 
 /* NOT QUITE WORKING - Might have something to do with polling instead of
@@ -86,4 +92,34 @@ char uart0_getch() {
 
     return *(volatile uint8_t*)((volatile char*)UART0_BASE + 0x0);
 
+}
+
+void uart0_test() {
+	uart0_putsln("Testing single char below: ");
+	const char testSingleChar = 'N';
+	uart0_putch(testSingleChar);
+
+	uart0_putsln("Testing new line below: ");
+	const char testNewLine = '\n';	
+	uart0_putch(testNewLine);
+	
+	uart0_putsln("Testing empty char");
+	const char testEmptyChar = '\0';
+	uart0_putch(testEmptyChar);
+
+	uart0_putsln("Testing empty string");
+	const char* testEmptyString = "";
+	uart0_putsln(testEmptyString);
+
+	uart0_putsln("Testing uart0_puts with manual \\n");
+	const char* testManualNewLine = "New line\n";
+	uart0_puts(testManualNewLine);
+
+	uart0_putsln("Testing uart0_putsln");
+	const char* testAutoNewLine = "Buddy";
+	uart0_putsln(testAutoNewLine);
+
+	uart0_putsln("Test spaces");
+	const char* testSpaces = "We are so awesome";
+	uart0_putsln(testSpaces);
 }
