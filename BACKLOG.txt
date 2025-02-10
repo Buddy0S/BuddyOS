@@ -16,9 +16,10 @@ Reformatted project directory: DONE
     - Abdullah
 
 Memory management:
-    - Kevin:
+    - Kevin: 
         - Memory sections
         - allocate/deallocate
         - BUDDY ALLOCATION FOR BUDDYOS???
+        - btw do not touch the mm.h and mm.c files or it will explode
 
 
