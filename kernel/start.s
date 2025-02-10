@@ -1,6 +1,43 @@
-.global _start
+    .section .text
+    .global _start
+    .global context_switch
+    .extern current_pcb
+    .extern next_pcb
+    .extern kernel_main
 
-.section .text
+/* _start: Entry point */
 _start:
-    b kernel_main
+    /* Set up the initial stack pointer */
+    ldr sp, =_stack_top
+    bl kernel_main
+
+1:
+    b 1b   /* Infinite loop if kernel_main returns */
+
+/*
+ * context_switch:
+ *   - If a current process exists, save its registers onto its stack.
+ *   - Load the stack pointer from next_pcb and update current_pcb.
+ *   - Restore registers from the new process's saved context.
+ *
+ * We save/restore 14 registers: r0–r12 and lr.
+ */
+context_switch:
+    ldr r0, =current_pcb
+    ldr r1, [r0]         /* r1 = current_pcb */
+    cmp r1, 
+    beq load_next        /* If no current process, skip saving */
+
+    push {r0-r12, lr}    /* Save registers onto current process stack */
+    str sp, [r1]         /* Update current_pcb->stack_ptr */
+
+/* Load the next process */
+load_next:
+
+
+/* In the real system, wherever on the RAM where we allocated the stack
+   is where this would be set to*/
+    .global _stack_top
+_stack_top:
+    .word 0x80000000
 
