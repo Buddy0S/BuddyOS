@@ -53,6 +53,13 @@ UART terminal functions -- IN PROGRESS
     - Noah
 - new line (maybe)
 - clear screen (maybe)
+- need to be able to print numbers and hex
+- create a kprintf that takes a format string 
+  - take var args
+  - format string
+  - print numbers
+  - print hex
+  - print newline
 
 init clocks -- IN PROGRESS
 
@@ -63,6 +70,9 @@ init clocks -- IN PROGRESS
 - CORE PLL
 - PERIPHERAL PLL
 - DDR PLL
+
+  - Marwan
+     - Working on this rn
 
 init sdram:
 - sdram starts at 0x80000000

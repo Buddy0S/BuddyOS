@@ -36,13 +36,16 @@ $(BUILD_DIR)led.o : peripherals/led.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $
 $(BUILD_DIR)uart.o :peripherals/uart.c $(INCLUDE)memory_map.h $(INCLUDE)uart.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) peripherals/uart.c -o $@
 
+$(BUILD_DIR)clock.o :boardinit/clock.c $(INCLUDE)clock.h | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) boardinit/clock.c -o $@
+
 $(BUILD_DIR)interrupt.o : interrupt/interrupts.c $(INCLUDE)interrupts.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) interrupt/interrupts.c -o $@
 
 $(BUILD_DIR)timer.o : peripherals/timer.c $(INCLUDE)timer.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) peripherals/timer.c -o $@
 
-$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o | $(BIN_DIR)
+$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o $(BUILD_DIR)clock.o | $(BIN_DIR)
 	$(PREFIX)ld -flto -T $^ -o $@
 
 MLO : $(BIN_DIR)boot.out
