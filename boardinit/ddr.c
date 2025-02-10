@@ -129,6 +129,9 @@ static void init_emif(void) {
 
 void init_ddr(void) {
 
+    init_emif();
+    init_ddr_phys();
+
     /* set up slew rates options */
     WRITE32(CM_BASE + CMD0_IOCTRL, 0x18B);
     WRITE32(CM_BASE + CMD1_IOCTRL, 0x18B);
