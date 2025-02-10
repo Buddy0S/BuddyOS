@@ -1,8 +1,8 @@
     .section .text
     .global _start
     .global context_switch
-    .extern current_pcb
-    .extern next_pcb
+    .extern _current_pcb
+    .extern _next_pcb
     .extern kernel_main
 
 /* _start: Entry point */
@@ -23,7 +23,7 @@ _start:
  * We save/restore 14 registers: r0–r12 and lr.
  */
 context_switch:
-    ldr r0, = current_pcb
+    ldr r0, =current_pcb
     ldr r1, [r0]         /* r1 = current_pcb */
     cmp r1, #0 
     beq load_next        /* If no current process, skip saving */
@@ -35,7 +35,7 @@ load_next:
     ldr r0, =next_pcb
     ldr r1, [r0]         /* r1 = next_pcb */
     ldr sp, [r1]         /* Set SP to next_pcb->stack_ptr */
-    ldr r0, = current_pcb
+    ldr r0, =current_pcb
     str r1, [r0]         /* current_pcb = next_pcb */
     pop {r0-r12, lr}     /* Restore registers from new process's stack */
     bx lr
