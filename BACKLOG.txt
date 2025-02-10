@@ -22,4 +22,11 @@ Memory management:
         - BUDDY ALLOCATION FOR BUDDYOS???
         - btw do not touch the mm.h and mm.c files or it will explode
 
-
+PCB:
+	- Abdullah:
+		- Created Process States with ability to add more states as required
+		- Setup PCB struct that has PID, state, stack ptr, and base address of that process
+		- Setup stack pointer in start.s
+		- Made a context switch function
+		- Made a load next context/PCB function
+		- Set the top of the stack to where QEMU loads from
