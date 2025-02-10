@@ -52,9 +52,12 @@ init clocks -- DONE
     - CORE PLL -- did not do this one
     - PERIPHERAL PLL
     - DDR PLL
+- Alexei
+    - EMIF clock
 
 init sdram -- DONE
 - Alexei
+    - sdram starts at 0x80000000
 
 # TODO
 
@@ -70,7 +73,6 @@ UART terminal functions -- IN PROGRESS
   - print numbers
   - print hex
   - print newline
-
 
 setup mmc loading:
 - be able to load blocks / sectors from sd card
