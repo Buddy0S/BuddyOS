@@ -13,6 +13,7 @@ Setup emulation: DONE (kinda)
 
 Reformatted project directory: DONE
     - Kevin
+    - Abdullah
 
 Memory management:
     - Kevin:
