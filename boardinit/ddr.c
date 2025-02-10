@@ -1,3 +1,4 @@
+#include "clock.h"
 #include "reg.h"
 
 #define CM_BASE 0x44E10000
@@ -105,6 +106,25 @@ static void init_ddr_phys(void) {
      * optimal slave ratios but i'm not sure we can actually use 
      * it with our beaglebone */
 
+}
+
+static void init_emif(void) {
+    volatile unsigned int regVal;
+
+    /* set clk control mode */
+    regVal = READ32(CM_EMIF_FW_CLKCTRL) & ~(0x00000003);
+    regVal |= 0x2;
+    WRITE32(CM_EMIF_FW_CLKCTRL, regVal);
+
+    regVal = READ32(CM_EMIF_CLKCTRL) & ~(0x00000003);
+    regVal |= 0x2;
+    WRITE32(CM_EMIF_CLKCTRL, regVal);
+
+    while ((READ32(CM_PER_L3_CLKCTRL) & (0x14)) != 0x14);
+
+
+
+    
 }
 
 void init_ddr(void) {

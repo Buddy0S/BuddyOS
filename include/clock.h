@@ -3,6 +3,8 @@
 
 /* TI manual section 8.1.12.2*/
 
+#define PRCM_BASE 0x44E00000
+
 #define CM_WKUP_BASE 0x44E00400
 
 /* CORE PLL */
@@ -21,6 +23,11 @@
 #define CM_CLKSEL_DPLL_PER (CM_WKUP_BASE + 0x9C)
 
 #define CM_DIV_M2_DPLL_PER (CM_WKUP_BASE + 0xAC)
+
+#define CM_EMIF_FW_CLKCTRL (PRCM_BASE + 0xD0)
+#define CM_EMIF_CLKCTRL (PRCM_BASE + 0x28)
+#define CM_PER_L3_CLKCTRL (PRCM_BASE + 0xC)
+
 
 /* MPU PLL */
 
