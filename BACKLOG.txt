@@ -35,6 +35,7 @@ init UART -- DONE
 UART output -- DONE
 - Aaron
 - Alexei
+- Noah
 
 UART input -- DONE
 - Marwan 
@@ -64,7 +65,8 @@ init sdram -- DONE
 UART terminal functions -- IN PROGRESS
 - print string 
     - Noah
-- new line (maybe)
+- new line
+    - Noah
 - clear screen (maybe)
 - need to be able to print numbers and hex
 - create a kprintf that takes a format string 
