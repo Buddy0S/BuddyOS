@@ -16,7 +16,7 @@ const uint32_t blocks_struct_addr = list_struct_addr + ((sizeof(mem_list) * MAX_
 
 /* we gotta allocate memory for the array of lists via raw memory reference */ 
 volatile struct mem_list **order_arr = (volatile struct mem_list **)order_arr_addr;
-volatile struct mem_list *list_structs = (volatile struct mem_list **)list_struct_addr;
+volatile struct mem_list *list_structs = (volatile struct mem_list *)list_struct_addr;
 volatile struct mem_block *block_structs = (volatile struct mem_block *)blocks_struct_addr;
 uint32_t block_struct_iterator = 0;
 
@@ -32,12 +32,13 @@ struct mem_block {
 struct mem_list {
     struct mem_block *head;
     struct mem_block *tail;
-}
+};
 
 /*
  * returns a mem_block node
  */
 struct mem_block *create_mem_block(void) {
+    if (block_struct_iterator > BLOCK_NUM * MAX_ORDER);
     return &block_structs[block_struct_iterator++];
 }
 
@@ -53,7 +54,8 @@ int init_order_arr(int order, int size, uint32_t addr) {
     order_arr[order] = &list_structs[order];
     
     /* set the first list head and tail */
-    if (order_arr[order]->head = create_mem_block() == NULL) {
+    order_arr[order]->head = create_mem_block();
+    if (order_arr[order]->head == NULL) {
         return -1;
     }
     order_arr[order]->tail = order_arr[order]->head;
@@ -65,10 +67,11 @@ int init_order_arr(int order, int size, uint32_t addr) {
     /* set the rest of the free blocks */
     i = addr;
     while (i < end) {
-        new_tail = order_arr[order]->tail->next;
-        if (new_tail = create_mem_block() == NULL) {
+        new_tail = create_mem_block();
+        if (new_tail == NULL) {
             return -1;
         }
+        order_arr[order]->tail->next = new_tail;
         new_tail->size = size;
         new_tail->addr = i;
         new_tail->next = NULL;
