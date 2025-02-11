@@ -90,7 +90,7 @@ int init_alloc(void) {
 
 
     /* initialize each free stack */
-    addr = KERNEL_RESERVED;
+    addr = KERNEL_RESERVED_START;
     for (order = 0; order < MAX_ORDER; ++order) {
         block_size = (MIN_BLOCK << order);
         if (init_order_arr(order, block_size, addr) != 0) {
