@@ -23,7 +23,7 @@ QEMU_OPTS += -machine realview-pb-a8
 QEMU_OPTS += -no-reboot
 
 # Compilation Flags
-CFLAGS = -nostdlib -ffreestanding -Wall -Wextra -O2
+CFLAGS = -nostdlib -ffreestanding -Wall -Wextra -O0 -g
 LDFLAGS = -T kernel/linker.ld -nostdlib
 
 # Directories for kernel source and include
@@ -68,7 +68,7 @@ qemu-gdb: $(QEMU_KERN) $(FS_IMG)
 gdb-client:
 	@echo "*****Starting GDB Remote Debugger*****"
 	@echo "*** Enter 'target remote tcp::9000' in GDB ***"
-	$(CROSS_COMPILE)gdb $(QEMU_KERN)
+	gdb $(QEMU_KERN)
 
 # Clean up object files and other generated files
 clean:
