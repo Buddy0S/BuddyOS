@@ -50,7 +50,7 @@ set register function: -- DONE
 init clocks -- DONE
 - Marwan
     - MPU PLL 
-    - CORE PLL -- did not do this one
+    - CORE PLL 
     - PERIPHERAL PLL
     - DDR PLL
 - Alexei

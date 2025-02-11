@@ -2,6 +2,7 @@
 #include "reg.h"
 #include <stdint.h>
 
+#define CORE_FREQ 500
 #define MPU_FREQ 1000
 #define PER_FREQ 960
 #define DDR_FREQ 400
@@ -83,6 +84,31 @@ void set_divider(uint32_t divider, uint32_t set, uint32_t clear){
     WRITE32(divider,reg);
 }
 
+/* TI manual 8.1.6.7.1 */
+void CORE_PLL_INIT(){
+
+    /* Switch to bypass mode*/
+    pll_to_bypass(CM_CLKMODE_DPLL_CORE, CM_IDLEST_DPLL_CORE);
+
+    /* TI manual 8.1.6.7 for example frequencys and M2 value*/
+    /* it says locking freq is 2000 */
+    /* want working so i just kept trying values till one worked*/
+
+    /* Configure Multiply and divide */
+    set_clock_frequency(CM_CLKSEL_DPLL_CORE, CORE_FREQ, 23);
+
+    /* Set dividers */
+
+    /* Ratios for the dividers found in 8.1.6.7 Table 8-22*/
+    set_divider(CM_DIV_M4_DPLL_CORE,10,0x1F);
+
+    set_divider(CM_DIV_M5_DPLL_CORE,8,0x1F);
+
+    set_divider(CM_DIV_M6_DPLL_CORE,4,0x1F);
+
+    /* Lock PLL*/
+    pll_lock(CM_CLKMODE_DPLL_CORE, CM_IDLEST_DPLL_CORE);
+}
 
 /* TI manual 8.1.6.9.1 */
 void MPU_PLL_INIT(){
@@ -147,6 +173,7 @@ void DDR_PLL_INIT(){
 
 void initClocks(){
 
+    CORE_PLL_INIT();	
     MPU_PLL_INIT();
     PER_PLL_INIT();
     DDR_PLL_INIT();
