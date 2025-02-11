@@ -69,7 +69,9 @@ UART terminal functions -- IN PROGRESS
     - Noah
 - clear screen (maybe)
 - need to be able to print numbers and hex
-- create a kprintf that takes a format string 
+    - Noah
+- create a kprintf that takes a format string
+    - Noah 
   - take var args
   - format string
   - print numbers
