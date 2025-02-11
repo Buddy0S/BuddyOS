@@ -78,9 +78,13 @@ UART terminal functions -- IN PROGRESS
 
 setup mmc loading:
 - be able to load blocks / sectors from sd card
+- mmc init
+- mmc send command
+- mmc read block
 
-FAT load kernel:
+FAT load kernel or Load from raw:
 - load kernel.bin using FAT 12 filesystem to start of sdram
+- load kerenl.bin from raw img
 
 contex switch to kernel:
 - jump / hand execution to kernel
