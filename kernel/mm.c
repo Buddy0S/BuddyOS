@@ -6,6 +6,8 @@
 #define MIN_BLOCK 64
 #define MAX_BLOCK 1024
 #define BLOCK_NUM ((KERNEL_RESERVED / 2) / MAX_BLOCK)
+#define NULL ((void*)0)
+
 
 /* addresses that we will be placing our data at */
 const uint32_t order_arr_addr = KERNEL_RESERVED_START;
@@ -33,23 +35,6 @@ struct mem_list {
 }
 
 /*
- * helper function for buddy allocator:
- * finds the order of a value given an input
- */
-uint8_t find_order(size_t n) {
-    if (n == 0) return 0;       /* handles 0 case */
-    n--;            /* handles case where n is a power of 2 */
-    n |= n >> 1;    /* propagate the 1s  */ 
-    n |= n >> 2;
-    n |= n >> 4;
-    n |= n >> 8;
-    n |= n >> 16;
-    n++;    /* convert to power of 2 */
-
-    return (uint8_t)__builtin_ctz(n);    /* return the order */
-};
-
-/*
  * returns a mem_block node
  */
 struct mem_block *create_mem_block(void) {
@@ -59,55 +44,65 @@ struct mem_block *create_mem_block(void) {
 /*
  * helper function to initialize each linked list
  */
-void init_order_arr(int order, int size, uint32_t addr) {
+int init_order_arr(int order, int size, uint32_t addr) {
     struct mem_block *new_tail;
     uint32_t i, end;
     end = addr + (size * BLOCK_NUM);
 
-    order_arr[order]->head = create_mem_block();
+    /* initialize the list head and tail */
+    order_arr[order] = &list_structs[order];
+    
+    /* set the first list head and tail */
+    if (order_arr[order]->head = create_mem_block() == NULL) {
+        return -1;
+    }
     order_arr[order]->tail = order_arr[order]->head;
     order_arr[order]->tail->size = size;
     order_arr[order]->tail->addr = addr;
     order_arr[order]->tail->next = NULL;
     addr += size;
 
+    /* set the rest of the free blocks */
     i = addr;
     while (i < end) {
         new_tail = order_arr[order]->tail->next;
-        new_tail = create_mem_block();
+        if (new_tail = create_mem_block() == NULL) {
+            return -1;
+        }
         new_tail->size = size;
         new_tail->addr = i;
         new_tail->next = NULL;
         order_arr[order]->tail = new_tail;
         i += size;
-    }   
+    }
+    return 0;
 }
 
 /*
  * we will have an array where each element corresponds to an order, each order
  * then has a linked list of blocks belonging to that order
  */
-void init_alloc(void) {
-    int mem_end = KERNEL_RESERVED_START + KERNEL_RESERVED;
-    uint32_t order0 = KERNEL_RESERVED + 131072;
-    uint32_t order1 = order0 + 262144;
-    uint32_t order2 = order1 + 524288;
-    uint32_t order3 = order2 + 1048576;
-    uint32_t order4 = order3 + 2097152;
+int init_alloc(void) {
+    uint32_t order, addr, block_size;
+
 
     /* initialize each free stack */
-    for (int i = 0; i < MAX_ORDER; ++i) {
-        order_arr[i] = &list_structs[i];
-        order_arr[i]->head = NULL;
-        order_arr[i]->tail = NULL;
+    addr = KERNEL_RESERVED;
+    for (order = 0; order < MAX_ORDER; ++order) {
+        block_size = (MIN_BLOCK << order);
+        if (init_order_arr(order, block_size, addr) != 0) {
+            return -1;
+        }
+        addr += block_size * BLOCK_NUM;
     }
-
+    return 0;
 }
 
 
 
 
 void *kmalloc(size_t size) {
+    return NULL;
 }
 
 void kfree(void *) {
