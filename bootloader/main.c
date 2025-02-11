@@ -77,6 +77,7 @@ int main(void) {
 
     uart0_puts((char*)0x80000000);
 
+    uart0_test(); 
     while (1);
 }
 

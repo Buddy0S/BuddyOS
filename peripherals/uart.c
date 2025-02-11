@@ -78,7 +78,9 @@ void uart0_puts(const char* str) {
 }
 
 void uart0_putsln(const char* str) {
-    uart0_puts(str);
+    if (str) {
+    	uart0_puts(str);
+    }
     uart0_putch('\n');
 }
 
@@ -95,31 +97,39 @@ char uart0_getch() {
 }
 
 void uart0_test() {
-	uart0_putsln("Testing single char below: ");
+	uart0_putsln("Test 1: Testing single char below: ");
 	const char testSingleChar = 'N';
 	uart0_putch(testSingleChar);
+	uart0_putsln("");
 
-	uart0_putsln("Testing new line below: ");
+	uart0_putsln("Test 2: Testing new line below: ");
 	const char testNewLine = '\n';	
 	uart0_putch(testNewLine);
+	uart0_putsln("");
 	
-	uart0_putsln("Testing empty char");
+	uart0_putsln("Test 3: Testing empty char below: ");
 	const char testEmptyChar = '\0';
 	uart0_putch(testEmptyChar);
+	uart0_putsln("");
 
-	uart0_putsln("Testing empty string");
+	uart0_putsln("Test 4: Testing empty string below: ");
 	const char* testEmptyString = "";
 	uart0_putsln(testEmptyString);
+	uart0_putsln("");
 
-	uart0_putsln("Testing uart0_puts with manual \\n");
+	uart0_putsln("Test 5: Testing uart0_puts with manual \\n below: ");
 	const char* testManualNewLine = "New line\n";
 	uart0_puts(testManualNewLine);
 
-	uart0_putsln("Testing uart0_putsln");
+	uart0_putsln("Test 6: Testing uart0_putsln below: ");
 	const char* testAutoNewLine = "Buddy";
 	uart0_putsln(testAutoNewLine);
 
-	uart0_putsln("Test spaces");
+	uart0_putsln("Test 7: Testing spaces below: ");
 	const char* testSpaces = "We are so awesome";
 	uart0_putsln(testSpaces);
+
+	uart0_putsln ("Test 8: Testing null below: ");
+        const char* testNull = 0;
+	uart0_putsln(testNull);	
 }
