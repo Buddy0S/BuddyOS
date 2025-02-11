@@ -19,8 +19,13 @@ Memory management:
     - Kevin: 
         - Memory sections
         - allocate/deallocate
-        - BUDDY ALLOCATION FOR BUDDYOS???
-        - btw do not touch the mm.h and mm.c files or it will explode
+        - Slab allocator
+            - Currently has sizes of 64, 128, 256, 512, 1024 bytes each
+            - We can change this variably by adjusting the macros for:
+                - KERNEL_DYNAMIC (total dynamic memory for kernel)
+                - MIN_BLOCK (the smallest block)
+                - MAX_BLOCK (the largest block)
+                - All of these need to be powers of 2 for alignment and O(1)
 
 PCB:
 	- Abdullah:
@@ -30,3 +35,4 @@ PCB:
 		- Made a context switch function
 		- Made a load next context/PCB function
 		- Set the top of the stack to where QEMU loads from
+            - you need to look at mm.h and change it outside of reserved memory man
