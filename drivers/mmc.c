@@ -1,4 +1,6 @@
 #include "mmc.h"
+#include "reg.h"
+#include <stdint.h>
 
 /* check header file for TI manual sections on each register */
 
@@ -44,16 +46,33 @@ void pinmuxMMC(){
 
 }
 
+void softresetMMC(){
+
+    uint32_t reg;
+
+    reg = READ32(SD_SYSCONFIG);
+
+    /* set bit 1 to 1 for soft reset */
+    reg |= 0x2;
+
+    WRITE32(SD_SYSCONFIG, reg);
+
+    /* bit 0 set to 1 means reset is done */
+    while (!(READ32(SD_SYSSTATUS) & 0x1)) {}
+
+}
+
 /* TI manual 18.4.2 */
 void initMMC(){
 
     /* init clock */
-    InitMMCCLK();
+    initMMCCLK();
 
     /* pin muxing */
-    pinMUXMMC();
+    pinmuxMMC();
 
     /* software reset */
+    softresetMMC();
 
     /* set modules hardware capabilites */
 

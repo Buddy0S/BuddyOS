@@ -6,6 +6,7 @@
 #include "uart.h"
 #include "clock.h"
 #include "ddr.h"
+#include "mmc.h"
 
 void buddy(void) {
 
@@ -67,6 +68,8 @@ int main(void) {
     initTimer();
 
     enable_interrupts();
+
+    initMMC();
 
     //buddy();
 
