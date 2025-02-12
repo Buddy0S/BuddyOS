@@ -104,11 +104,46 @@ int init_alloc(void) {
     return 0;
 }
 
+uint8_t find_order(size_t n) {
+    if (n == 0) return 0;       /* handles 0 case */
+    n--;            /* handles case where n is a power of 2 */
+    n |= n >> 1;    /* propagate the 1s  */ 
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    n++;    /* convert to power of 2 */
 
+    return (uint8_t)__builtin_ctz(n);    /* return the order */
+};
 
+/* simple memset */
+void memset32(uint32_t addr, uint32_t value, size_t size) {
+    uint32_t *ptr = (uint32_t *)addr;
+    for (size_t i = 0; i < size / sizeof(uint32_t); i++) {
+        ptr[i] = value;
+    }
+}
 
 void *kmalloc(size_t size) {
-    return NULL;
+    uint8_t order;
+    uint32_t addr;
+    int block_size;
+    void *alloc_block;
+    order = find_order(size);
+    block_size = (MIN_BLOCK << order);
+    
+    alloc_block = order_arr[order]->head;
+    if (alloc_block == NULL) {
+        return NULL;
+    }
+    order_arr[order]->head = alloc_block->next;
+
+    addr = alloc_block->addr;
+
+    memset32(addr, 0, block_size);
+
+    return (void *)addr;
 }
 
 void kfree(void *) {
