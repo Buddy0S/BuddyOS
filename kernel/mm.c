@@ -12,13 +12,11 @@
 /* addresses that we will be placing our data at */
 const uint32_t order_arr_addr = KERNEL_RESERVED_START;
 const uint32_t list_struct_addr = order_arr_addr + ((sizeof(void *) * MAX_ORDER) + 1);
-const uint32_t blocks_struct_addr = list_struct_addr + ((sizeof(mem_list) * MAX_ORDER) + 1);
+static uint32_t blocks_struct_addr = KERNEL_DYNAMIC_START;
 
 /* we gotta allocate memory for the array of lists via raw memory reference */ 
 volatile struct mem_list **order_arr = (volatile struct mem_list **)order_arr_addr;
 volatile struct mem_list *list_structs = (volatile struct mem_list *)list_struct_addr;
-volatile struct mem_block *block_structs = (volatile struct mem_block *)blocks_struct_addr;
-static uint32_t block_struct_iterator = 0;
 
 /*
  * data structs to store memory blocks as a linked list
@@ -35,13 +33,16 @@ struct mem_list {
 };
 
 /*
- * returns a mem_block node
+ * returns a mem_block node.
+ *
+ * the node is stored in the starting bytes of the free node it is referencing.
+ * this way, when giving out this block, we can clear the node and use have
+ * no memory overhead.
  */
-struct mem_block *create_mem_block() {
-    if (block_struct_iterator > BLOCK_NUM * MAX_ORDER) {
-        return NULL;
-    }
-    return &block_structs[block_struct_iterator++];
+struct mem_block *create_mem_block(int order) {
+    volatile struct mem_block *block_structs = (volatile struct mem_block *)blocks_struct_addr;
+    blocks_struct_addr += (MIN_BLOCK << order);
+    return (struct mem_block *)block_structs;
 }
 
 /*
@@ -56,7 +57,7 @@ int init_order_arr(int order, int size, uint32_t addr) {
     order_arr[order] = &list_structs[order];
     
     /* set the first list head and tail */
-    order_arr[order]->head = create_mem_block();
+    order_arr[order]->head = create_mem_block(order);
     if (order_arr[order]->head == NULL) {
         return -1;
     }
@@ -69,7 +70,7 @@ int init_order_arr(int order, int size, uint32_t addr) {
     /* set the rest of the free blocks */
     i = addr;
     while (i < end) {
-        new_tail = create_mem_block();
+        new_tail = create_mem_block(order);
         if (new_tail == NULL) {
             return -1;
         }
