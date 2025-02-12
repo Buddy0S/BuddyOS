@@ -62,6 +62,25 @@ void softresetMMC(){
 
 }
 
+void sethardwareCAP(){
+
+    uint32_t reg;
+
+    reg = READ32(SD_CAPA);
+
+    /*
+     * need to set support for all voltages
+     * bits 24 25 26
+     *
+     * 111 = 0x7 need to shift it 24 
+     * */
+
+    reg |= (0x7 << 24);
+
+    WRITE32(SD_CAPA, reg);
+
+}
+
 /* TI manual 18.4.2 */
 void initMMC(){
 
@@ -75,6 +94,7 @@ void initMMC(){
     softresetMMC();
 
     /* set modules hardware capabilites */
+    sethardwareCAP();
 
     /* Set module idle and wake up modes */
 

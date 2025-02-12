@@ -31,6 +31,15 @@
 /* bit 0 when set to 1 means reset is done */
 #define SD_SYSSTATUS (MMC_BASE + 0x114)
 
+/* TI manual 18.5.1.23 */
+/* reading this section 
+ * the only thing we need to set is the voltages
+ * everything else is good at default
+ * need to set bits 24 25 26 to 1
+ * */
+#define SD_CAPA (MMC_BASE + 0x240)
+
+
 void initMMC();
 
 #endif
