@@ -25,6 +25,15 @@
 
 /* TI manual 18.5.1.1 */
 /* Set bit 1 to 1 for Soft reset */
+/* Wake up config 
+ *
+ * set bit 2 to enable wake up capability
+ *
+ * bit 4-3 set to 0x2
+ *
+ * bit  0 to 1 prob a good idea to set
+ *
+ * */
 #define SD_SYSCONFIG (MMC_BASE + 0x110)
 
 /* TI manual 18.5.1.2 */
@@ -38,6 +47,11 @@
  * need to set bits 24 25 26 to 1
  * */
 #define SD_CAPA (MMC_BASE + 0x240)
+
+/* TI manual 18.5.1.17 */
+/* gonna need to set bit 24 to enabled
+ * so that card wakes up on interrupt */
+#define SD_HCTL (MMC_BASE + 0x228)
 
 
 void initMMC();

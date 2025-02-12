@@ -81,6 +81,31 @@ void sethardwareCAP(){
 
 }
 
+void setwakeMMC(){
+
+    uint32_t reg;
+
+    reg = READ32(SD_SYSCONFIG);
+
+    /* set ENAWAKEUP bit */
+    reg |= (0x1 << 2);
+
+    /* set bit 4-3 to 0x2 */
+    reg |= (0x2 << 3);
+
+    /* set bit 0 to 1 */
+    reg |= 0x1;
+
+    WRITE32(SD_SYSCONFIG, reg);
+
+    reg = READ32(SD_HCTL);
+
+    /* set bit 24 to 1 to enable wake interrupt events*/
+    reg |= (0x1 << 24);
+
+    WRITE32(SD_HCTL, reg);
+}
+
 /* TI manual 18.4.2 */
 void initMMC(){
 
@@ -97,6 +122,7 @@ void initMMC(){
     sethardwareCAP();
 
     /* Set module idle and wake up modes */
+    setwakeMMC();
 
     /* MMC host and bus config TI manual 18.4.2.5*/
 
