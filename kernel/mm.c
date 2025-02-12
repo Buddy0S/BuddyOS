@@ -18,7 +18,7 @@ const uint32_t blocks_struct_addr = list_struct_addr + ((sizeof(mem_list) * MAX_
 volatile struct mem_list **order_arr = (volatile struct mem_list **)order_arr_addr;
 volatile struct mem_list *list_structs = (volatile struct mem_list *)list_struct_addr;
 volatile struct mem_block *block_structs = (volatile struct mem_block *)blocks_struct_addr;
-uint32_t block_struct_iterator = 0;
+static uint32_t block_struct_iterator = 0;
 
 /*
  * data structs to store memory blocks as a linked list
@@ -37,8 +37,10 @@ struct mem_list {
 /*
  * returns a mem_block node
  */
-struct mem_block *create_mem_block(void) {
-    if (block_struct_iterator > BLOCK_NUM * MAX_ORDER);
+struct mem_block *create_mem_block() {
+    if (block_struct_iterator > BLOCK_NUM * MAX_ORDER) {
+        return NULL;
+    }
     return &block_structs[block_struct_iterator++];
 }
 
