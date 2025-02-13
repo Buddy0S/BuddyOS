@@ -37,6 +37,12 @@ void uart0_init(void);
 void uart0_putch(char c);
 void uart0_puts(const char* str);
 void uart0_putsln(const char* str);
+char* itohex(uint32_t number, char* str);
+void reverse(char* str);
+char* itoa(int num, char* str);
+void uart0_printHex(uint32_t number);
+void uart0_printf(const char* str, ...);
+char uart0_getch();
 void uart0_test();
 
 #endif

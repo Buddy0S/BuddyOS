@@ -1,6 +1,7 @@
 #ifndef ARGS_H
 #define ARGS_H
 
+#define BASE10 10
 //represents our lists of arguments
 typedef char* va_list;
 

@@ -99,12 +99,6 @@ char* itohex(uint32_t number, char* str) {
 	return str;
 }
 
-/*char* itoa(int num, char* str) {
-	if (num == 0) {
-		
-	}
-}*/
-
 void uart0_printHex(uint32_t number) {
 	int bitShift;
 	char hexValues[] = "0123456789ABCDEF";
@@ -113,6 +107,75 @@ void uart0_printHex(uint32_t number) {
 	for (bitShift = 28; bitShift >= 0; bitShift -=4) {
 		uart0_putch(hexValues[(number >> bitShift) & 0xF]);
 	}
+}
+
+void reverse(char* str) {
+	int i, j;
+	char c;
+
+	for (i = 0, j = sizeof(str)-2; i<j; i++, j--) {
+		c = str[i];
+		str[i] = str[j];
+		str[j] = c;	
+	} 
+}	
+
+char* itoa(int num, char* str) {
+	int i = 0;
+	int isNegative = 0;
+
+	if (num == 0) {
+		str[i++] = '0';
+		str[i] = '\0';
+		return str;	
+	}
+
+	if (num < 0) {
+		isNegative = 1;
+		num = -num;
+	}
+
+	while (num != 0) {
+		int remainder = num % BASE10;
+		str[i++] = num % BASE10 + '0';
+		num /= BASE10;	
+	}	
+
+	if (isNegative) {
+		str[i++] = '-';
+	}
+
+	str[i] = '\0';
+	
+	reverse(str);
+
+	return str;
+}
+
+void uart0_printitoa(int num) {
+	int isNegative = 0;
+
+	if (num == 0) {
+		uart0_putch('0');
+		uart0_putch('\0');
+		return;	
+	}
+
+	if (num < 0) {
+		isNegative = 1;
+		num = -num;
+	}
+
+	if (isNegative) {
+		uart0_putch('-');
+	}
+
+	while (num != 0) {
+		int remainder = num % BASE10;
+		uart0_putch(num % BASE10 + '0');
+		num /= BASE10;	
+	}
+	return;	
 }
 
 void uart0_printf(const char* str, ...) {
@@ -130,8 +193,7 @@ void uart0_printf(const char* str, ...) {
 				}
 				case 'd': {
 					int formattedInt = va_args(args, int);
-					uart0_putsln("In progress");
-					//itoa
+					uart0_printitoa(formattedInt);
 					break;
 				}
 				case 'f': {
