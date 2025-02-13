@@ -248,11 +248,11 @@ void initsequence(){
     /* wait for comand to finish need to wait 1ms */
     /* low key one cycle of the buddy function might be enough*/
 
-    uart0_putsln("PLEASE WORK");
+    uart0_putsln("TESTING");
 
     buddy();
 
-    uart0_putsln("PLEASE WORK");
+    uart0_putsln("TESTING");
  
     //while(!(READ32(SD_STAT) & 0x1)){}
 
@@ -260,7 +260,7 @@ void initsequence(){
 
     WRITE32(SD_STAT, (READ32(SD_STAT) | 0x1) );
 
-    uart0_putsln("WHY ARE YOU BREAKING NOW");
+    uart0_putsln("TESTING");
 
     /* end init sequence */
     reg = READ32(SD_CON);
