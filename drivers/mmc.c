@@ -159,6 +159,43 @@ void mmcCONFIG(){
 
 }
 
+void configMMCCLK(){
+
+    uint32_t reg;
+
+    /* enable internal clock */
+    /* set bit 0 to 1 */
+    reg =  READ32(SD_SYSCTL);
+    
+    reg |= 0x1;
+
+    WRITE32(SD_SYSCTL, reg);
+
+    /*set init clock frequnecy */
+    /* 96Mhz / 512 */
+
+    /* clear existing bits */
+    reg = READ32(SD_SYSCTL);
+
+    reg &= ~(0x3FF << 6);
+
+    /* set divisor to 512 */
+    reg |= (0x240 << 6);
+
+    WRITE32(SD_SYSCTL, reg);
+
+    /* enable external clock */
+    reg = READ32(SD_SYSCTL);
+
+    reg |= (0x2 << 2);
+
+    WRITE32(SD_SYSCTL, reg);
+
+    /* wait for clock to stablize */
+    while (!(READ32(SD_SYSCTL) & 0x2)){}
+
+}
+
 /* TI manual 18.4.2 */
 void initMMC(){
 
@@ -177,9 +214,15 @@ void initMMC(){
     /* Set module idle and wake up modes */
     setwakeMMC();
 
-    /* TI manual 18.4.2.6 */
+    /* TI manual 18.4.2.5 */
 
     /* MMC host and bus config */
     mmcCONFIG();
 
+    /* config internal clock for init sequence */
+    configMMCCLK();
+
+    /* Enable all interrupts im not sure if we even have to do this
+     * but will do it incase we want to use interrupts*/
+    WRITE32(SD_IE, 0xFFFFFFFF);
 }

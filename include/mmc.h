@@ -71,6 +71,27 @@
  * */
 #define SD_CON (MMC_BASE + 0x12C)
 
+/* TI manual 18.5.1.18 */
+/*
+ * Enable internal clock set bit 0 to 1
+ * set the clock frequency bit 15-6
+ *  - clear it 
+ *  - need it to be less then = to 80kHz
+ *  - so its refrence clock / value in bit 15-6
+ *  - refrence clock = 96Mhz
+ *  - we want it to be slow but not super slow for init sequence
+ *  - max is 1024 so lets use 512
+ *
+ * enable external clock by seting bit 2 to  1
+ *
+ *
+ * */
+#define SD_SYSCTL (MMC_BASE + 0x22C)
+
+/* TI manual 18.5.1.20 */
+/* Just gonna enable all interrupts */
+#define SD_IE (MMC_BASE + 0x234)
+
 void initMMC();
 
 #endif
