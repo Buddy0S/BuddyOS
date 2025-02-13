@@ -106,6 +106,59 @@ void setwakeMMC(){
     WRITE32(SD_HCTL, reg);
 }
 
+void mmcCONFIG(){
+
+    uint32_t reg;	
+	
+    /* set bits 5 DW8 and 12 CEATA to 0 in SD_CON */
+    
+    reg = READ32(SD_CON);
+
+    reg &= ~(0x1 << 5);
+    reg &= ~(0x1 << 12);
+
+    WRITE32(SD_CON, reg);
+
+    /* config sd bus */
+
+    /* power off sd bus while config*/
+    /* set bit 8  to 0*/
+    reg = READ32(SD_HCTL);
+
+    reg &= ~(0x1 << 8);
+
+    WRITE32(SD_HCTL,reg);
+
+    /* Select voltage 3.3v */
+    /* set bit  11-9 to 0x7 */
+    reg = READ32(SD_HCTL);
+
+    reg |= (0x7 << 9);
+
+    WRITE32(SD_HCTL, reg);
+
+    /* Set data transfer width to 1 bit */
+    /* set bit 1 to 0 */
+    reg = READ32(SD_HCTL);
+
+    reg &= ~(0x1 << 1);
+
+    WRITE32(SD_HCTL, reg);
+
+    /* Power on sd bus*/
+    /* set bit 8 to 1 */
+    reg = READ32(SD_HCTL);
+
+    reg |= (0x1 << 8);
+
+    WRITE32(SD_HCTL, reg);
+
+    /* wait for it to power on */
+    while (!(READ32(SD_HCTL) & (0x1 << 8))){}
+
+
+}
+
 /* TI manual 18.4.2 */
 void initMMC(){
 
@@ -124,6 +177,9 @@ void initMMC(){
     /* Set module idle and wake up modes */
     setwakeMMC();
 
-    /* MMC host and bus config TI manual 18.4.2.5*/
+    /* TI manual 18.4.2.6 */
+
+    /* MMC host and bus config */
+    mmcCONFIG();
 
 }
