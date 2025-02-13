@@ -1,7 +1,9 @@
 #include "mmc.h"
 #include "reg.h"
 #include <stdint.h>
+#include "uart.h"
 
+extern void buddy();
 /* check header file for TI manual sections on each register */
 
 void initMMCCLK(){
@@ -96,6 +98,8 @@ void setwakeMMC(){
     /* set bit 0 to 1 */
     reg |= 0x1;
 
+    reg |= (0x2 << 12);
+
     WRITE32(SD_SYSCONFIG, reg);
 
     reg = READ32(SD_HCTL);
@@ -115,7 +119,7 @@ void mmcCONFIG(){
     reg = READ32(SD_CON);
 
     reg &= ~(0x1 << 5);
-    reg &= ~(0x1 << 12);
+    //reg &= ~(0x1 << 12);
 
     WRITE32(SD_CON, reg);
 
@@ -133,7 +137,7 @@ void mmcCONFIG(){
     /* set bit  11-9 to 0x7 */
     reg = READ32(SD_HCTL);
 
-    reg |= (0x7 << 9);
+    reg |= (0x6 << 9);
 
     WRITE32(SD_HCTL, reg);
 
@@ -187,7 +191,7 @@ void configMMCCLK(){
     /* enable external clock */
     reg = READ32(SD_SYSCTL);
 
-    reg |= (0x2 << 2);
+    reg |= (0x1 << 2);
 
     WRITE32(SD_SYSCTL, reg);
 
@@ -224,5 +228,63 @@ void initMMC(){
 
     /* Enable all interrupts im not sure if we even have to do this
      * but will do it incase we want to use interrupts*/
-    WRITE32(SD_IE, 0xFFFFFFFF);
+    //WRITE32(SD_IE, 0xFFFFFFFF);
 }
+
+void initsequence(){
+
+    uint32_t reg;
+
+    /* set init bit to 1, bit 1 */
+    reg = READ32(SD_CON);
+
+    reg |= (0x1 << 1);
+
+    WRITE32(SD_CON, reg);
+
+    /* write to SD_CMD register */
+    WRITE32(SD_CMD, 0x00000000);
+
+    /* wait for comand to finish need to wait 1ms */
+    /* low key one cycle of the buddy function might be enough*/
+
+    uart0_putsln("PLEASE WORK");
+
+    buddy();
+
+    uart0_putsln("PLEASE WORK");
+ 
+    //while(!(READ32(SD_STAT) & 0x1)){}
+
+    /* clear sd status */
+
+    WRITE32(SD_STAT, (READ32(SD_STAT) | 0x1) );
+
+    uart0_putsln("WHY ARE YOU BREAKING NOW");
+
+    /* end init sequence */
+    reg = READ32(SD_CON);
+
+    reg &= ~(0x1 << 1);
+
+    WRITE32(SD_CON, reg);
+
+    uart0_putsln("EXPLAIN PLEASE");
+
+    WRITE32(SD_STAT,0xFFFFFFFF);
+}
+
+/* TI manual 18.4.3.2 */
+int detectSDcard(){
+
+    /* complete init sequence */
+    initsequence();
+
+    /* change clock frequency to fit protocol */
+
+    /* detect return 0 if no card is detected */
+    if(!(READ32(SD_PSTATE) & (0x1 << 16))) return 0;
+
+    return 1;
+}
+

@@ -13,43 +13,35 @@ void buddy(void) {
     volatile int i;
     volatile int T = 500000;
 
-    while(1){
+    for (i = 0; i < T; i++);
 
-        LEDon(LED0);
-        //uart0_putch('T');
+    LEDon(LED1);
 
-       /* for (i = 0; i < T; i++);
+    for (i = 0; i < T; i++);
 
-        LEDon(LED1);
+    LEDon(LED2);
 
-        for (i = 0; i < T; i++);
+    for (i = 0; i < T; i++);
 
-        LEDon(LED2);
+    LEDon(LED3);
 
-        for (i = 0; i < T; i++);
+    for (i = 0; i < T; i++);
 
-        LEDon(LED3);
+    LEDoff(LED0);
 
-        for (i = 0; i < T; i++);
+    for (i = 0; i < T; i++);
 
-        LEDoff(LED0);
+    LEDoff(LED1);
 
-        for (i = 0; i < T; i++);
+    for (i = 0; i < T; i++);
 
-        LEDoff(LED1);
+    LEDoff(LED2);
 
-        for (i = 0; i < T; i++);
+    for (i = 0; i < T; i++);
 
-        LEDoff(LED2);
+    LEDoff(LED3);
 
-        for (i = 0; i < T; i++);
-
-        LEDoff(LED3);
-
-        for (i = 0; i < T; i++);
-
-	*/
-    }
+    for (i = 0; i < T; i++);
 
 }
 
@@ -70,6 +62,10 @@ int main(void) {
     enable_interrupts();
 
     initMMC();
+
+    int sd_card = detectSDcard();
+
+    if (sd_card) uart0_putsln("SD card Detected");
 
     //buddy();
 

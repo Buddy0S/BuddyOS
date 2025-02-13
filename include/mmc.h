@@ -80,7 +80,9 @@
  *  - so its refrence clock / value in bit 15-6
  *  - refrence clock = 96Mhz
  *  - we want it to be slow but not super slow for init sequence
- *  - max is 1024 so lets use 512
+ *  - max divisor is 1023 which gives us a freq of 93khz
+ *  - bro how do we get down to 80khz when the max divisor is 1023
+ *  - im just gonna start at 0x200 and go up until it works
  *
  * enable external clock by seting bit 2 to  1
  *
@@ -92,6 +94,25 @@
 /* Just gonna enable all interrupts */
 #define SD_IE (MMC_BASE + 0x234)
 
+/* TI manual 18.5.1.10 */
+/* this register is kinda crazy, conrtols what commands we send 
+ * to the sd card */
+#define SD_CMD (MMC_BASE + 0x20C)
+
+/* TI manual 18.5.1.19 */
+/* can use this to check status of interrupts */
+/* bit 0 can be read to check if a command has completed 
+ * set to 1 if cmd has been completed
+ * */
+#define SD_STAT (MMC_BASE + 0x230)
+
+/* TI manual 18.5.1.16 */
+/* can use to get status of host controller 
+ * bit 16 CINS can be read to see if card is inserted
+ * */
+#define SD_PSTATE (MMC_BASE + 0x224)
+
 void initMMC();
+int detectSDcard();
 
 #endif
