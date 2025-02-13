@@ -1,5 +1,6 @@
 #include "led.h"
 #include <stdint.h>
+#include "args.h"
 #include "uart.h"
 #include "reg.h"
 
@@ -66,7 +67,6 @@ void uart0_putch(char c) {
     while((READ8(UART0_BASE + UART_LSR) & 0x20) != 0x20);
 
     WRITE8(UART0_BASE + 0x0, c);
-
 }
 
 void uart0_puts(const char* str) {
@@ -74,14 +74,109 @@ void uart0_puts(const char* str) {
          uart0_putch(*str);
 	 str++;
     }
-    uart0_putch('\r');
 }
 
 void uart0_putsln(const char* str) {
     if (str) {
     	uart0_puts(str);
     }
-    uart0_putch('\n');
+    uart0_puts("\r\n");
+}
+
+char* itohex(uint32_t number, char* str) {
+	int bitShift;
+	
+	int i = 0;
+	char hexValues[] = "0123456789ABCDEF";
+	str[i++] = '0';
+	str[i++] = 'x';
+
+	for (bitShift = 28; bitShift >= 0; bitShift -=4) {
+		str[i++] = hexValues[(number >> bitShift) & 0xF];
+	}
+
+	str[i] = '\0';
+	return str;
+}
+
+/*char* itoa(int num, char* str) {
+	if (num == 0) {
+		
+	}
+}*/
+
+void uart0_printHex(uint32_t number) {
+	int bitShift;
+	char hexValues[] = "0123456789ABCDEF";
+	uart0_puts("0x");
+	
+	for (bitShift = 28; bitShift >= 0; bitShift -=4) {
+		uart0_putch(hexValues[(number >> bitShift) & 0xF]);
+	}
+}
+
+void uart0_printf(const char* str, ...) {
+	va_list args;
+	va_start(args, str);
+
+	while (*str != 0) {
+		if (*str == '%') {
+			str++;
+			switch(*str) {
+				case 'c': {
+					char formattedChar = va_args(args, char);
+					uart0_putch(formattedChar);
+					break;
+				}
+				case 'd': {
+					int formattedInt = va_args(args, int);
+					uart0_putsln("In progress");
+					//itoa
+					break;
+				}
+				case 'f': {
+					double formattedDouble = va_args(args, double);
+					//floatfunc
+					break;
+				}
+				case 'p': {
+					void* formattedPtr = va_args(args, void *);
+					uart0_printHex((uint32_t)formattedPtr);
+					break;
+				}
+				case 's': {
+					const char* formattedString = va_args(args, char*);
+					/*if (formattedString) {
+						uart0_puts("WORK\0");
+					} else {
+						uart0_puts("FAIL\0");
+					}*/
+					uart0_puts(formattedString);
+					break;
+				}
+				case 'x': {
+					uint32_t formattedHex = va_args(args, uint32_t);
+					uart0_printHex(formattedHex);
+					break;
+				}
+				case '%': {
+					uart0_putch('%');
+					break;
+				}
+				default: {
+					uart0_putch('?');
+					break;
+				}
+			}
+		} else if (*str == '\n') {
+			uart0_putch(*str);
+			uart0_putch('\r');	
+		} else {
+			uart0_putch(*str);
+		}
+		str++;
+	}
+	va_end(args);
 }
 
 /* NOT QUITE WORKING - Might have something to do with polling instead of
@@ -129,7 +224,15 @@ void uart0_test() {
 	const char* testSpaces = "We are so awesome";
 	uart0_putsln(testSpaces);
 
-	uart0_putsln ("Test 8: Testing null below: ");
+	uart0_putsln("Test 8: Testing null below: ");
         const char* testNull = 0;
-	uart0_putsln(testNull);	
+	uart0_putsln(testNull);
+
+	uart0_putsln("Test 9: Testing printf format specifiers below: ");
+	const char testChar = 'B';
+	int testInt = 42;
+	const char* testString = "Nuts";
+	uint32_t testHex = 3735928559;
+	uart0_printf("Expected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual testHex = %x\nExpected testChar = B, Actual testChar = %c\n", testString, testHex, testChar);
+	//uart0_printf("Expected testChar = B, Actual testChar = %c\nExpected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual = testHex = %x\n", testChar, testString, testHex); 
 }

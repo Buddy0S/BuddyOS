@@ -36,7 +36,7 @@ $(BUILD_DIR)drivers.o : drivers/mmc.c | $(BUILD_DIR)
 $(BUILD_DIR)led.o : peripherals/led.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) peripherals/led.c -o $@
 
-$(BUILD_DIR)uart.o :peripherals/uart.c $(INCLUDE)memory_map.h $(INCLUDE)uart.h | $(BUILD_DIR)
+$(BUILD_DIR)uart.o :peripherals/uart.c $(INCLUDE)memory_map.h $(INCLUDE)uart.h $(INCLUDE)args.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) peripherals/uart.c -o $@
 
 $(BUILD_DIR)clock.o :boardinit/clock.c $(INCLUDE)clock.h | $(BUILD_DIR)
