@@ -46,7 +46,7 @@ void buddy(void) {
 }
 
 int main(void) { 
-
+	
     initClocks();
 
     init_interrupts();
@@ -57,6 +57,7 @@ int main(void) {
 
     uart0_init();
 
+    uart0_printf("INITING\n");
     initTimer();
 
     enable_interrupts();
@@ -68,6 +69,8 @@ int main(void) {
     if (sd_card) uart0_putsln("SD card Detected");
 
     //buddy();
+    
+    //idCard();
 
     const char* test = "testing!";
     const char* initializeMsg = "BuddyOS...initialized...";

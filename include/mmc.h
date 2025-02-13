@@ -96,7 +96,15 @@
 
 /* TI manual 18.5.1.10 */
 /* this register is kinda crazy, conrtols what commands we send 
- * to the sd card */
+ * to the sd card 
+ *
+ * bit 29-24 command 
+ *
+ * bit 17-16 response type
+ *
+ * first 6 bits are for flags
+ *
+ * */
 #define SD_CMD (MMC_BASE + 0x20C)
 
 /* TI manual 18.5.1.19 */
@@ -112,7 +120,12 @@
  * */
 #define SD_PSTATE (MMC_BASE + 0x224)
 
+/* TI manual 18.5.1.9 */
+/* uses all 32 bits for argument for sd command */
+#define SD_ARG (MMC_BASE + 0x206)
+
 void initMMC();
 int detectSDcard();
+void idCard();
 
 #endif

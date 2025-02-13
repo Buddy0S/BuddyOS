@@ -228,7 +228,7 @@ void initMMC(){
 
     /* Enable all interrupts im not sure if we even have to do this
      * but will do it incase we want to use interrupts*/
-    //WRITE32(SD_IE, 0xFFFFFFFF);
+    WRITE32(SD_IE, 0xFFFFFFFF);
 }
 
 void initsequence(){
@@ -248,19 +248,19 @@ void initsequence(){
     /* wait for comand to finish need to wait 1ms */
     /* low key one cycle of the buddy function might be enough*/
 
-    uart0_putsln("TESTING");
+    //uart0_putsln("TESTING");
 
     buddy();
 
-    uart0_putsln("TESTING");
+    //uart0_putsln("TESTING");
  
-    //while(!(READ32(SD_STAT) & 0x1)){}
+    while(!(READ32(SD_STAT) & 0x1)){}
 
     /* clear sd status */
 
     WRITE32(SD_STAT, (READ32(SD_STAT) | 0x1) );
 
-    uart0_putsln("TESTING");
+    //uart0_putsln("TESTING");
 
     /* end init sequence */
     reg = READ32(SD_CON);
@@ -269,7 +269,7 @@ void initsequence(){
 
     WRITE32(SD_CON, reg);
 
-    uart0_putsln("EXPLAIN PLEASE");
+    //`uart0_putsln("EXPLAIN PLEASE");
 
     WRITE32(SD_STAT,0xFFFFFFFF);
 }
@@ -286,5 +286,35 @@ int detectSDcard(){
     if(!(READ32(SD_PSTATE) & (0x1 << 16))) return 0;
 
     return 1;
+}
+
+void mmcCMD(uint8_t cmd, uint8_t response, uint32_t arg, uint8_t flags){
+
+    uint32_t reg;
+
+    /* set arg */	
+    WRITE32(SD_ARG,arg);
+
+    /* run command */
+    reg = READ32(SD_CMD);
+
+    reg |= (cmd << 24);
+
+    reg |= (response << 16);
+
+    reg |= flags;
+
+    WRITE32(SD_CMD,reg);
+
+    /* wait for command to finish*/
+    while (!(READ32(SD_STAT) & 0x1)){}
+
+}
+
+void idCard(){
+
+    /* send cmd 0 */	
+    mmcCMD(0,0,0,0);
+
 }
 
