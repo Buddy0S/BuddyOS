@@ -124,7 +124,7 @@ void uart0_printf(const char* str, ...) {
 			str++;
 			switch(*str) {
 				case 'c': {
-					char formattedChar = va_args(args, char);
+					char formattedChar = (char) va_args(args, int);
 					uart0_putch(formattedChar);
 					break;
 				}
@@ -233,6 +233,7 @@ void uart0_test() {
 	int testInt = 42;
 	const char* testString = "Nuts";
 	uint32_t testHex = 3735928559;
-	uart0_printf("Expected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual testHex = %x\nExpected testChar = B, Actual testChar = %c\n", testString, testHex, testChar);
+	uint32_t testHex2 = 15;
+	uart0_printf("Expected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual testHex = %x\nExpected testChar = B, Actual testChar = %c\nExpected testHex2 = 0x0000000F, Actual testHex2 = %x\n", testString, testHex, testChar, testHex2);
 	//uart0_printf("Expected testChar = B, Actual testChar = %c\nExpected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual = testHex = %x\n", testChar, testString, testHex); 
 }
