@@ -9,3 +9,11 @@ void bmemcpy(void *dest, const void *const src, unsigned long len) {
     }
 
 }
+
+void bmemset(void *dest, uint32_t T, unsigned long len) {
+
+    for (int i = 0; i < len; ++i) {
+        WRITE32((uint32_t)dest + i, T);
+    }
+
+}

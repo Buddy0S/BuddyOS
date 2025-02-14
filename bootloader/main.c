@@ -67,6 +67,8 @@ int main(void) {
     uint32_t bufW[128];
     uint32_t bufR[128];
 
+    //bmemset(bufW,7,128);
+
     bufW[1] = 7;
 
     uart0_printf("writing to block 1 \n");
@@ -75,7 +77,7 @@ int main(void) {
 
     uart0_printf("reading form block 1 \n");
 
-    //MMCreadblock(1,bufR);
+    MMCreadblock(1,bufR);
 
     uart0_printf("checking %d\n",bufR[1]);
 
