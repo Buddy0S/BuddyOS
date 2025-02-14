@@ -1,6 +1,8 @@
 #ifndef MMC_H
 #define MMC_H
 
+#include <stdint.h>
+
 #define CONTROL_MODULE 0x44E10000
 #define CM_PER_BASE 0x44E00000
 #define MMC_BASE 0x48060000
@@ -129,6 +131,15 @@
  * */
 #define SD_RSP10 (MMC_BASE + 0x210)
 
+/* TI manual 18.5.1.15 */
+#define SD_DATA (MMC_BASE + 0x220)
+
+/* TI manual 18.5.1.8 */
+/* sets block size for read and write */
+#define SD_BLK (MMC_BASE + 0x204)
+
 void initMMCdriver();
+void MMCwriteblock(uint32_t block, uint32_t* buf);
+void MMCreadblock(uint32_t block, uint32_t* buf);
 
 #endif

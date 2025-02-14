@@ -469,3 +469,68 @@ void initMMCdriver(){
     selectSD();
 
 }
+
+void MMCwriteblock(uint32_t block, uint32_t* buf){
+
+    int i;
+
+    /* set block size to 512*/
+    WRITE32(SD_BLK, 0x200);
+
+    /* Write CMD*/
+    mmcCMD(24,2,block,(0x1 << 20) | (0x1 << 19) | (0x1 << 21) );
+
+    /* Wait for write to complete */
+    uart0_printf("write cmd sent\n");
+
+    while(1){
+    
+        if (READ32(SD_PSTATE) & (0x1 << 10)){
+
+	   //uart0_printf("TESTING\n");	
+	   for (i = 0; i < (512/4); i++){
+	        WRITE32(SD_DATA,*buf);
+		buf++;
+	    }
+	}
+	if (READ32(SD_STAT) & (0x1 << 1)) {
+	
+	  WRITE32(SD_STAT,READ32(SD_STAT) | (0x1 << 4) | (0x1 << 1));
+	  break;
+	}
+    
+    }
+
+}
+
+void MMCreadblock(uint32_t block, uint32_t* buf){
+
+    int i;
+
+    /* set block size to 512*/
+    WRITE32(SD_BLK, 0x200);
+
+    /* read CMD*/
+    mmcCMD(17,2,block, (0x1 << 21) | (0x1 << 4) );
+
+    /* Wait for read to complete */
+
+    while(1){
+
+        if (READ32(SD_STAT) & (0x1 << 5)){
+
+           for (i = 0; i < (512/4); i++){
+                *buf = READ32(SD_DATA);
+                buf++;
+            }
+        }
+        if (READ32(SD_STAT) & (0x1 << 1)) {
+
+          WRITE32(SD_STAT,READ32(SD_STAT) | (0x1 << 5) | (0x1 << 1));
+          break;
+        }
+
+    }
+
+}
+

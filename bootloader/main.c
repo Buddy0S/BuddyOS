@@ -64,6 +64,21 @@ int main(void) {
 
     initMMCdriver();
 
+    uint32_t bufW[128];
+    uint32_t bufR[128];
+
+    bufW[1] = 7;
+
+    uart0_printf("writing to block 1 \n");
+
+    MMCwriteblock(1,bufW);
+
+    uart0_printf("reading form block 1 \n");
+
+    //MMCreadblock(1,bufR);
+
+    uart0_printf("checking %d\n",bufR[1]);
+
     const char* test = "testing!";
     const char* initializeMsg = "BuddyOS...initialized...";
 
