@@ -70,7 +70,7 @@ int main(void) {
 
     //buddy();
     
-    //idCard();
+    idCard();
 
     const char* test = "testing!";
     const char* initializeMsg = "BuddyOS...initialized...";

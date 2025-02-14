@@ -122,7 +122,7 @@
 
 /* TI manual 18.5.1.9 */
 /* uses all 32 bits for argument for sd command */
-#define SD_ARG (MMC_BASE + 0x206)
+#define SD_ARG (MMC_BASE + 0x208)
 
 void initMMC();
 int detectSDcard();

@@ -137,7 +137,7 @@ void mmcCONFIG(){
     /* set bit  11-9 to 0x7 */
     reg = READ32(SD_HCTL);
 
-    reg |= (0x6 << 9);
+    reg |= (0x7 << 9);
 
     WRITE32(SD_HCTL, reg);
 
@@ -288,7 +288,7 @@ int detectSDcard(){
     return 1;
 }
 
-void mmcCMD(uint8_t cmd, uint8_t response, uint32_t arg, uint8_t flags){
+void mmcCMD(uint32_t cmd, uint32_t response, uint32_t arg, uint32_t flags){
 
     uint32_t reg;
 
@@ -296,7 +296,7 @@ void mmcCMD(uint8_t cmd, uint8_t response, uint32_t arg, uint8_t flags){
     WRITE32(SD_ARG,arg);
 
     /* run command */
-    reg = READ32(SD_CMD);
+    reg = 0x00000000;
 
     reg |= (cmd << 24);
 
@@ -307,14 +307,14 @@ void mmcCMD(uint8_t cmd, uint8_t response, uint32_t arg, uint8_t flags){
     WRITE32(SD_CMD,reg);
 
     /* wait for command to finish*/
-    while (!(READ32(SD_STAT) & 0x1)){}
+    while (!(READ32(SD_STAT))){}
 
 }
 
 void idCard(){
 
     /* send cmd 0 */	
-    mmcCMD(0,0,0,0);
+    mmcCMD(0x00,0x00,0x00,0x00);
 
 }
 
