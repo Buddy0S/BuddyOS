@@ -423,3 +423,33 @@ void poweronSD(){
     uart0_printf("SD card powered on \n");
 
 }
+
+/* TI manual 18.4.3.2 after node B*/
+void selectSD(){
+
+    uint32_t sd_addr;
+
+    /* we need to find the addr of the sd card and select it as the one we are using*/
+
+    /* send cmd 2 */
+
+    mmcCMD(2,1,0,0);
+
+    /* send cmd 3 */
+    mmcCMD(3,3,0,0);
+
+    /* read addr from response */
+
+    sd_addr = READ32(SD_RSP10) >> 16;
+
+    /* send cmd 9 */
+    mmcCMD(9,1,(sd_addr << 16),0);
+
+    /* send cmd 7 */
+    mmcCMD(7,3,(sd_addr << 16),0);
+
+    uart0_printf("SD card selected at %x \n",sd_addr);
+
+}
+
+

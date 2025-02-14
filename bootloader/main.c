@@ -76,6 +76,8 @@ int main(void) {
 
     poweronSD();
 
+    selectSD();
+
     const char* test = "testing!";
     const char* initializeMsg = "BuddyOS...initialized...";
 
