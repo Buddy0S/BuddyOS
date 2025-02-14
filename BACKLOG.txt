@@ -60,6 +60,14 @@ init sdram -- DONE
 - Alexei
     - sdram starts at 0x80000000
 
+
+setup mmc loading:
+- Marwan 
+  - mmc init
+  - mmc send command
+  - mmc read block
+  - mmc write block
+
 # TODO
 
 UART terminal functions -- IN PROGRESS
@@ -77,12 +85,6 @@ UART terminal functions -- IN PROGRESS
   - print numbers
   - print hex
   - print newline
-
-setup mmc loading:
-- be able to load blocks / sectors from sd card
-- mmc init
-- mmc send command
-- mmc read block
 
 FAT load kernel or Load from raw:
 - load kernel.bin using FAT 12 filesystem to start of sdram

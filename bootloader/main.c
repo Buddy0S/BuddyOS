@@ -67,6 +67,7 @@ int main(void) {
     uint32_t bufW[128];
     uint32_t bufR[128];
 
+    //mem set is broken will cause program to stall, TODO
     //bmemset(bufW,7,128);
 
     bufW[1] = 7;

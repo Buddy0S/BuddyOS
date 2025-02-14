@@ -470,6 +470,8 @@ void initMMCdriver(){
 
 }
 
+
+/* what block to write using LBA and a 512 byte buffer*/
 void MMCwriteblock(uint32_t block, uint32_t* buf){
 
     int i;
@@ -481,7 +483,7 @@ void MMCwriteblock(uint32_t block, uint32_t* buf){
     mmcCMD(24,2,block,(0x1 << 20) | (0x1 << 19) | (0x1 << 21) );
 
     /* Wait for write to complete */
-    uart0_printf("write cmd sent\n");
+    uart0_printf(""); // dont remove this it will break something
 
     while(1){
     
@@ -503,6 +505,7 @@ void MMCwriteblock(uint32_t block, uint32_t* buf){
 
 }
 
+/* what block to read from and a 512 byte buffer*/
 void MMCreadblock(uint32_t block, uint32_t* buf){
 
     int i;
