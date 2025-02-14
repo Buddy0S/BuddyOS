@@ -183,6 +183,22 @@ void uart0_printitoa(int num) {
 	return;	
 }
 
+/*void uart0_printFloat(float num) {
+	int intNum = (int)num;
+	float fractionalNum = num - intNum;
+
+	uart0_printitoa(intNum);
+	uart0_putch('.');
+	
+	while (fractionalNum > 0.00001) {
+		fractionalNum *= BASE10;
+		int digit = (int)fractionalNum;
+		uart0_putch(digit + '0');
+		fractionalNum -= digit;
+	}
+	return;
+}*/
+
 void uart0_printf(const char* str, ...) {
 	va_list args;
 	va_start(args, str);
@@ -201,11 +217,11 @@ void uart0_printf(const char* str, ...) {
 					uart0_printitoa(formattedInt);
 					break;
 				}
-				case 'f': {
-					double formattedDouble = va_args(args, double);
-					//floatfunc
+				/*case 'f': {
+					float formattedFloat = va_args(args, float);
+					uart0_printFloat(formattedFloat);
 					break;
-				}
+				}*/
 				case 'p': {
 					void* formattedPtr = va_args(args, void *);
 					uart0_printHex((uint32_t)formattedPtr);
@@ -298,6 +314,6 @@ void uart0_test() {
 	uint32_t testHex2 = 15;
 	int testInt2 = 0;
 	int testInt3 = -69;
-	uart0_printf("Expected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual testHex = %x\nExpected testChar = B, Actual testChar = %c\nExpected testHex2 = 0x0000000F, Actual testHex2 = %x\nExpected testInt = 42, Actual testInt = %d\nExpected testInt2 = 0, Actual testInt2 = %d\nExpected testInt3 = -69, Actual testInt3 = %d\n", testString, testHex, testChar, testHex2, testInt, testInt2, testInt3);
+	uart0_printf("Expected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual testHex = %x\nExpected testChar = B, Actual testChar = %c\nExpected testHex2 = 0x0000000F, Actual testHex2 = %x\nExpected testInt = 42, Actual testInt = %d\nExpected testInt2 = 0, Actual testInt2 = %d\nExpected testInt3 = -69, Actual testInt3 = %d\nExpected %%, Actual = %%\nExpected %?, Actual = %g\n", testString, testHex, testChar, testHex2, testInt, testInt2, testInt3);
 	//uart0_printf("Expected testChar = B, Actual testChar = %c\nExpected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual = testHex = %x\n", testChar, testString, testHex); 
 }

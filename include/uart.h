@@ -44,5 +44,6 @@ void uart0_printHex(uint32_t number);
 void uart0_printf(const char* str, ...);
 char uart0_getch();
 void uart0_test();
+/*void uart0_printFloat(float num);*/
 
 #endif
