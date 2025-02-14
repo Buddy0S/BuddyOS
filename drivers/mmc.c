@@ -288,7 +288,7 @@ int detectSDcard(){
     return 1;
 }
 
-void mmcCMD(uint32_t cmd, uint32_t response, uint32_t arg, uint32_t flags){
+int mmcCMD(uint32_t cmd, uint32_t response, uint32_t arg, uint32_t flags){
 
     uint32_t reg;
 
@@ -309,8 +309,25 @@ void mmcCMD(uint32_t cmd, uint32_t response, uint32_t arg, uint32_t flags){
     /* wait for command to finish*/
     while (!(READ32(SD_STAT))){}
 
+    /* Check for Error */
+    /* bit 15 of SD_STATUS indicates if an error has occured */
+    if (READ32(SD_STAT) & (0x1 << 15)){
+    
+        uart0_printf("mmc CMD Error \n");
+
+        /* Clear status */
+	WRITE32(SD_STAT, 0xFFFFFFFF);
+
+	return 0;
+    }
+
+    /* clear command status */
+    WRITE32(SD_STAT, 0x1);
+
+    return 1;
 }
 
+/* TI manual 18.4.3.2 */
 void idCard(){
 
     /* send cmd 0 */	
