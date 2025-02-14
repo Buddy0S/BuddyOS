@@ -129,10 +129,6 @@
  * */
 #define SD_RSP10 (MMC_BASE + 0x210)
 
-void initMMC();
-int detectSDcard();
-int idCard();
-void poweronSD();
-void selectSD();
+void initMMCdriver();
 
 #endif

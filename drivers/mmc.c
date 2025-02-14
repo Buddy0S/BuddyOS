@@ -452,4 +452,20 @@ void selectSD(){
 
 }
 
+void initMMCdriver(){
 
+    initMMC();
+
+    int sd_card = detectSDcard();
+
+    if (sd_card) uart0_putsln("SD card Detected");
+    
+    int sd_card_stat =  idCard();
+
+    if (sd_card_stat) uart0_printf("SD card is compliant with standard 2.0 \n");
+
+    poweronSD();
+
+    selectSD();
+
+}

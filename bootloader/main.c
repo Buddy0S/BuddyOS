@@ -62,21 +62,7 @@ int main(void) {
 
     enable_interrupts();
 
-    initMMC();
-
-    int sd_card = detectSDcard();
-
-    if (sd_card) uart0_putsln("SD card Detected");
-
-    //buddy();
-    
-    int sd_card_stat =  idCard();
-
-    if (sd_card_stat) uart0_printf("SD card is compliant with standard 2.0 \n");
-
-    poweronSD();
-
-    selectSD();
+    initMMCdriver();
 
     const char* test = "testing!";
     const char* initializeMsg = "BuddyOS...initialized...";
