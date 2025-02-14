@@ -154,6 +154,8 @@ char* itoa(int num, char* str) {
 
 void uart0_printitoa(int num) {
 	int isNegative = 0;
+	int index = 0;
+	char buf[12];
 
 	if (num == 0) {
 		uart0_putch('0');
@@ -170,10 +172,13 @@ void uart0_printitoa(int num) {
 		uart0_putch('-');
 	}
 
-	while (num != 0) {
-		int remainder = num % BASE10;
-		uart0_putch(num % BASE10 + '0');
+	while (num > 0) {
+		buf[index++] = num % BASE10 + '0';
 		num /= BASE10;	
+	}
+
+	for (int i = index - 1; i >= 0; i--) {
+		uart0_putch(buf[i]);
 	}
 	return;	
 }
@@ -208,11 +213,6 @@ void uart0_printf(const char* str, ...) {
 				}
 				case 's': {
 					const char* formattedString = va_args(args, char*);
-					/*if (formattedString) {
-						uart0_puts("WORK\0");
-					} else {
-						uart0_puts("FAIL\0");
-					}*/
 					uart0_puts(formattedString);
 					break;
 				}
@@ -275,7 +275,7 @@ void uart0_test() {
 	uart0_putsln("");
 
 	uart0_putsln("Test 5: Testing uart0_puts with manual \\n below: ");
-	const char* testManualNewLine = "New line\n";
+	const char* testManualNewLine = "New line\r\n";
 	uart0_puts(testManualNewLine);
 
 	uart0_putsln("Test 6: Testing uart0_putsln below: ");
@@ -296,6 +296,8 @@ void uart0_test() {
 	const char* testString = "Nuts";
 	uint32_t testHex = 3735928559;
 	uint32_t testHex2 = 15;
-	uart0_printf("Expected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual testHex = %x\nExpected testChar = B, Actual testChar = %c\nExpected testHex2 = 0x0000000F, Actual testHex2 = %x\n", testString, testHex, testChar, testHex2);
+	int testInt2 = 0;
+	int testInt3 = -69;
+	uart0_printf("Expected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual testHex = %x\nExpected testChar = B, Actual testChar = %c\nExpected testHex2 = 0x0000000F, Actual testHex2 = %x\nExpected testInt = 42, Actual testInt = %d\nExpected testInt2 = 0, Actual testInt2 = %d\nExpected testInt3 = -69, Actual testInt3 = %d\n", testString, testHex, testChar, testHex2, testInt, testInt2, testInt3);
 	//uart0_printf("Expected testChar = B, Actual testChar = %c\nExpected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual = testHex = %x\n", testChar, testString, testHex); 
 }
