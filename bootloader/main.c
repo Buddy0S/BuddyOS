@@ -70,7 +70,9 @@ int main(void) {
 
     //buddy();
     
-    idCard();
+    int sd_card_stat =  idCard();
+
+    if (sd_card_stat) uart0_printf("SD card is compliant with standard 2.0 \n");
 
     const char* test = "testing!";
     const char* initializeMsg = "BuddyOS...initialized...";

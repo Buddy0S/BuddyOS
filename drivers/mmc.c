@@ -288,6 +288,11 @@ int detectSDcard(){
     return 1;
 }
 
+/*
+ * https://users.ece.utexas.edu/~valvano/EE345M/SD_Physical_Layer_Spec.pdf
+ *
+ * has all the commands
+ * */
 int mmcCMD(uint32_t cmd, uint32_t response, uint32_t arg, uint32_t flags){
 
     uint32_t reg;
@@ -328,10 +333,59 @@ int mmcCMD(uint32_t cmd, uint32_t response, uint32_t arg, uint32_t flags){
 }
 
 /* TI manual 18.4.3.2 */
-void idCard(){
+int idCard(){
+
+    uint32_t cmd, response_type, arg, flags;
 
     /* send cmd 0 */	
-    mmcCMD(0x00,0x00,0x00,0x00);
+
+    cmd = 0x00;
+
+    response_type = 0x00;
+
+    arg = 0x00;
+
+    flags = 0x00;
+
+    mmcCMD(cmd,response_type,arg,flags);
+
+    /* skiping the SDIO check */
+
+    /* checking if card is compliant with standard 2.0 */
+
+    /* send command 8 */
+    cmd = 0x8;
+
+    /* response length 48 bits */
+    response_type = 0x2;
+
+    /* arg 
+     *
+     * bit 8-11 is voltage
+     * 0x1 for 2.7 - 3.6v
+     *
+     * bit 0 - 7 is a check pattern 0x55
+     * */
+
+    arg = (0x1 << 8) | (0x55);
+
+    flags = 0x00;
+
+    if(!mmcCMD(cmd,response_type,arg,flags)){
+    
+        uart0_printf("CMD 8 failed \n");
+	return 0;
+    }
+
+
+    /* check if response returns the same pattern */
+    if(READ32(SD_RSP10) != ((0x1 << 8) | (0x55))){
+    
+      uart0_printf("Card is not compliant \n");
+      return 0;
+    }
+
+    return 1;
 
 }
 
