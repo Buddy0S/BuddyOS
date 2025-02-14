@@ -132,5 +132,5 @@
 void initMMC();
 int detectSDcard();
 int idCard();
-
+void poweronSD();
 #endif

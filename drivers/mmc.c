@@ -274,7 +274,7 @@ void initsequence(){
     WRITE32(SD_STAT,0xFFFFFFFF);
 }
 
-/* TI manual 18.4.3.2 */
+/* TI manual 18.4.3.2  part 1 */
 int detectSDcard(){
 
     /* complete init sequence */
@@ -326,13 +326,19 @@ int mmcCMD(uint32_t cmd, uint32_t response, uint32_t arg, uint32_t flags){
 	return 0;
     }
 
+    /* if the response type is a busy wait 0x3, we need to wait */
+    if (response == 0x3){
+        while (!(READ32(SD_STAT) & 0x2)){}
+	WRITE32(SD_STAT,0x2);
+    }
+
     /* clear command status */
     WRITE32(SD_STAT, 0x1);
 
     return 1;
 }
 
-/* TI manual 18.4.3.2 */
+/* TI manual 18.4.3.2  pre node A */
 int idCard(){
 
     uint32_t cmd, response_type, arg, flags;
@@ -389,3 +395,31 @@ int idCard(){
 
 }
 
+/* TI manual 18.4.3.2 part 2, bro this just looks horible */
+void poweronSD(){
+
+    uint32_t arg;
+
+    /* since our card is compliant we need to keep looping until powered on*/
+
+    while(1){
+    
+        /* send cmd 55*/
+
+	mmcCMD(55,3,0,0);
+
+	/* send ACMD41 */
+
+	/* arg set bit 30 OCR and set voltage window */
+
+        arg = (0x1 << 30) | (0x3F << 15);
+
+        mmcCMD(41,3,arg,0);
+
+	if (READ32(SD_RSP10) & (0x1 << 31)) break;
+    
+    }
+
+    uart0_printf("SD card powered on \n");
+
+}
