@@ -8,6 +8,8 @@
 #include "ddr.h"
 #include "mmc.h"
 
+extern mmc_driver mmc;
+
 void buddy(void) {
 
     volatile int i;
@@ -62,6 +64,8 @@ int main(void) {
 
     enable_interrupts();
 
+    //mmc.init();
+    //
     initMMCdriver();
 
     uint32_t bufW[128];
