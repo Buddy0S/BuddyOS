@@ -698,9 +698,11 @@ void initMMCdriver(){
 /* EVEN REPlACING NUMBERS WITH CONSTANTS BREAKS IT*/
 
 /* what block to write using LBA and a 512 byte buffer*/
-void MMCwriteblock(uint32_t block, uint32_t* buf){
+void MMCwriteblock(uint32_t block, volatile uint32_t* buf){
 
     int i;
+
+    uart0_printf(""); // again random print fixes the bug
 
     /* set block size to 512*/
     WRITE32(SD_BLK, 0x200);
@@ -733,7 +735,7 @@ void MMCwriteblock(uint32_t block, uint32_t* buf){
 }
 
 /* what block to read from and a 512 byte buffer*/
-void MMCreadblock(uint32_t block, uint32_t* buf){
+void MMCreadblock(uint32_t block, volatile uint32_t* buf){
 
     int i;
 

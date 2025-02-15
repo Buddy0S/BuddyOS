@@ -64,12 +64,12 @@ int main(void) {
 
     enable_interrupts();
 
-    //mmc.init();
-    //
-    initMMCdriver();
+    mmc.init();
+    
+    //initMMCdriver();
 
-    uint32_t bufW[128];
-    uint32_t bufR[128];
+    volatile uint32_t __attribute__((aligned(4))) bufW[128];
+    volatile uint32_t __attribute__((aligned(4))) bufR[128];
 
     //mem set is broken will cause program to stall, TODO
     //bmemset(bufW,7,128);
@@ -78,11 +78,11 @@ int main(void) {
 
     uart0_printf("writing to block 1 \n");
 
-    MMCwriteblock(1,bufW);
+    mmc.write_block(1,bufW);
 
     uart0_printf("reading form block 1 \n");
 
-    MMCreadblock(1,bufR);
+    mmc.read_block(1,bufR);
 
     uart0_printf("checking %d\n",bufR[1]);
 
