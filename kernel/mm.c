@@ -156,6 +156,11 @@ void *kmalloc(size_t size) {
     }
     order_arr[order]->head = alloc_block->next;
 
+    /* empty */
+    if (order_arr[order]->head == NULL) {
+        order_arr[order]->tail = NULL;
+    }
+
     addr = alloc_block->addr;
 
     memset32(addr, 0, block_size);
@@ -163,8 +168,25 @@ void *kmalloc(size_t size) {
     return (void *)addr;
 }
 
-void kfree(void *ptr) {
+int kfree(void *ptr) {
+    uint8_t order;
     volatile struct mem_block *free_block = (volatile struct mem_block *)ptr;
+    
     free_block->addr = (uint32_t)ptr;
-    free_block->size = 
+    free_block->size = find_size(free_block->addr);
+    free_block->next = NULL;
+    order = find_order(free_block->size);
+
+    if (!order_arr[order]) {
+        return -1;
+    }
+    if (!order_arr[order]->head) {
+        order_arr[order]->head = free_block;
+        order_arr[order]->tail = free_block;
+    } else {
+        order_arr[order]->tail->next = free_block;
+        order_arr[order]->tail = free_block;
+    }
+    return 0;
+
 }
