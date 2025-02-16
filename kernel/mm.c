@@ -127,7 +127,7 @@ uint32_t find_size(uint32_t addr) {
         if (addr < bound) {
             return size;
         } else {
-            size >> 1;
+            size = size >> 1;
             bound += (size * NUM_BLOCK);
         }
     }
