@@ -104,6 +104,7 @@ int init_alloc(void) {
     return 0;
 }
 
+/* find order given size */
 uint8_t find_order(size_t n) {
     if (n == 0) return 0;       /* handles 0 case */
     n--;            /* handles case where n is a power of 2 */
@@ -116,6 +117,22 @@ uint8_t find_order(size_t n) {
 
     return (uint8_t)__builtin_ctz(n);    /* return the order */
 };
+
+/* find size given addr */
+uint32_t find_size(uint32_t addr) {
+    addr = addr - KERNEL_DYNAMIC_START;
+    int size = MAX_BLOCK;
+    int bound = (size * NUM_BLOCK);
+    while (size >= MIN_BLOCK) {
+        if (addr < bound) {
+            return size;
+        } else {
+            size >> 1;
+            bound += (size * NUM_BLOCK);
+        }
+    }
+    return -1;
+}
 
 /* simple memset */
 void memset32(uint32_t addr, uint32_t value, size_t size) {
@@ -146,6 +163,8 @@ void *kmalloc(size_t size) {
     return (void *)addr;
 }
 
-void kfree(void *) {
-
+void kfree(void *ptr) {
+    volatile struct mem_block *free_block = (volatile struct mem_block *)ptr;
+    free_block->addr = (uint32_t)ptr;
+    free_block->size = 
 }
