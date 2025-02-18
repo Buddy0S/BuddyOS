@@ -29,5 +29,6 @@ typedef struct fat12_ebs {
 } fat12_ebs_t;
 
 void fat12_init(unsigned int startSector, volatile uint32_t* buffer); 
-
+void fat12_find(const char* filename, volatile uint32_t* buffer,
+    uint16_t *start_cluster, uint32_t *file_size); 
 #endif
