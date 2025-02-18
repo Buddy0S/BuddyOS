@@ -19,7 +19,7 @@ typedef struct fat_bs {
 	unsigned char extendedBootRecord[54]; /* flexible for FAT12/FAT16/FAT32 respectively */
 } fat_bs_t;
 
-typdef struct fat12_ebs {
+typedef struct fat12_ebs {
 	unsigned char driverNumber; 
 	unsigned char reserved1;
 	unsigned char bootSignature;

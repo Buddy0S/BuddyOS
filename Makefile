@@ -26,7 +26,6 @@ $(BUILD_DIR)vector_table.o : interrupt/vector_table.S | $(BUILD_DIR)
 $(BUILD_DIR)init.o : bootloader/init.S | $(BUILD_DIR)
 	$(PREFIX)as bootloader/init.S -o $@
 
-
 $(BUILD_DIR)main.o : bootloader/main.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) bootloader/main.c -o $@
 
@@ -54,7 +53,10 @@ $(BUILD_DIR)memcmd.o : misc/memcmd.c | $(BUILD_DIR)
 $(BUILD_DIR)ddr.o : boardinit/ddr.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) boardinit/ddr.c -o $@
 
-$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o $(BUILD_DIR)clock.o $(BUILD_DIR)ddr.o $(BUILD_DIR)memcmd.o $(BUILD_DIR)drivers.o | $(BIN_DIR)
+$(BUILD_DIR)fat12.o : fat12.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) fat12.c -o $@
+
+$(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o $(BUILD_DIR)clock.o $(BUILD_DIR)ddr.o $(BUILD_DIR)memcmd.o $(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o | $(BIN_DIR)
 	$(PREFIX)ld -flto=all -T $^ -o $@
 
 MLO : $(BIN_DIR)boot.out

@@ -87,6 +87,7 @@ UART terminal functions -- IN PROGRESS
   - print newline
 
 FAT load kernel or Load from raw:
+-Noah
 - load kernel.bin using FAT 12 filesystem to start of sdram
 - load kerenl.bin from raw img
 
