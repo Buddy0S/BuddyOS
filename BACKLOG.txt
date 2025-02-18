@@ -86,8 +86,17 @@ UART terminal functions -- IN PROGRESS
   - print hex
   - print newline
 
-FAT load kernel or Load from raw:
--Noah
+FAT load kernel or Load from raw: -- IN PROGRESS
+-Noah + Aaron
+- Necessary Functions: 
+    - Read Boot sector from SD
+    - find_file(): 
+        - finds file on sd card given name
+        - Updates passed pointer with start_cluster and file_size
+        - returns 1 if file found 0 if not
+    - read_file():
+        - takes a buffer, filename, and filesize
+        - Reads file into the buffer
 - load kernel.bin using FAT 12 filesystem to start of sdram
 - load kerenl.bin from raw img
 
