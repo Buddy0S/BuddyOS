@@ -28,7 +28,23 @@ typedef struct fat12_ebs {
 	unsigned char FATTypeLabel[8]; /* string representation of FAT file system type */
 } fat12_ebs_t;
 
+typedef struct {
+    char name[8];   /* file name */
+    char ext[3];    /* file extension */
+    uint8_t attrib; /* file attributes */
+    uint16_t reserved; /* reserved (unused) */
+    uint16_t createTime;
+    uint16_t createDate;
+    uint16_t lastAccessDate;
+    uint16_t firstClusterHigh; /* High 16-bits of the first cluster number */
+    uint16_t modifyTime;
+    uint16_t modifyDate;
+    uint16_t firstClusterLow;  /* Low 16-bits of the first cluster number */
+    uint32_t fileSize;
+} __attribute__((packed)) DirEntry;
+
+
 void fat12_init(unsigned int startSector, volatile uint32_t* buffer); 
-void fat12_find(const char* filename, volatile uint32_t* buffer,
-    uint16_t *start_cluster, uint32_t *file_size); 
+void fat12_find(const char* filename, volatile uint32_t* buffer);//,
+    //uint16_t *start_cluster, uint32_t *file_size); 
 #endif
