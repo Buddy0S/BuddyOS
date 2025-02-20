@@ -75,19 +75,6 @@ int main(void) {
     //mem set is broken will cause program to stall, TODO
     //bmemset(bufW,7,128);
 
-    bufW[1] = 7;
-
-    uart0_printf("writing to block 1 \n");
-
-    mmc.write_block(1,bufW);
-
-    uart0_printf("reading form block 1 \n");
-
-    mmc.read_block(1,bufR);
-
-    uart0_printf("checking %d\n",bufR[1]);
-
-    const char* test = "testing!";
     const char* initializeMsg = "BuddyOS...initialized...";
 
     bmemcpy((void*)0x80000000, initializeMsg, 25);
@@ -101,29 +88,17 @@ int main(void) {
     uart0_printf("Attempting to init fat12......\n");
     fat12_init(0, buffer);
 
-    //volatile uint16_t __attribute__((aligned(4))) startCluster[1];
-    //volatile uint32_t __attribute__((aligned(4))) size[1];
-    
-    volatile uint16_t __attribute__((aligned(4))) startCluster;
-    volatile uint32_t __attribute__((aligned(4))) size;
+    volatile uint16_t __attribute__((aligned(4))) startCluster = 0;
+    volatile uint32_t __attribute__((aligned(4))) size = 0;
 
-    //uint16_t startCluster;
-    //uint32_t size;
-    
     volatile uint32_t __attribute__((aligned(4))) buff[128];
 
     ////////////////////////////////////////////////
     // THIS DOES NOT WORK
     /*
-    volatile int retVal;
+    volatile uint32_t __attribute__((aligned(4))) retVal = 0;
     retVal = fat12_find("HELLO.TXT", buff, &startCluster, &size);
-    */
-    ///////////////////////////////////////////////
-
-    /* THIS WORKS......NO CLUE WHY */
-    fat12_find("HELLO.TXT", buff, &startCluster, &size);
     
-    /*
     if (retVal) {
         uart0_printf("Found! Start = %d, size = %d\n", startCluster, size);
     }
@@ -131,8 +106,13 @@ int main(void) {
         uart0_printf("Not Found :(\n");
     }
     */
-    
+    ///////////////////////////////////////////////
 
+    /* THIS WORKS......NO CLUE WHY */
+    fat12_find("HELLO.TXT", buff, &startCluster, &size);
+
+    uart0_printf("Start Cluster: %d, File Size: %d\n", startCluster, size);
+    
     while (1);
 }
 
