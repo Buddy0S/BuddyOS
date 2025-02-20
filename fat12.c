@@ -55,17 +55,22 @@ void fat12_init(unsigned int startSector, volatile uint32_t* buffer) {
     uart0_printf("OEM = %s\n", bootSector.oemName);
     uart0_printf("Bytes per sector = %d\n", bootSector.bytesPerSector);
     uart0_printf("Sectors per cluster = %d\n", bootSector.sectorsPerCluster);
-    uart0_printf("Total Sectors = %d\n", bootSector.totalSectorCount);
+    uart0_printf("REC = %d\n", bootSector.rootEntryCount);
 
 }
 
-void fat12_find(const char* filename, volatile uint32_t* buffer,
-    uint16_t *start_cluster, uint32_t *file_size) {
+void fat12_find(const char* filename, volatile uint32_t* buffer) {
+    //uint16_t *start_cluster, uint32_t *file_size) {
 
     uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
 
     uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
+
+    DirEntry dirEntry;
+
+    uart0_printf("start = %d, numSectors = %d\n", rootSectorStart,
+    numRootSectors);
 
     for (uint32_t i = rootSectorStart; i < rootSectorStart + numRootSectors;
         i++) {
@@ -73,15 +78,33 @@ void fat12_find(const char* filename, volatile uint32_t* buffer,
         MMCreadblock(i, buffer);
         uart0_printf("Reading Sector %d ...\n", i);
 
+        char *buf = (char*)buffer;
+
         for (int j = 0; j < 16; j++) {
 
-            uint8_t *entry = &buffer[j * 32];
+            dirEntry = *((DirEntry*) &buf[j * 32]);
+            dirEntry.name[7] = '\0';
 
-            if (entry[0] != 0xE5 && entry[0] != 0x00) {
-                uart0_printf("%s - %d\n", (char*)entry[0], entry[28]);
-            }
+            uart0_printf("%d)%s.%s - %d\n", j+1, dirEntry.name, dirEntry.ext, dirEntry.fileSize);
+
         }
+        /*
+
+        dirEntry = *((DirEntry *)&buffer[0]);
+
+        // Check if the entry is valid (not free or deleted)
+        if (dirEntry.name[0] == 0x00) {
+            break;  // No more entries
+        }
+        if (dirEntry.name[0] == 0xE5) {
+            continue;  // Entry is deleted, skip it
+        }
+
+        uart0_printf("%s - %d\n", dirEntry.name, dirEntry.fileSize);
+
+        */
+
     }
-    
+
 
 }
