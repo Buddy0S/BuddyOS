@@ -93,6 +93,8 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
 
     DirEntry dirEntry;
 
+    uart0_printf("Args = %s %d %d\n", filename, *startCluster, *fileSize);
+
     uart0_printf("start = %d, numSectors = %d\n", rootSectorStart,
     numRootSectors);
 
@@ -122,36 +124,30 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
                 continue;
             }
             
-            /* File found */
-            /* Should be passing in filename param instead of HELLO.TXT */
-            if (compareFileNames(&dirEntry, "XHELLOX.TXT")) {
+            /* File found - set passed pointers to appropriate values*/
+            if (compareFileNames(&dirEntry, filename)) {
                 *startCluster = dirEntry.firstClusterLow;
                 *fileSize = dirEntry.fileSize;
-                uart0_printf("RETURNING 1\n");
+                uart0_printf("fat12_find - RETURNING 1\n");
                 return 1;
             }
 
         }
 
-        /*
-
-        dirEntry = *((DirEntry *)&buffer[0]);
-
-        // Check if the entry is valid (not free or deleted)
-        if (dirEntry.name[0] == 0x00) {
-            break;  // No more entries
-        }
-        if (dirEntry.name[0] == 0xE5) {
-            continue;  // Entry is deleted, skip it
-        }
-
-        uart0_printf("%s - %d\n", dirEntry.name, dirEntry.fileSize);
-
-        */
-
     }
     
-    uart0_printf("RETURNING 0\n");
+    uart0_printf("fat12_find - RETURNING 0\n");
     return 0;
+}
 
+
+uint16_t fat12_get_next_cluster(uint16_t cluster) {
+    return 0;
+}
+
+
+void fat12_read_file(uint16_t startCluster, uint32_t fileSize, volatile
+    uint32_t* buffer) {
+
+    return;
 }
