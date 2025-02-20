@@ -7,6 +7,30 @@
 fat_bs_t bootSector;
 fat12_ebs_t extendedBootRecord;
 
+int compareFileNames(DirEntry *entry, char* fileName) {
+    
+    int i, j;
+
+    for (i = 0; i < 8; i++) {
+        
+        if (fileName[i] != '.' && entry->name[i] != fileName[i]) {
+            return 0;
+        }
+        else if (fileName[i] == '.') {
+            break;
+        }
+    }
+
+    for (j = 0; j < 3; j++) {
+        if (entry->ext[j] != fileName[i+1 + j]) {
+            return 0;
+        }
+    }
+
+    return 1;
+
+}
+
 void fat12_init(unsigned int startSector, volatile uint32_t* buffer) {
 	MMCreadblock(startSector, buffer);
 
@@ -72,20 +96,34 @@ void fat12_find(const char* filename, volatile uint32_t* buffer) {
     uart0_printf("start = %d, numSectors = %d\n", rootSectorStart,
     numRootSectors);
 
+    /* Iterate through each sector */
     for (uint32_t i = rootSectorStart; i < rootSectorStart + numRootSectors;
         i++) {
-    
+
         MMCreadblock(i, buffer);
         uart0_printf("Reading Sector %d ...\n", i);
 
         char *buf = (char*)buffer;
 
+        /* In FAT12, each sector has 16 directory entries */
         for (int j = 0; j < 16; j++) {
 
+            /* Each directory entry in FAT 12 is 32 bytes long */
+            /* See DirEntry struct for fields in directory entry */
             dirEntry = *((DirEntry*) &buf[j * 32]);
             dirEntry.name[7] = '\0';
 
-            uart0_printf("%d)%s.%s - %d\n", j+1, dirEntry.name, dirEntry.ext, dirEntry.fileSize);
+            /* Check for directory end */
+            if (dirEntry.name[0] == 0x00) {
+                break; 
+            }
+
+            /* Check for valid entry */
+            if (dirEntry.name[0] == 0xE5) {
+                continue;
+            }
+            
+            uart0_printf("%d)%d\n", j+1, compareFileNames(&dirEntry, "HELLO.TXT"));
 
         }
         /*
