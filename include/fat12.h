@@ -1,14 +1,15 @@
 #ifndef FAT12_H
 #define FAT12_H
 
-#define FAT12_UNUSED 0x000 //0x000: unused
-#define FAT12_RESERVED_CLUSTER 0x001 //0x001: reserved cluster
-#define FAT12_VALID_CLUSTER_MIN 0x002 //0x002 - 0xFEF: cluster in use, value represents next cluster
+/* https://www.sqlpassion.at/archive/2022/03/03/reading-files-from-a-fat12-partition/ */
+#define FAT12_UNUSED 0x000 /*0x000: unused*/
+#define FAT12_RESERVED_CLUSTER 0x001 /*0x001: reserved cluster*/
+#define FAT12_VALID_CLUSTER_MIN 0x002 /*0x002 - 0xFEF: cluster in use, value represents next cluster*/
 #define FAT12_VALID_CLUSTER_MAX 0xFEF
-#define FAT12_RESERVED_CLUSTER_MIN 0xFF0 //0xFF0 - 0xFF6: reserved cluster
+#define FAT12_RESERVED_CLUSTER_MIN 0xFF0 /*0xFF0 - 0xFF6: reserved cluster*/
 #define FAT12_RESERVED_CLUSTER_MAX 0xFF6
-#define FAT12_BAD_CLUSTER 0xFF7 //0xFF7: bad cluster
-#define FAT12_EOF_MIN 0xFF8 // 0xFF8 - 0xFFF: last cluster in a file
+#define FAT12_BAD_CLUSTER 0xFF7 /*0xFF7: bad cluster*/
+#define FAT12_EOF_MIN 0xFF8 /*0xFF8 - 0xFFF: last cluster in a file*/
 #define FAT12_EOF_MAX 0xFFF
 
 typedef struct fat_bs {
