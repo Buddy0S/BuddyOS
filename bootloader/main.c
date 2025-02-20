@@ -7,6 +7,7 @@
 #include "clock.h"
 #include "ddr.h"
 #include "mmc.h"
+#include "fat12.h"
 
 extern mmc_driver mmc;
 
@@ -93,7 +94,45 @@ int main(void) {
 
     uart0_puts((char*)0x80000000);
 
-    uart0_test(); 
+    uart0_test();
+
+    volatile uint32_t __attribute__((aligned(4))) buffer[128];
+
+    uart0_printf("Attempting to init fat12......\n");
+    fat12_init(0, buffer);
+
+    //volatile uint16_t __attribute__((aligned(4))) startCluster[1];
+    //volatile uint32_t __attribute__((aligned(4))) size[1];
+    
+    volatile uint16_t __attribute__((aligned(4))) startCluster;
+    volatile uint32_t __attribute__((aligned(4))) size;
+
+    //uint16_t startCluster;
+    //uint32_t size;
+    
+    volatile uint32_t __attribute__((aligned(4))) buff[128];
+
+    ////////////////////////////////////////////////
+    // THIS DOES NOT WORK
+    /*
+    volatile int retVal;
+    retVal = fat12_find("HELLO.TXT", buff, &startCluster, &size);
+    */
+    ///////////////////////////////////////////////
+
+    /* THIS WORKS......NO CLUE WHY */
+    fat12_find("HELLO.TXT", buff, &startCluster, &size);
+    
+    /*
+    if (retVal) {
+        uart0_printf("Found! Start = %d, size = %d\n", startCluster, size);
+    }
+    else {
+        uart0_printf("Not Found :(\n");
+    }
+    */
+    
+
     while (1);
 }
 

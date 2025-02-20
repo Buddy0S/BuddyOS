@@ -7,7 +7,7 @@
 fat_bs_t bootSector;
 fat12_ebs_t extendedBootRecord;
 
-int compareFileNames(DirEntry *entry, char* fileName) {
+int compareFileNames(DirEntry *entry, volatile char* fileName) {
     
     int i, j;
 
@@ -83,8 +83,8 @@ void fat12_init(unsigned int startSector, volatile uint32_t* buffer) {
 
 }
 
-void fat12_find(const char* filename, volatile uint32_t* buffer) {
-    //uint16_t *start_cluster, uint32_t *file_size) {
+int fat12_find(volatile char* filename, volatile uint32_t* buffer,
+    volatile uint16_t *startCluster, volatile uint32_t *fileSize) {
 
     uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
@@ -111,7 +111,6 @@ void fat12_find(const char* filename, volatile uint32_t* buffer) {
             /* Each directory entry in FAT 12 is 32 bytes long */
             /* See DirEntry struct for fields in directory entry */
             dirEntry = *((DirEntry*) &buf[j * 32]);
-            dirEntry.name[7] = '\0';
 
             /* Check for directory end */
             if (dirEntry.name[0] == 0x00) {
@@ -123,9 +122,17 @@ void fat12_find(const char* filename, volatile uint32_t* buffer) {
                 continue;
             }
             
-            uart0_printf("%d)%d\n", j+1, compareFileNames(&dirEntry, "HELLO.TXT"));
+            /* File found */
+            /* Should be passing in filename param instead of HELLO.TXT */
+            if (compareFileNames(&dirEntry, "XHELLOX.TXT")) {
+                *startCluster = dirEntry.firstClusterLow;
+                *fileSize = dirEntry.fileSize;
+                uart0_printf("RETURNING 1\n");
+                return 1;
+            }
 
         }
+
         /*
 
         dirEntry = *((DirEntry *)&buffer[0]);
@@ -143,6 +150,8 @@ void fat12_find(const char* filename, volatile uint32_t* buffer) {
         */
 
     }
-
+    
+    uart0_printf("RETURNING 0\n");
+    return 0;
 
 }

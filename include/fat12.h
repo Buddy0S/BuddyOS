@@ -36,7 +36,7 @@ typedef struct {
     uint16_t createTime;
     uint16_t createDate;
     uint16_t lastAccessDate;
-    uint16_t firstClusterHigh; /* High 16-bits of the first cluster number */
+    uint16_t firstClusterHigh; /* High 16-bits of the first cluster number (unused in FAT12) */
     uint16_t modifyTime;
     uint16_t modifyDate;
     uint16_t firstClusterLow;  /* Low 16-bits of the first cluster number */
@@ -45,6 +45,6 @@ typedef struct {
 
 
 void fat12_init(unsigned int startSector, volatile uint32_t* buffer); 
-void fat12_find(const char* filename, volatile uint32_t* buffer);//,
-    //uint16_t *start_cluster, uint32_t *file_size); 
+int fat12_find(volatile char* filename, volatile uint32_t* buffer,
+    volatile uint16_t *startCluster, volatile uint32_t *fileSize); 
 #endif
