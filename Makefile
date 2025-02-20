@@ -12,7 +12,7 @@ OUTPUT = BuddyOS.img
 all: $(OUTPUT)
 
 clean:
-	rm -rf $(OUTPUT) MLO header.bin build/ bin/
+	rm -rf $(OUTPUT) MLO header.bin build/ bin/ hello.txt
 
 $(BUILD_DIR) :
 	mkdir -p $(BUILD_DIR)
@@ -66,7 +66,8 @@ BuddyOS.img: MLO
 	dd if=/dev/zero of=BuddyOS.img bs=512 count=2880
 	mkfs.fat -F 12 BuddyOS.img
 	mcopy -i BuddyOS.img MLO "::MLO"
-		
+	echo "HI FROM FAT12!" > hello.txt
+	mcopy -i BuddyOS.img hello.txt "::hello.txt"
 
 objdump: BuddyOS.img
 	$(PREFIX)objdump -D -b binary -m arm MLO
