@@ -11,9 +11,30 @@
 
 extern mmc_driver mmc;
 
-void exception_handler(){
-    uart0_printf("exception unhandled HALTING\n");
-    while(1){}
+void exception_handler(uint32_t exception) {
+    uart0_printf("Exception Occurred: ");
+
+    switch (exception) {
+        case 1:  
+            uart0_printf("Supervisor Call Exception\n");
+            break;
+        case 2:  
+            uart0_printf("Data Abort Exception\n");
+            break;
+        case 3:  
+            uart0_printf("Undefined Instruction Exception\n");
+            break;
+        case 4:  
+            uart0_printf("Prefetch Abort Exception \n");
+            break;
+        default:
+            uart0_printf("Unknown Exception\n");
+            break;
+    }
+
+    uart0_printf("HALTING\n");
+
+    while (1); 
 }
 
 void buddy(void) {

@@ -19,15 +19,19 @@ vector_table:
 @ depending on what type of exception it is
 
 undefined_instruction:
+    ldr r0, =3
     b loop
 
 supervisor_call:
+    ldr r0, =1
     b loop
 
 prefetch_abort:
+    ldr r0, =4
     b loop
 
 data_abort:
+    ldr r0, =2
     b loop
 
 not_used:
@@ -61,19 +65,9 @@ fiq_interrupt:
     b loop
 
 
-@ loop to stall unhandled exception types
 loop:
 
-    @ save registers to stack
-    stmfd sp!, {r0-r3, r11, lr}
-
-    @ save the saved program status register
-    mrs r11, spsr
-
-    @ jump to interrupt handler
+    @ jump to exception handler
     bl exception_handler
-
-    msr spsr, r11 @ restore saved program status register
-    ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
 
     b loop
