@@ -110,17 +110,17 @@ int main(void) {
     
     //initMMCdriver();
 
-    volatile uint32_t __attribute__((aligned(4))) bufW[128];
-    volatile uint32_t __attribute__((aligned(4))) bufR[128];
+    //volatile uint32_t __attribute__((aligned(4))) bufW[128];
+    //volatile uint32_t __attribute__((aligned(4))) bufR[128];
 
     //mem set is broken will cause program to stall, TODO
     //bmemset(bufW,7,128);
 
-    const char* initializeMsg = "BuddyOS...initialized...";
+    //const char* initializeMsg = "BuddyOS...initialized...";
 
-    bmemcpy((void*)0x80000000, initializeMsg, 25);
+    //bmemcpy((void*)0x80000000, initializeMsg, 25);
 
-    uart0_puts((char*)0x80000000);
+    //uart0_puts((char*)0x80000000);
 
     uart0_test();
 
@@ -132,7 +132,7 @@ int main(void) {
     volatile uint16_t __attribute__((aligned(4))) startCluster = 0;
     volatile uint32_t __attribute__((aligned(4))) size = 0;
 
-    volatile uint32_t __attribute__((aligned(4))) buff[128];
+    //volatile uint32_t __attribute__((aligned(4))) buff[128];
 
     ////////////////////////////////////////////////
     // THIS DOES NOT WORK
@@ -151,13 +151,13 @@ int main(void) {
 
     /* THIS WORKS......NO CLUE WHY */
     uart0_printf("Attempting find..\n");
-    fat12_find("HELLO.TXT", buff, &startCluster, &size);
+    fat12_find("HELLO.TXT", buffer, &startCluster, &size);
     uart0_printf("Start Cluster: %d, File Size: %d\n", startCluster, size);
 
     uart0_printf("About to start read file test\n");
     //volatile uint32_t recvBuff[128];
 
-    //fat12_read_file(&startCluster, &size, recvBuff);
+    fat12_read_file(&startCluster, &size, buffer);
     /*for (int i = 0; i < 128; i++) {
 	uart0_printf("%c", (char)recvBuff[i]);	
     }*/
