@@ -22,18 +22,31 @@ void exception_handler(uint32_t exception) {
 	    {
 		uint32_t addr; 
 	        uint32_t status;
+                uint32_t reason;
 
                 uart0_printf("Data Abort Exception\n");
 
                 // this whole function is causing some embbeded bs
 
 
-		asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
+		//asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
 
-		//asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
+		asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
 
-		uart0_printf("Addr: %x \n", addr);
-		//uart0_printf("Status: %x \n", status);
+		//uart0_printf("Addr: %x \n", addr);
+		uart0_printf("Status: %x \n", status);
+
+                reason = status & 0xF;
+
+		switch(reason){
+		    case 0x0: uart0_printf("Alignment Fault\n"); break;
+                    case 0x4: uart0_printf("Translation Fault (Section)\n"); break;
+                    case 0x5: uart0_printf("Translation Fault (Page)\n"); break;
+                    case 0x8: uart0_printf("Permission Fault (Section)\n"); break;
+                    case 0x9: uart0_printf("Permission Fault (Page)\n"); break;
+                    default: uart0_printf("Unknown Fault\n"); break;
+		}
+
                 break;
 	    }
         case 3:  
@@ -88,6 +101,8 @@ void buddy(void) {
     for (i = 0; i < T; i++);
 
 }
+
+typedef void (*KernelStart)();
 
 int main(void) { 
 	
@@ -161,7 +176,16 @@ int main(void) {
     uart0_printf("%s\n", recvBuff);
 
     fat12_find("KERNEL.BIN", buffer, &startCluster, &size);
-    fat12_read_file(&startCluster, &size, 0x80000000);
+    fat12_read_file(&startCluster, &size, (volatile uint32_t *)0x80000000);
+
+    /*jump to kernel*/
+    uint32_t* kernel = (uint32_t*)0x80000000;
+    KernelStart kernelStart = (KernelStart)kernel;
+
+    uart0_printf("Jumping to kernel \n");
+
+    kernelStart();
+ 
 
     while (1);
 }

@@ -98,7 +98,10 @@ FAT load kernel or Load from raw: -- IN PROGRESS
         - takes a buffer, filename, and filesize
         - Reads file into the buffer
 - load kernel.bin using FAT 12 filesystem to start of sdram
-- load kerenl.bin from raw img
 
-contex switch to kernel:
+Create Test Kernel:
+- Marwan
+
+contex switch to kernel: -- IN PROGRESS
+- Marwan
 - jump / hand execution to kernel
