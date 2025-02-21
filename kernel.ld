@@ -7,31 +7,28 @@ ENTRY(init);
 
 SECTIONS 
 {
-    . = dram;
-    . = ALIGN(32);
-    __vector_load__ = .;
+    . = 0x80000000;
     .text :
-    {    
-	build/vector_table.o(.text);    
+    {        
         . = ALIGN(4);
         build/kinit.o(.text);
         build/kernel.o(.text.main);
         *(.text);
-    } > sram
+    } > dram
     .rodata :
     {
 	. = ALIGN(4);
         *(.rodata);
-    } > sram
+    } > dram
     .bss :
     {
 	. = ALIGN(4);    
         *(.bss);
-    } > sram
+    } > dram
     .data :
     {
 	. = ALIGN(4);    
         *(.data);
-    } > sram
+    } > dram
 }
 

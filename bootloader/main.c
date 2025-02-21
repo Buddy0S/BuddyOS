@@ -185,7 +185,8 @@ int main(void) {
     uart0_printf("Jumping to kernel \n");
 
     kernelStart();
- 
+
+    uart0_printf("Kernel Exited\n"); 
 
     while (1);
 }
