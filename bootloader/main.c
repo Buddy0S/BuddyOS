@@ -155,13 +155,11 @@ int main(void) {
     uart0_printf("Start Cluster: %d, File Size: %d\n", startCluster, size);
 
     uart0_printf("About to start read file test\n");
-    //volatile uint32_t recvBuff[128];
+    volatile uint32_t recvBuff[128];
 
-    fat12_read_file(&startCluster, &size, buffer);
-    /*for (int i = 0; i < 128; i++) {
-	uart0_printf("%c", (char)recvBuff[i]);	
-    }*/
-    
+    fat12_read_file(&startCluster, &size, recvBuff);
+    uart0_printf("%s\n", recvBuff);
+
     while (1);
 }
 
