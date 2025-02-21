@@ -57,7 +57,7 @@ $(BUILD_DIR)fat12.o : fat12.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) fat12.c -o $@
 
 $(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o $(BUILD_DIR)clock.o $(BUILD_DIR)ddr.o $(BUILD_DIR)memcmd.o $(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o | $(BIN_DIR)
-	$(PREFIX)ld -flto=all -T $^ -o $@
+	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 MLO : $(BIN_DIR)boot.out
 	$(PREFIX)objcopy -S -O binary $< $@

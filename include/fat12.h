@@ -58,4 +58,5 @@ typedef struct {
 void fat12_init(unsigned int startSector, volatile uint32_t* buffer); 
 int fat12_find(volatile char* filename, volatile uint32_t* buffer,
     volatile uint16_t *startCluster, volatile uint32_t *fileSize); 
+void fat12_read_file(volatile uint16_t *startCluster, volatile uint32_t *fileSize, volatile uint32_t* buffer);
 #endif

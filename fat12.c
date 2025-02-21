@@ -75,12 +75,12 @@ void fat12_init(unsigned int startSector, volatile uint32_t* buffer) {
 	for (int i = 0; i < 8; i++) {
 		extendedBootRecord.FATTypeLabel[i] = bootSector.extendedBootRecord[18 + i];
 	}
-
+/*
     uart0_printf("OEM = %s\n", bootSector.oemName);
     uart0_printf("Bytes per sector = %d\n", bootSector.bytesPerSector);
     uart0_printf("Sectors per cluster = %d\n", bootSector.sectorsPerCluster);
     uart0_printf("REC = %d\n", bootSector.rootEntryCount);
-
+*/
 }
 
 int fat12_find(volatile char* filename, volatile uint32_t* buffer,
@@ -126,7 +126,7 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
             
             /* File found - set passed pointers to appropriate values*/
             if (compareFileNames(&dirEntry, filename)) {
-                *startCluster = dirEntry.firstClusterLow;
+                *startCluster = dirEntry.firstClusterLow;// do we needd  this 2/20 9:21 pm Noah | (dirEntry.firstClusterHigh << 8);
                 *fileSize = dirEntry.fileSize;
                 uart0_printf("fat12_find - RETURNING 1\n");
                 return 1;
@@ -142,38 +142,70 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
 
 /* //wiki.osdev.org/FAT#FAT_12 */
 uint16_t fat12_get_next_cluster(uint16_t cluster) {
-    return 0;
+	uart0_printf("Entered getNextCluster\n");
+	uint16_t nextCluster;
+	
+	uint32_t FATTable[bootSector.bytesPerSector * 2]; /*may need to straddle a sector due to 12 bits */
+	uint32_t fatStart = bootSector.reservedSectorCount;
+	uint32_t fatOffset = cluster + (cluster / 2); /*1.5 bytes per entry */
+	uint32_t fatSector = fatStart + (fatOffset / bootSector.bytesPerSector);
+	uint32_t fatByteOffset = fatOffset % bootSector.bytesPerSector;
+
+	MMCreadblock(fatSector, FATTable);
+
+	if (cluster % 2 == 0) {
+		nextCluster = (FATTable[fatByteOffset] | ((FATTable[fatByteOffset + 1] & 0x0F) << 8)) & 0xFFF;
+	} else {
+		nextCluster = ((FATTable[fatByteOffset] >> 4) | (FATTable[fatByteOffset + 1] << 4)) & 0xFFF;
+	}
+
+    	return nextCluster;
 }
 
 /* //wiki.osdev.org/FAT#FAT_12 */
-void fat12_read_file(uint16_t startCluster, uint32_t fileSize, volatile
+void fat12_read_file(volatile uint16_t *startCluster, volatile uint32_t *fileSize, volatile
     uint32_t* buffer) {
-
+	uart0_printf("Entered read file\n");
 	uint32_t sectorRead; /* sector to start reading from */
 	uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
 
     	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
 	uint32_t bytesRead = 0;
-	uint16_t loopCluster = startCluster;
+	uint16_t loopCluster = *startCluster;
 
 	/* read until EOF marker */
 	while (loopCluster < FAT12_EOF_MIN) {
 		/* reads from first data sector available */
+		uart0_printf("Entered loopCluster loop\n");
 		sectorRead = rootSectorStart + numRootSectors + ((loopCluster-2) * bootSector.sectorsPerCluster);
+		uart0_printf("rootSectorStart = %d\n", rootSectorStart);
+		uart0_printf("numRootSectors = %d\n", numRootSectors);
+		uart0_printf("loopCluster = %d\n", loopCluster);
+		uart0_printf("sectorsPerCluster = %d\n", bootSector.sectorsPerCluster);
+		uart0_printf("Calculated sectorRead = %d\n", sectorRead);
 
 		/* need to divide bytesRead/4 to convert to pointer index */
-		MMCreadblock(sectorRead, buffer + bytesRead/4);
+		MMCreadblock(sectorRead, buffer + bytesRead / 4);
 
 		/* updates bytes read */
 		bytesRead += bootSector.bytesPerSector * bootSector.sectorsPerCluster;
+		uart0_printf("bytesRead = %d\n", bytesRead);
 
-		if (bytesRead > fileSize) {
+		if (bytesRead > *fileSize) {
+			uart0_printf("breaking");
 			break;
 		}
-
+	
+		/*uart0_printf("First 16 bytes of the buffer: ");
+        	for (int i = 0; i < 16; i++) {
+	        	uart0_printf("%s", buffer[i]);
+		}	            
+	        uart0_printf("\n");
+		*/
 		loopCluster = fat12_get_next_cluster(loopCluster);
 	}
-	
-    return;
+	uart0_printf("File read complete\n");
+    	return;
+
 }

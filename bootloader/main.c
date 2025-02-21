@@ -109,9 +109,17 @@ int main(void) {
     ///////////////////////////////////////////////
 
     /* THIS WORKS......NO CLUE WHY */
+    uart0_printf("Attempting find..\n");
     fat12_find("HELLO.TXT", buff, &startCluster, &size);
-
     uart0_printf("Start Cluster: %d, File Size: %d\n", startCluster, size);
+
+    uart0_printf("About to start read file test\n");
+    //volatile uint32_t recvBuff[128];
+
+    //fat12_read_file(&startCluster, &size, recvBuff);
+    /*for (int i = 0; i < 128; i++) {
+	uart0_printf("%c", (char)recvBuff[i]);	
+    }*/
     
     while (1);
 }
