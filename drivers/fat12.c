@@ -177,16 +177,17 @@ void fat12_read_file(volatile uint16_t *startCluster, volatile uint32_t *fileSiz
 	/* read until EOF marker */
 	while (loopCluster < FAT12_EOF_MIN) {
 		/* reads from first data sector available */
-		uart0_printf("Entered loopCluster loop\n");
+		//uart0_printf("Entered loopCluster loop\n");
 		sectorRead = rootSectorStart + numRootSectors + ((loopCluster-2) * bootSector.sectorsPerCluster);
-		uart0_printf("rootSectorStart = %d\n", rootSectorStart);
-		uart0_printf("numRootSectors = %d\n", numRootSectors);
-		uart0_printf("loopCluster = %d\n", loopCluster);
-		uart0_printf("sectorsPerCluster = %d\n", bootSector.sectorsPerCluster);
-		uart0_printf("Calculated sectorRead = %d\n", sectorRead);
+		//uart0_printf("rootSectorStart = %d\n", rootSectorStart);
+		//uart0_printf("numRootSectors = %d\n", numRootSectors);
+		//uart0_printf("loopCluster = %d\n", loopCluster);
+		//uart0_printf("sectorsPerCluster = %d\n", bootSector.sectorsPerCluster);
+		//uart0_printf("Calculated sectorRead = %d\n", sectorRead);
 
 		/* need to divide bytesRead/4 to convert to pointer index */
 		MMCreadblock(sectorRead, buffer + bytesRead / 4);
+                uart0_printf("Addr: %x\n", buffer + bytesRead / 4);
 
 		/* updates bytes read */
 		bytesRead += bootSector.bytesPerSector * bootSector.sectorsPerCluster;

@@ -19,7 +19,9 @@ init:
    @mcr p15, #0, r0, c12, c0, #0
 
    @ jump to main
-   bl main
+   @bl main
+
+   b .
 
 WRITE32:
     str r1,[r0]
