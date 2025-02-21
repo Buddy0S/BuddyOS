@@ -12,7 +12,7 @@ OUTPUT = BuddyOS.img
 all: $(OUTPUT)
 
 clean:
-	rm -rf $(OUTPUT) MLO header.bin build/ bin/ hello.txt
+	rm -rf $(OUTPUT) MLO kernel.bin build/ bin/ hello.txt
 
 $(BUILD_DIR) :
 	mkdir -p $(BUILD_DIR)
@@ -53,8 +53,8 @@ $(BUILD_DIR)memcmd.o : misc/memcmd.c | $(BUILD_DIR)
 $(BUILD_DIR)ddr.o : boardinit/ddr.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) boardinit/ddr.c -o $@
 
-$(BUILD_DIR)fat12.o : fat12.c | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) fat12.c -o $@
+$(BUILD_DIR)fat12.o : drivers/fat12.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) drivers/fat12.c -o $@
 
 $(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o $(BUILD_DIR)clock.o $(BUILD_DIR)ddr.o $(BUILD_DIR)memcmd.o $(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o | $(BIN_DIR)
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
@@ -62,12 +62,22 @@ $(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)in
 MLO : $(BIN_DIR)boot.out
 	$(PREFIX)objcopy -S -O binary $< $@
 
-BuddyOS.img: MLO
+$(BUILD_DIR)kinit.o : kernel/kinit.S | $(BUILD_DIR)
+	$(PREFIX)as kernel/kinit.S -o $@
+
+$(BUILD_DIR)kernel.o: kernel/main.c
+	$(PREFIX)gcc $(CFLAGS) kernel/main.c -o $@
+
+kernel.bin: $(BUILD_DIR)kernel.o $(BUILD_DIR)uart.o $(BUILD_DIR)kinit.o
+	$(PREFIX)gcc -nostartfiles -flto=all $(BUILD_DIR)kernel.o $(BUILD_DIR)uart.o $(BUILD_DIR)kinit.o -o $@ 
+
+BuddyOS.img: MLO kernel.bin
 	dd if=/dev/zero of=BuddyOS.img bs=512 count=2880
 	mkfs.fat -F 12 BuddyOS.img
 	mcopy -i BuddyOS.img MLO "::MLO"
 	echo "HI FROM FAT12!" > hello.txt
 	mcopy -i BuddyOS.img hello.txt "::hello.txt"
+	mcopy -i BuddyOS.img kernel.bin "::kernel.bin"
 
 objdump: BuddyOS.img
 	$(PREFIX)objdump -D -b binary -m arm MLO

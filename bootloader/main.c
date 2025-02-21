@@ -160,6 +160,9 @@ int main(void) {
     fat12_read_file(&startCluster, &size, recvBuff);
     uart0_printf("%s\n", recvBuff);
 
+    fat12_find("KERNEL.BIN", buffer, &startCluster, &size);
+    fat12_read_file(&startCluster, &size, 0x80000000);
+
     while (1);
 }
 
