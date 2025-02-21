@@ -63,4 +63,17 @@ fiq_interrupt:
 
 @ loop to stall unhandled exception types
 loop:
-   b loop
+
+    @ save registers to stack
+    stmfd sp!, {r0-r3, r11, lr}
+
+    @ save the saved program status register
+    mrs r11, spsr
+
+    @ jump to interrupt handler
+    bl exception_handler
+
+    msr spsr, r11 @ restore saved program status register
+    ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
+
+    b loop

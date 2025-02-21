@@ -11,6 +11,11 @@
 
 extern mmc_driver mmc;
 
+void exception_handler(){
+    uart0_printf("exception unhandled HALTING\n");
+    while(1){}
+}
+
 void buddy(void) {
 
     volatile int i;
