@@ -12,6 +12,14 @@
 
 init:
 
+   @ set stack pointer for SVC mode and dsiable interrupts
+   mrs r0, cpsr
+   bic r0, r0, #0x1F @ clear mode bits
+   orr r0, r0, #0x1F @ set System mode
+   msr cpsr, r0
+
+   ldr sp, = #0x81000000
+
    @ load vector table into vector table base address register
    @ our vector table is loaded at the start of sram
    @ Cortex a8 manual 3.2.68
