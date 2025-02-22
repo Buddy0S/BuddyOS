@@ -14,4 +14,8 @@
 #define ALLOC_START         (KERNEL_START + KERNEL_TOTAL)
 #define ALLOC_END           0x8FFFFFFF
 
+int init_alloc(void);
+void *kmalloc(uint32_t size);
+int kfree(void *ptr);
+
 #endif

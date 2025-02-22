@@ -99,6 +99,11 @@ void yield(void) {
 void kernel_main(void) {
     uart_puts("Welcome to buddyOS\n");
     scheduler_init();
+    if (init_alloc() >= 0) {
+        uart_puts("MEMORY ALLOCATOR INIT\n");
+    } else {
+        uart_puts("MEMORY ALLOCATOR FAILED TO INIT\n");
+    }
 
     /* For the initial context switch, set current_pcb to 0 so that the assembly code skips saving the kernel context */
     current_pcb = 0;
