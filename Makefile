@@ -12,7 +12,7 @@ OUTPUT = BuddyOS.img
 all: $(OUTPUT)
 
 clean:
-	rm -rf $(OUTPUT) MLO kernel.bin build/ bin/ hello.txt
+	rm -rf $(OUTPUT) MLO kernel.bin build/ bin/ hello.txt kernel.elf
 
 $(BUILD_DIR) :
 	mkdir -p $(BUILD_DIR)
@@ -68,8 +68,11 @@ $(BUILD_DIR)kinit.o : kernel/kinit.S | $(BUILD_DIR)
 $(BUILD_DIR)kernel.o: kernel/main.c
 	$(PREFIX)gcc $(CFLAGS) kernel/main.c -o $@
 
-kernel.bin: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)uart.o $(BUILD_DIR)kinit.o
+kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)uart.o $(BUILD_DIR)kinit.o
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
+
+kernel.bin: kernel.elf
+	$(PREFIX)objcopy -O binary kernel.elf kernel.bin
 
 BuddyOS.img: MLO kernel.bin
 	dd if=/dev/zero of=BuddyOS.img bs=512 count=2880
