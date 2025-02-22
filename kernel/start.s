@@ -44,5 +44,5 @@ load_next:
    is where this would be set to*/
     .global _stack_top
 _stack_top:
-    .word 0x80000000
+    .word 0x8F000000
 

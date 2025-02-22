@@ -55,6 +55,7 @@ int init_order_arr(int order, int size, uint32_t addr) {
 
     /* initialize the list head and tail */
     order_arr[order] = &list_structs[order];
+    order_arr[order] = (struct mem_list *)order_arr[order];
     
     /* set the first list head and tail */
     order_arr[order]->head = create_mem_block(order);
@@ -104,8 +105,17 @@ int init_alloc(void) {
     return 0;
 }
 
+uint8_t ctz(uint8_t x) {
+    uint8_t count = 0;
+    while ((x & 1) == 0 && x != 0) {
+        x >>= 1;
+        count++;
+    }
+    return count;
+}
+
 /* find order given size */
-uint8_t find_order(size_t n) {
+uint8_t find_order(uint32_t n) {
     if (n == 0) return 0;       /* handles 0 case */
     n--;            /* handles case where n is a power of 2 */
     n |= n >> 1;    /* propagate the 1s  */ 
@@ -115,38 +125,38 @@ uint8_t find_order(size_t n) {
     n |= n >> 16;
     n++;    /* convert to power of 2 */
 
-    return (uint8_t)__builtin_ctz(n);    /* return the order */
+    return ctz(n);    /* return the order */
 };
 
 /* find size given addr */
 uint32_t find_size(uint32_t addr) {
     addr = addr - KERNEL_DYNAMIC_START;
-    int size = MAX_BLOCK;
-    int bound = (size * NUM_BLOCK);
+    uint32_t size = MAX_BLOCK;
+    uint32_t bound = (size * BLOCK_NUM);
     while (size >= MIN_BLOCK) {
         if (addr < bound) {
             return size;
         } else {
             size = size >> 1;
-            bound += (size * NUM_BLOCK);
+            bound += (size * BLOCK_NUM);
         }
     }
     return -1;
 }
 
 /* simple memset */
-void memset32(uint32_t addr, uint32_t value, size_t size) {
+void memset32(uint32_t addr, uint32_t value, uint32_t size) {
     uint32_t *ptr = (uint32_t *)addr;
-    for (size_t i = 0; i < size / sizeof(uint32_t); i++) {
+    for (uint32_t i = 0; i < size / sizeof(uint32_t); i++) {
         ptr[i] = value;
     }
 }
 
-void *kmalloc(size_t size) {
+void *kmalloc(uint32_t size) {
     uint8_t order;
     uint32_t addr;
     int block_size;
-    void *alloc_block;
+    struct mem_block *alloc_block;
     order = find_order(size);
     block_size = (MIN_BLOCK << order);
     
@@ -170,7 +180,9 @@ void *kmalloc(size_t size) {
 
 int kfree(void *ptr) {
     uint8_t order;
-    volatile struct mem_block *free_block = (volatile struct mem_block *)ptr;
+
+    /* free block struct ptr and assigning */
+    struct mem_block *free_block = (struct mem_block *)ptr;
     
     free_block->addr = (uint32_t)ptr;
     free_block->size = find_size(free_block->addr);

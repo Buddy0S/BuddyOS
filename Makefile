@@ -37,7 +37,7 @@ CFLAGS += -I $(KERNEL_INC)
 all: $(QEMU_KERN) kernel.bin
 
 # Add the other object files here that the kernel needs to be compiled with
-$(QEMU_KERN): $(KERNEL_SRC)/start.o $(KERNEL_SRC)/kernel.o $(KERNEL_SRC)/uart.o
+$(QEMU_KERN): $(KERNEL_SRC)/start.o $(KERNEL_SRC)/kernel.o $(KERNEL_SRC)/uart.o $(KERNEL_SRC)/mm.o
 	$(LD) $(LDFLAGS) -o $@ $^
 
 kernel.bin: $(QEMU_KERN)

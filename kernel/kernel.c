@@ -1,5 +1,6 @@
 #include "uart.h"
 #include "proc.h"
+#include "mm.h"
 #include <stdint.h>
 
 #define STACK_SIZE    4096
