@@ -1,119 +1,85 @@
 #include "uart.h"
 #include "proc.h"
-#include "mm.h"
+#include "mm.h"        
 #include <stdint.h>
 
-#define STACK_SIZE    4096
-#define MAX_PROCESSES 1
+#define STACK_SIZE 1024
 
-/* Implement this later when real scheduling */
+/* Arrays for PCBs and their stacks */
+PCB pcb[3];
+uint32_t proc_stacks[3][STACK_SIZE];
+
+int current_index = 0;
+
+/* Externally defined context switch routine (in context_switch.S) */
+extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
+
+/* declarations for helper routines */
+void delay(void);
 void yield(void);
 
-/* Process stack for Process 1 (must be 8-byte aligned) */
-uint8_t process1_stack[STACK_SIZE] __attribute__((aligned(8)));
+/* Process function declarations */
+extern void process1(void);
+extern void process2(void);
+extern void process3(void);
 
-/* Process table and global process pointers.
-   We use 0 instead of NULL because we dont have NULL
-  (maybe we could make our own?) */
-PCB process_table[MAX_PROCESSES];
-PCB *current_pcb = 0;
-PCB *next_pcb = 0;
-
-extern void context_switch(void);
-
-/* This is a dummy process 1, not real but
-   it prints a message and then loops forever. */
-void process1_entry(void) {
-    uart_puts("This is process 1, infinitely loop\n");
-    while (1) {
-        /* Process halts here */
-    }
+/* Function for delay */
+void delay(void) {
+    for (volatile unsigned int i = 0; i < 1000000; i++);
 }
 
-/*
- * Initialize a process control block (PCB) and its stack.
- *
- * We reserve space for 14 32-bit words arranged as follows:
- *   Word 0: r0    (0)
- *   Word 1: r1    (0)
- *   Word 2: r2    (0)
- *   Word 3: r3    (0)
- *   Word 4: r4    (0)
- *   Word 5: r5    (0)
- *   Word 6: r6    (0)
- *   Word 7: r7    (0)
- *   Word 8: r8    (0)
- *   Word 9: r9    (0)
- *   Word 10: r10  (0)
- *   Word 11: r11  (0)
- *   Word 12: r12  (0)
- *   Word 13: lr   (process entry point)
- *
- * When the context_switch routine later does:
- *    pop {r0-r12, lr}
- * then registers r0–r12 will be restored as 0 and lr will be set to the entry point,
- * causing a branch (thru "bx lr") into the process entry function.
- */
-void init_process(PCB *pcb, void (*entry)(), uint8_t *stack) {
-    pcb->stack_base = (uint32_t *)stack;
-    pcb->stack_ptr = (uint32_t *)((uint8_t *)stack + STACK_SIZE - 14 * sizeof(uint32_t));
-
-    uint32_t *sp = pcb->stack_ptr;
-    sp[0]  = 0;              // r0
-    sp[1]  = 0;              // r1
-    sp[2]  = 0;              // r2
-    sp[3]  = 0;              // r3
-    sp[4]  = 0;              // r4
-    sp[5]  = 0;              // r5
-    sp[6]  = 0;              // r6
-    sp[7]  = 0;              // r7
-    sp[8]  = 0;              // r8
-    sp[9]  = 0;              // r9
-    sp[10] = 0;              // r10
-    sp[11] = 0;              // r11
-    sp[12] = 0;              // r12
-    sp[13] = (uint32_t)entry; // lr: branch here when context is restored
-}
-
-/* Initialize the single process */
-void scheduler_init(void) {
-    init_process(&process_table[0], process1_entry, process1_stack);
-    process_table[0].pid = 0;
-    process_table[0].state = READY;
-}
-
-/* For one process scheduler_get_next always returns the same process */
-PCB* scheduler_get_next(void) {
-    return &process_table[0];
-}
-
-/* Yield the CPU:
-   For one process this will simply reload the same process’s context.
- */
+/* The function switches context to the next process in an RR style, later
+ * we'll use a list for this */
 void yield(void) {
-    next_pcb = scheduler_get_next();
-    context_switch();
+    int next_index = (current_index + 1) % 3;
+    int old_index = current_index;
+    current_index = next_index;  /* Update current process index before switching */
+    switch_context((unsigned int **)&pcb[old_index].stack_ptr,
+                   (unsigned int **)&pcb[next_index].stack_ptr);
 }
 
-/* The kernel's main entry point */
+/* Initialize a process’s PCB so that when restored it begins execution at func */
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid) {
+    p->pid = pid;
+    p->state = READY;
+    p->stack_base = stack_base;
+
+    /* Set the stack pointer to the top of the process's stack */
+    uint32_t *stack_top = stack_base + STACK_SIZE;
+    /* Reserve space for registers r4–r11 and LR */
+    stack_top -= 9;
+    /* Initialize registers r4–r11 with 0 as the processes are nothing right now*/
+    for (int i = 0; i < 8; i++) {
+        stack_top[i] = 0;
+    }
+    /* Set the saved LR to the address of the process function;
+       when context is restored, execution will jump to func */
+    stack_top[8] = (uint32_t)func;
+    p->stack_ptr = stack_top;
+}
+
+/* Kernel entry point */
 void kernel_main(void) {
-    uart_puts("Welcome to buddyOS\n");
-    scheduler_init();
+    uart_puts("Welcome to BuddyOS\n");
+
+    /* Initialize buddyOS memory allocator */
     if (init_alloc() >= 0) {
         uart_puts("MEMORY ALLOCATOR INIT\n");
     } else {
         uart_puts("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
 
-    /* For the initial context switch, set current_pcb to 0 so that the assembly code skips saving the kernel context */
-    current_pcb = 0;
-    next_pcb = &process_table[0];
+    /* Initialize the three processes */
+    init_process(&pcb[0], process1, proc_stacks[0], 0);
+    init_process(&pcb[1], process2, proc_stacks[1], 1);
+    init_process(&pcb[2], process3, proc_stacks[2], 2);
 
-    /* Load the process context.
-       This pops the registers (including lr, which is set to process1_entry) and branches to process1_entry. */
-    context_switch();
+    /* Save the kernel context in a dummy variable and switch to process 1.
+       Execution will jump to process1 via its saved LR. */
+    unsigned int *kernel_sp;
+    switch_context(&kernel_sp, (unsigned int **)&pcb[0].stack_ptr);
 
-    /* Should never reach here; if we do, loop forever */
-    while (1) { }
+    /* Should never reach here */
+    while (1);
 }
 
