@@ -174,7 +174,7 @@ int main(void) {
 	fat12_read_file("HELLO.TXT", recvBuff);
     uart0_printf("%s\n", recvBuff);
 
-    uint32_t bytesRead = fat12_read_file("KERNEL.BIN", (volatile uint32_t *)0x80000000);
+    fat12_read_file("KERNEL.BIN", (volatile uint32_t *)0x80000000);
 
     /*jump to kernel*/
     uint32_t* kernel = (uint32_t*)0x80000000;
