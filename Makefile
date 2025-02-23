@@ -1,5 +1,6 @@
 # Set the kernel directory as a variable
 KERNEL_DIR = kernel
+INCLUDES = include
 
 # Compiler and Tools
 CROSS_COMPILE = arm-none-eabi-
@@ -23,54 +24,47 @@ QEMU_OPTS += -machine realview-pb-a8
 QEMU_OPTS += -no-reboot
 
 # Compilation Flags
-CFLAGS = -nostdlib -ffreestanding -Wall -Wextra -O0 -g
+CFLAGS = -nostdlib -ffreestanding -Wall -Wextra -O2
 LDFLAGS = -T kernel/linker.ld -nostdlib
 
 # Directories for kernel source and include
 KERNEL_SRC = $(KERNEL_DIR)
-KERNEL_INC = include
+KERNEL_INC = $(INCLUDES)
 
-# Include the kernel's headers
+# Include the kernel's headers from the include folder
 CFLAGS += -I $(KERNEL_INC)
 
 # Targets
 all: $(QEMU_KERN) kernel.bin
 
-# Add the other object files here that the kernel needs to be compiled with
-$(QEMU_KERN): $(KERNEL_SRC)/start.o $(KERNEL_SRC)/kernel.o $(KERNEL_SRC)/uart.o $(KERNEL_SRC)/mm.o
+$(QEMU_KERN): $(KERNEL_SRC)/start.o $(KERNEL_SRC)/kernel.o $(KERNEL_SRC)/uart.o $(KERNEL_SRC)/context_switch.o $(KERNEL_SRC)/process1.o $(KERNEL_SRC)/process2.o $(KERNEL_SRC)/process3.o $(KERNEL_SRC)/mm.o
 	$(LD) $(LDFLAGS) -o $@ $^
 
 kernel.bin: $(QEMU_KERN)
 	$(OBJCOPY) -O binary $< $@
 
-# Compile .c and .s files
 $(KERNEL_SRC)/%.o: $(KERNEL_SRC)/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(KERNEL_SRC)/%.o: $(KERNEL_SRC)/%.s
 	$(CC) -c -o $@ $<
 
-# Filesystem image creation
 $(FS_IMG):
 	qemu-img create -f raw $(FS_IMG) $(QEMU_FS_SIZE)
 
-# QEMU run target
 qemu: $(QEMU_KERN) $(FS_IMG)
 	$(QEMU) $(QEMU_OPTS) -kernel $(QEMU_KERN)
 
-# QEMU with GDB debugging
 qemu-gdb: $(QEMU_KERN) $(FS_IMG)
 	@echo "*****Starting QEMU for debugging*****"
 	@echo "*** Open another terminal and run 'make gdb-client' ***"
 	$(QEMU) $(QEMU_OPTS) -kernel $(QEMU_KERN) -S -gdb tcp::9000
 
-# GDB client setup
 gdb-client:
 	@echo "*****Starting GDB Remote Debugger*****"
 	@echo "*** Enter 'target remote tcp::9000' in GDB ***"
-	gdb $(QEMU_KERN)
+	$(CROSS_COMPILE)gdb $(QEMU_KERN)
 
-# Clean up object files and other generated files
 clean:
-	rm -f $(KERNEL_SRC)/*.o $(QEMU_KERN) $(KERNEL_DIR)/kernel.bin $(FS_IMG)
+	rm -f $(KERNEL_SRC)/*.o $(QEMU_KERN) kernel.bin $(FS_IMG)
 
