@@ -1,7 +1,6 @@
 #include <stdint.h>
-#include "uart.h"
-#include "led.h"
 #include "reg.h"
+#include "kernel.h"
 
 int main(){
 
