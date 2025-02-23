@@ -14,3 +14,6 @@ SECTIONS {
     }
 }
 
+/* Define the top of the initial kernel stack */
+PROVIDE(_stack_top = 0x8F000000);
+
