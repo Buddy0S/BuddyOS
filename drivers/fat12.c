@@ -159,6 +159,8 @@ uint16_t fat12_get_next_cluster(uint16_t cluster) {
 		nextCluster = ((FATTable[fatByteOffset] >> 4) | (FATTable[fatByteOffset + 1] << 4)) & 0xFFF;
 	}
 
+	uart0_printf("Next Cluster = %d\n",nextCluster);
+
     	return nextCluster;
 }
 
@@ -189,11 +191,11 @@ uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 		//uart0_printf("numRootSectors = %d\n", numRootSectors);
 		//uart0_printf("loopCluster = %d\n", loopCluster);
 		//uart0_printf("sectorsPerCluster = %d\n", bootSector.sectorsPerCluster);
-		//uart0_printf("Calculated sectorRead = %d\n", sectorRead);
+		uart0_printf("Calculated sectorRead = %d\n", sectorRead);
 
 		/* need to divide bytesRead/4 to convert to pointer index */
 		MMCreadblock(sectorRead, buffer + bytesRead / 4);
-        uart0_printf("Addr: %x\n", buffer + bytesRead / 4);
+                uart0_printf("Addr: %x\n", buffer + bytesRead / 4);
 
 		/* updates bytes read */
 		bytesRead += bootSector.bytesPerSector * bootSector.sectorsPerCluster;

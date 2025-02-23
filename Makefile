@@ -81,8 +81,6 @@ BuddyOS.img: MLO kernel.bin
 	dd if=/dev/zero of=BuddyOS.img bs=512 count=2880
 	mkfs.fat -F 12 BuddyOS.img
 	mcopy -i BuddyOS.img MLO "::MLO"
-	echo "HI FROM FAT12!" > hello.txt
-	mcopy -i BuddyOS.img hello.txt "::hello.txt"
 	mcopy -i BuddyOS.img kernel.bin "::kernel.bin"
 
 objdump: BuddyOS.img
