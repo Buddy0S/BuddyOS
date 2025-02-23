@@ -164,7 +164,6 @@ int main(void) {
     */
     ///////////////////////////////////////////////
 
-    /* THIS WORKS......NO CLUE WHY */
     uart0_printf("Attempting find..\n");
     fat12_find("HELLO.TXT", buffer, &startCluster, &size);
     uart0_printf("Start Cluster: %d, File Size: %d\n", startCluster, size);
@@ -172,11 +171,10 @@ int main(void) {
     uart0_printf("About to start read file test\n");
     volatile uint32_t recvBuff[128];
 
-    fat12_read_file(&startCluster, &size, recvBuff);
+	fat12_read_file("HELLO.TXT", recvBuff);
     uart0_printf("%s\n", recvBuff);
 
-    fat12_find("KERNEL.BIN", buffer, &startCluster, &size);
-    fat12_read_file(&startCluster, &size, (volatile uint32_t *)0x80000000);
+    uint32_t bytesRead = fat12_read_file("KERNEL.BIN", (volatile uint32_t *)0x80000000);
 
     /*jump to kernel*/
     uint32_t* kernel = (uint32_t*)0x80000000;

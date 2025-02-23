@@ -163,16 +163,22 @@ uint16_t fat12_get_next_cluster(uint16_t cluster) {
 }
 
 /* //wiki.osdev.org/FAT#FAT_12 */
-void fat12_read_file(volatile uint16_t *startCluster, volatile uint32_t *fileSize, volatile
-    uint32_t* buffer) {
+uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 	uart0_printf("Entered read file\n");
 	uint32_t sectorRead; /* sector to start reading from */
 	uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
 
-    	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
+	uint16_t startCluster;
+	uint32_t fileSize;
+
+	if (fat12_find(filename, buffer, &startCluster, &fileSize) == 0) {
+		return -1;
+	}
+
+   	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
 	uint32_t bytesRead = 0;
-	uint16_t loopCluster = *startCluster;
+	uint16_t loopCluster = startCluster;
 
 	/* read until EOF marker */
 	while (loopCluster < FAT12_EOF_MIN) {
@@ -187,20 +193,20 @@ void fat12_read_file(volatile uint16_t *startCluster, volatile uint32_t *fileSiz
 
 		/* need to divide bytesRead/4 to convert to pointer index */
 		MMCreadblock(sectorRead, buffer + bytesRead / 4);
-                uart0_printf("Addr: %x\n", buffer + bytesRead / 4);
+        uart0_printf("Addr: %x\n", buffer + bytesRead / 4);
 
 		/* updates bytes read */
 		bytesRead += bootSector.bytesPerSector * bootSector.sectorsPerCluster;
 		uart0_printf("bytesRead = %d\n", bytesRead);
 
-		if (bytesRead > *fileSize) {
-			uart0_printf("breaking");
+		if (bytesRead > fileSize) {
+			uart0_printf("breaking\n");
 			break;
 		}	
 				
 		loopCluster = fat12_get_next_cluster(loopCluster);
 	}
 	uart0_printf("File read complete\n");
-    	return;
+    return bytesRead;
 
 }
