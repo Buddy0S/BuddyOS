@@ -68,7 +68,10 @@ $(BUILD_DIR)kinit.o : kernel/kinit.S | $(BUILD_DIR)
 $(BUILD_DIR)kernel.o: kernel/main.c
 	$(PREFIX)gcc $(CFLAGS) kernel/main.c -o $@
 
-kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o 
+$(BUILD_DIR)kernelfunctions.o: kernel/kernelfunctions.c
+	$(PREFIX)gcc $(CFLAGS) kernel/kernelfunctions.c -o $@
+
+kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o $(BUILD_DIR)kernelfunctions.o 
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 kernel.bin: kernel.elf
