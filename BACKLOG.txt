@@ -35,4 +35,7 @@ PCB:
 		- Made a context switch function
 		- Made a load next context/PCB function
 		- Set the top of the stack to where QEMU loads from
+		- Created 3 process files that just output a message and then yield
+		- Got context switching to actually work, the 3 processes interleave output msgs
             - you need to look at mm.h and change it outside of reserved memory man
+	    - bro what
