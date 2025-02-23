@@ -4,7 +4,7 @@
 
 int main(){
 
-    kputc('T');
+    kputs("I hope this works");
 
     while(1){}	
 
