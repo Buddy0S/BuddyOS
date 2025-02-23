@@ -18,7 +18,7 @@ init:
    orr r0, r0, #0x1F @ set System mode
    msr cpsr, r0
 
-   ldr sp, = #0x81000000
+   ldr sp, = #0x80800000 @ end of reserved
 
    @ load vector table into vector table base address register
    @ our vector table is loaded at the start of sram
