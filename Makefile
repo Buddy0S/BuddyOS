@@ -71,7 +71,7 @@ $(BUILD_DIR)kernel.o: kernel/main.c
 $(BUILD_DIR)kernelfunctions.o: kernel/kernelfunctions.c
 	$(PREFIX)gcc $(CFLAGS) kernel/kernelfunctions.c -o $@
 
-kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o $(BUILD_DIR)kernelfunctions.o 
+kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)kernelfunctions.o 
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 kernel.bin: kernel.elf
