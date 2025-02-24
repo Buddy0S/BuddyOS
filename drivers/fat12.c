@@ -93,17 +93,17 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
 
     DirEntry dirEntry;
 
-    uart0_printf("Args = %s %d %d\n", filename, *startCluster, *fileSize);
+    //uart0_printf("Args = %s %d %d\n", filename, *startCluster, *fileSize);
 
-    uart0_printf("start = %d, numSectors = %d\n", rootSectorStart,
-    numRootSectors);
+    //uart0_printf("start = %d, numSectors = %d\n", rootSectorStart,
+    //numRootSectors);
 
     /* Iterate through each sector */
     for (uint32_t i = rootSectorStart; i < rootSectorStart + numRootSectors;
         i++) {
 
         MMCreadblock(i, buffer);
-        uart0_printf("Reading Sector %d ...\n", i);
+        //uart0_printf("Reading Sector %d ...\n", i);
 
         char *buf = (char*)buffer;
 
@@ -145,23 +145,23 @@ uint16_t fat12_get_next_cluster(uint16_t cluster) {
 	uart0_printf("Entered getNextCluster\n");
 	uint16_t nextCluster;
 	
-	uint32_t FATTable[bootSector.bytesPerSector * 2]; /*may need to straddle a sector due to 12 bits */
+	uint8_t FATTable[bootSector.bytesPerSector * 2]; /*may need to straddle a sector due to 12 bits */
 	uint32_t fatStart = bootSector.reservedSectorCount;
 	uint32_t fatOffset = cluster + (cluster / 2); /*1.5 bytes per entry */
 	uint32_t fatSector = fatStart + (fatOffset / bootSector.bytesPerSector);
 	uint32_t fatByteOffset = fatOffset % bootSector.bytesPerSector;
 
-	MMCreadblock(fatSector, FATTable);
+	MMCreadblock(fatSector, (uint32_t*)FATTable);
 
 	if (cluster % 2 == 0) {
-		nextCluster = (FATTable[fatByteOffset] | ((FATTable[fatByteOffset + 1] & 0x0F) << 8)) & 0xFFF;
+		nextCluster = (FATTable[fatByteOffset] | ((FATTable[fatByteOffset + 1]) << 8)) & 0xFFF;
 	} else {
 		nextCluster = ((FATTable[fatByteOffset] >> 4) | (FATTable[fatByteOffset + 1] << 4)) & 0xFFF;
 	}
 
 	uart0_printf("Next Cluster = %d\n",nextCluster);
 
-    	return nextCluster;
+	return nextCluster;
 }
 
 /* //wiki.osdev.org/FAT#FAT_12 */
@@ -178,6 +178,9 @@ uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 		return -1;
 	}
 
+	uart0_printf("Start Cluster = %d, Kernel Size = %d\n", startCluster,
+	fileSize);
+
    	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
 	uint32_t bytesRead = 0;
 	uint16_t loopCluster = startCluster;
@@ -189,7 +192,7 @@ uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 		sectorRead = rootSectorStart + numRootSectors + ((loopCluster-2) * bootSector.sectorsPerCluster);
 		//uart0_printf("rootSectorStart = %d\n", rootSectorStart);
 		//uart0_printf("numRootSectors = %d\n", numRootSectors);
-		//uart0_printf("loopCluster = %d\n", loopCluster);
+		uart0_printf("loopCluster = %d\n", loopCluster);
 		//uart0_printf("sectorsPerCluster = %d\n", bootSector.sectorsPerCluster);
 		uart0_printf("Calculated sectorRead = %d\n", sectorRead);
 
