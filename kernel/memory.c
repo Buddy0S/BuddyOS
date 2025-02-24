@@ -1,19 +1,7 @@
-#include "kernel.h"
-#include "reg.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "memory.h"
 
-void kputc(char c){
-    WRITE8(UART0_BASE, (uint8_t)c);
-}
-
-void kputs(const char *s) {
-    while (*s) {
-        kputc(*s++);
-    }
-}
-
-/* MEMORY */
 #define MAX_ORDER 5
 #define MIN_BLOCK 64
 #define MAX_BLOCK 1024
@@ -26,7 +14,7 @@ const uint32_t order_arr_addr = KERNEL_RESERVED_START;
 const uint32_t list_struct_addr = order_arr_addr + ((sizeof(void *) * MAX_ORDER) + 1);
 static uint32_t blocks_struct_addr = KERNEL_DYNAMIC_START;
 
-/* we gotta allocate memory for the array of lists via raw memory reference */
+/* we gotta allocate memory for the array of lists via raw memory reference */ 
 volatile struct mem_list **order_arr = (volatile struct mem_list **)order_arr_addr;
 volatile struct mem_list *list_structs = (volatile struct mem_list *)list_struct_addr;
 
@@ -68,7 +56,7 @@ int init_order_arr(int order, int size, uint32_t addr) {
     /* initialize the list head and tail */
     order_arr[order] = &list_structs[order];
     order_arr[order] = (struct mem_list *)order_arr[order];
-
+    
     /* set the first list head and tail */
     order_arr[order]->head = create_mem_block(order);
     if (order_arr[order]->head == NULL) {
@@ -130,7 +118,7 @@ uint8_t ctz(uint8_t x) {
 uint8_t find_order(uint32_t n) {
     if (n == 0) return 0;       /* handles 0 case */
     n--;            /* handles case where n is a power of 2 */
-    n |= n >> 1;    /* propagate the 1s  */
+    n |= n >> 1;    /* propagate the 1s  */ 
     n |= n >> 2;
     n |= n >> 4;
     n |= n >> 8;
@@ -171,7 +159,7 @@ void *kmalloc(uint32_t size) {
     struct mem_block *alloc_block;
     order = find_order(size);
     block_size = (MIN_BLOCK << order);
-
+    
     alloc_block = order_arr[order]->head;
     if (alloc_block == NULL) {
         return NULL;
@@ -195,7 +183,7 @@ int kfree(void *ptr) {
 
     /* free block struct ptr and assigning */
     struct mem_block *free_block = (struct mem_block *)ptr;
-
+    
     free_block->addr = (uint32_t)ptr;
     free_block->size = find_size(free_block->addr);
     free_block->next = NULL;
