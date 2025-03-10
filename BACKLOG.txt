@@ -1,0 +1,107 @@
+*Note even if you made minor contribution to a section 
+or spent time trying to get it work add your name to it
+
+
+# DONE
+
+initial setup -- DONE
+- Alexei
+
+boot off sd -- DONE
+- Alexei
+
+blink LEDs -- DONE
+- Alexei
+
+set stacks for each cpu mode -- DONE
+- Alexei
+- Marwan
+
+load vector table -- DONE
+- Marwan
+- Alexei
+
+set up interrupt handling -- DONE
+- Marwan
+
+set up timer interrupt -- DONE
+- Marwan
+
+init UART -- DONE
+- Alexei
+- Aaron
+- Noah
+
+UART output -- DONE
+- Aaron
+- Alexei
+- Noah
+
+UART input -- DONE
+- Marwan 
+    - did interrupt get char
+    - polling get char needs to be done (optional)
+
+set register function: -- DONE
+- Aaron
+    - made it cleaner to set register instead of all that casting
+    - function headers are in include/reg.h
+
+init clocks -- DONE
+- Marwan
+    - MPU PLL 
+    - CORE PLL 
+    - PERIPHERAL PLL
+    - DDR PLL
+- Alexei
+    - EMIF clock
+
+init sdram -- DONE
+- Alexei
+    - sdram starts at 0x80000000
+
+
+setup mmc loading:
+- Marwan 
+  - mmc init
+  - mmc send command
+  - mmc read block
+  - mmc write block
+
+# TODO
+
+UART terminal functions -- IN PROGRESS
+- print string 
+    - Noah
+- new line
+    - Noah
+- clear screen (maybe)
+- need to be able to print numbers and hex
+    - Noah
+- create a kprintf that takes a format string
+    - Noah 
+  - take var args
+  - format string
+  - print numbers
+  - print hex
+  - print newline
+
+FAT load kernel or Load from raw: -- IN PROGRESS
+-Noah + Aaron
+- Necessary Functions: 
+    - Read Boot sector from SD
+    - find_file(): 
+        - finds file on sd card given name
+        - Updates passed pointer with start_cluster and file_size
+        - returns 1 if file found 0 if not
+    - read_file():
+        - takes a buffer, filename, and filesize
+        - Reads file into the buffer
+- load kernel.bin using FAT 12 filesystem to start of sdram
+
+Create Test Kernel:
+- Marwan
+
+contex switch to kernel: -- IN PROGRESS
+- Marwan
+- jump / hand execution to kernel
