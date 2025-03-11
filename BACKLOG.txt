@@ -68,6 +68,10 @@ setup mmc loading:
   - mmc read block
   - mmc write block
 
+memory allocator
+- Kevin
+- Alexei
+
 # TODO
 
 UART terminal functions -- IN PROGRESS

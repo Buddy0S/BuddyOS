@@ -29,11 +29,11 @@ void exception_handler(uint32_t exception) {
                 // this whole function is causing some embbeded bs
 
 
-		//asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
+		asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
 
 		asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
 
-		//uart0_printf("Addr: %x \n", addr);
+		uart0_printf("Addr: %x \n", addr);
 		uart0_printf("Status: %x \n", status);
 
                 reason = status & 0xF;
