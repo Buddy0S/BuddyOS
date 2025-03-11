@@ -12,7 +12,7 @@
 
 /* addresses that we will be placing our data at */
 const uint32_t order_arr_addr = KERNEL_RESERVED_START;
-const uint32_t list_struct_addr = order_arr_addr + ((sizeof(void *) * MAX_ORDER) + 1);
+const uint32_t list_struct_addr = order_arr_addr + ((sizeof(void *) * MAX_ORDER));
 static uint32_t blocks_struct_addr = KERNEL_DYNAMIC_START;
 
 /* we gotta allocate memory for the array of lists via raw memory reference */ 
@@ -60,7 +60,6 @@ int init_order_arr(int order, int size, uint32_t addr) {
 
     /* initialize the list head and tail */
     order_arr[order] = &list_structs[order];
-    order_arr[order] = (struct mem_list *)order_arr[order];
     
     /* set the first list head and tail */
     order_arr[order]->head = create_mem_block(order);
