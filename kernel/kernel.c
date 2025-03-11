@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #define STACK_SIZE 1024
+#define NULL ((void *)0)
 
 /* Arrays for PCBs and their stacks */
 PCB pcb[3];
@@ -60,6 +61,7 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid) {
 
 /* Kernel entry point */
 void kernel_main(void) {
+    void *test;
     uart_puts("Welcome to BuddyOS\n");
 
     /* Initialize buddyOS memory allocator */
@@ -68,7 +70,12 @@ void kernel_main(void) {
     } else {
         uart_puts("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
-
+    if ((test = kmalloc(4)) == NULL) {
+        uart_puts("fail");
+    }
+    if (kfree(test) == -1) {
+        uart_puts("kfree fail");
+    }
     /* Initialize the three processes */
     init_process(&pcb[0], process1, proc_stacks[0], 0);
     init_process(&pcb[1], process2, proc_stacks[1], 1);

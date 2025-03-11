@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "mm.h"
+#include "uart.h"
 
 #define MAX_ORDER 5
 #define MIN_BLOCK 64
@@ -126,7 +127,7 @@ uint8_t find_order(uint32_t n) {
     n++;    /* convert to power of 2 */
 
     return ctz(n);    /* return the order */
-};
+}
 
 /* find size given addr */
 uint32_t find_size(uint32_t addr) {
@@ -174,7 +175,7 @@ void *kmalloc(uint32_t size) {
     addr = alloc_block->addr;
 
     memset32(addr, 0, block_size);
-
+    uart_puts("kmalloc reached return\n");
     return (void *)addr;
 }
 
@@ -199,6 +200,7 @@ int kfree(void *ptr) {
         order_arr[order]->tail->next = free_block;
         order_arr[order]->tail = free_block;
     }
+    uart_puts("kfree reached return\n");
     return 0;
 
 }
