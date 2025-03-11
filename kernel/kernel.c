@@ -70,11 +70,11 @@ void kernel_main(void) {
     } else {
         uart_puts("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
-    if ((test = kmalloc(4)) == NULL) {
-        uart_puts("fail");
+    if ((test = kmalloc(60)) == NULL) {
+        uart_puts("fail\n");
     }
     if (kfree(test) == -1) {
-        uart_puts("kfree fail");
+        uart_puts("kfree fail\n");
     }
 
     return

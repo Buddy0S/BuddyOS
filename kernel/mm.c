@@ -42,7 +42,7 @@ struct mem_list {
  */
 struct mem_block *create_mem_block(int order) {
     if (blocks_struct_addr > (KERNEL_DYNAMIC_START + KERNEL_DYNAMIC)) {
-        uart_puts("no more mem");
+        uart_puts("no more mem\n");
         return NULL;
     }
     volatile struct mem_block *block_structs = (volatile struct mem_block *)blocks_struct_addr;
@@ -166,6 +166,7 @@ void *kmalloc(uint32_t size) {
     struct mem_block *alloc_block;
 
     if (size > MAX_BLOCK || size <= 0) {
+        uart_puts("invalid size\n");
         return NULL;
     }
 
