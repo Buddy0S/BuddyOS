@@ -71,13 +71,11 @@ void kernel_main(void) {
         uart_puts("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
     if ((test = kmalloc(60)) == NULL) {
-        uart_puts("fail\n");
+        uart_puts("fail");
     }
     if (kfree(test) == -1) {
-        uart_puts("kfree fail\n");
+        uart_puts("kfree fail");
     }
-
-    return
     /* Initialize the three processes */
     init_process(&pcb[0], process1, proc_stacks[0], 0);
     init_process(&pcb[1], process2, proc_stacks[1], 1);
@@ -91,4 +89,5 @@ void kernel_main(void) {
     /* Should never reach here */
     while (1);
 }
+
 
