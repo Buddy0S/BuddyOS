@@ -70,7 +70,9 @@ setup mmc loading:
 
 memory allocator
 - Kevin
+    - wrote implementation
 - Alexei
+    - tested on hardware
 
 # TODO
 
@@ -109,3 +111,7 @@ Create Test Kernel:
 contex switch to kernel: -- IN PROGRESS
 - Marwan
 - jump / hand execution to kernel
+
+ISR in kernel
+- Kevin
+- Alexei
