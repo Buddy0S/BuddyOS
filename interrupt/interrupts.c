@@ -129,6 +129,13 @@ void interrupt_handler(){
 
 }
 
+void svc_handler(uint32_t svc_num, uint32_t args[]) {
+
+    uart0_printf("%d", svc_num);
+    return;
+
+}
+
 /* Renables interrupts by clearing the 
  * IRQ and FIQ disable bits in cpsr
  * */
@@ -150,3 +157,4 @@ void disable_interrupts(void){
         " msr cpsr, r1 \n\t");
 
 }
+

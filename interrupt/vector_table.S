@@ -23,8 +23,30 @@ undefined_instruction:
     b loop
 
 supervisor_call:
-    ldr r0, =1
-    b loop
+
+    @ save registers to stack
+    stmfd sp!, {r0-r3, r11, lr}
+
+    @ save address of stack for access to parameters
+    mov r1, sp
+ 
+    @ save the saved program status register
+    mrs r11, spsr
+
+    @ get svc number
+    ldr r0, [lr, #-4]
+
+    @ svc num in r0, parameters array in a1
+
+    @ jump to interrupt handler 
+    bl svc_handler
+
+    msr spsr, r11 @ restore saved program status register
+    ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
+
+    subs pc, lr, #0 @ restore execution
+
+
 
 prefetch_abort:
     ldr r0, =4
