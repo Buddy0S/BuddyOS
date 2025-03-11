@@ -89,12 +89,12 @@ int main(){
     uart0_printf("Entering Kernel\n");
 
     /* Initialize buddyOS memory allocator */
-    /*if (init_alloc() >= 0) {
+    if (init_alloc() >= 0) {
         uart0_printf("MEMORY ALLOCATOR INIT\n");
     } else {
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
-    */
+    
 
     /* Initialize the three processes */
     init_process(&pcb[0], process1, proc_stacks[0], 0);

@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "memory.h"
+#include "uart.h"
 
 #define MAX_ORDER 5
 #define MIN_BLOCK 64
@@ -11,7 +12,7 @@
 
 /* addresses that we will be placing our data at */
 const uint32_t order_arr_addr = KERNEL_RESERVED_START;
-const uint32_t list_struct_addr = order_arr_addr + ((sizeof(void *) * MAX_ORDER) + 1);
+const uint32_t list_struct_addr = order_arr_addr + ((sizeof(void *) * MAX_ORDER));
 static uint32_t blocks_struct_addr = KERNEL_DYNAMIC_START;
 
 /* we gotta allocate memory for the array of lists via raw memory reference */ 
@@ -40,6 +41,10 @@ struct mem_list {
  * no memory overhead.
  */
 struct mem_block *create_mem_block(int order) {
+    if (blocks_struct_addr > (KERNEL_DYNAMIC_START + KERNEL_DYNAMIC)) {
+        uart0_puts("no more mem\n");
+        return NULL;
+    }
     volatile struct mem_block *block_structs = (volatile struct mem_block *)blocks_struct_addr;
     blocks_struct_addr += (MIN_BLOCK << order);
     return (struct mem_block *)block_structs;
@@ -55,7 +60,6 @@ int init_order_arr(int order, int size, uint32_t addr) {
 
     /* initialize the list head and tail */
     order_arr[order] = &list_structs[order];
-    order_arr[order] = (struct mem_list *)order_arr[order];
     
     /* set the first list head and tail */
     order_arr[order]->head = create_mem_block(order);
@@ -116,7 +120,9 @@ uint8_t ctz(uint8_t x) {
 
 /* find order given size */
 uint8_t find_order(uint32_t n) {
-    if (n == 0) return 0;       /* handles 0 case */
+    if (n <= MIN_BLOCK) {
+        return 0;
+    }
     n--;            /* handles case where n is a power of 2 */
     n |= n >> 1;    /* propagate the 1s  */ 
     n |= n >> 2;
@@ -125,19 +131,19 @@ uint8_t find_order(uint32_t n) {
     n |= n >> 16;
     n++;    /* convert to power of 2 */
 
-    return ctz(n);    /* return the order */
-};
+    return ctz((n / MIN_BLOCK));    /* return the order */
+}
 
 /* find size given addr */
 uint32_t find_size(uint32_t addr) {
     addr = addr - KERNEL_DYNAMIC_START;
-    uint32_t size = MAX_BLOCK;
+    uint32_t size = MIN_BLOCK;
     uint32_t bound = (size * BLOCK_NUM);
-    while (size >= MIN_BLOCK) {
+    while (size <= MAX_BLOCK) {
         if (addr < bound) {
             return size;
         } else {
-            size = size >> 1;
+            size = size << 1;
             bound += (size * BLOCK_NUM);
         }
     }
@@ -157,9 +163,15 @@ void *kmalloc(uint32_t size) {
     uint32_t addr;
     int block_size;
     struct mem_block *alloc_block;
+
+    if (size > MAX_BLOCK || size <= 0) {
+        uart0_puts("invalid size\n");
+        return NULL;
+    }
+
     order = find_order(size);
     block_size = (MIN_BLOCK << order);
-    
+
     alloc_block = order_arr[order]->head;
     if (alloc_block == NULL) {
         return NULL;
@@ -174,7 +186,7 @@ void *kmalloc(uint32_t size) {
     addr = alloc_block->addr;
 
     memset32(addr, 0, block_size);
-
+    uart0_puts("kmalloc reached return\n");
     return (void *)addr;
 }
 
@@ -199,8 +211,8 @@ int kfree(void *ptr) {
         order_arr[order]->tail->next = free_block;
         order_arr[order]->tail = free_block;
     }
+    uart0_puts("kfree reached return\n");
     return 0;
 
 }
-
 
