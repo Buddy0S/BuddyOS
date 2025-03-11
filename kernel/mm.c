@@ -41,6 +41,10 @@ struct mem_list {
  * no memory overhead.
  */
 struct mem_block *create_mem_block(int order) {
+    if (blocks_struct_addr > (KERNEL_DYNAMIC_START + KERNEL_DYNAMIC)) {
+        uart_puts("no more mem");
+        return NULL;
+    }
     volatile struct mem_block *block_structs = (volatile struct mem_block *)blocks_struct_addr;
     blocks_struct_addr += (MIN_BLOCK << order);
     return (struct mem_block *)block_structs;
@@ -117,7 +121,9 @@ uint8_t ctz(uint8_t x) {
 
 /* find order given size */
 uint8_t find_order(uint32_t n) {
-    if (n == 0) return 0;       /* handles 0 case */
+    if (n <= MIN_BLOCK) {
+        return 0;
+    }
     n--;            /* handles case where n is a power of 2 */
     n |= n >> 1;    /* propagate the 1s  */ 
     n |= n >> 2;
@@ -126,19 +132,19 @@ uint8_t find_order(uint32_t n) {
     n |= n >> 16;
     n++;    /* convert to power of 2 */
 
-    return ctz(n);    /* return the order */
+    return ctz((n / MIN_BLOCK));    /* return the order */
 }
 
 /* find size given addr */
 uint32_t find_size(uint32_t addr) {
     addr = addr - KERNEL_DYNAMIC_START;
-    uint32_t size = MAX_BLOCK;
+    uint32_t size = MIN_BLOCK;
     uint32_t bound = (size * BLOCK_NUM);
-    while (size >= MIN_BLOCK) {
+    while (size <= MAX_BLOCK) {
         if (addr < bound) {
             return size;
         } else {
-            size = size >> 1;
+            size = size << 1;
             bound += (size * BLOCK_NUM);
         }
     }
@@ -158,9 +164,14 @@ void *kmalloc(uint32_t size) {
     uint32_t addr;
     int block_size;
     struct mem_block *alloc_block;
+
+    if (size > MAX_BLOCK || size <= 0) {
+        return NULL;
+    }
+
     order = find_order(size);
     block_size = (MIN_BLOCK << order);
-    
+
     alloc_block = order_arr[order]->head;
     if (alloc_block == NULL) {
         return NULL;

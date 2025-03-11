@@ -76,6 +76,8 @@ void kernel_main(void) {
     if (kfree(test) == -1) {
         uart_puts("kfree fail");
     }
+
+    return
     /* Initialize the three processes */
     init_process(&pcb[0], process1, proc_stacks[0], 0);
     init_process(&pcb[1], process2, proc_stacks[1], 1);
