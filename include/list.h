@@ -39,7 +39,7 @@ struct KListIter {
  *  THIS ASSUMES YOU ARE RIGHT ABOUT THE ATTRIBUTE AND CLASS BE CAREFUL!!!!
  */
 #define knode_data(entry_ptr, struc, attr) \
-    (type*)((void*) entry_ptr - offsetof(struc, attr));
+    (struc*)((void*) entry_ptr - offsetof(struc, attr));
 
 static inline void list_init(struct KList *list) {
     list->next = list;
