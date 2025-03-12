@@ -22,6 +22,7 @@ undefined_instruction:
     ldr r0, =3
     b loop
 
+@ can't use svc in supervisor node
 supervisor_call:
 
     @ save registers to stack
