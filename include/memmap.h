@@ -1,7 +1,8 @@
 /* Special memory addresses */
 
-#ifndef MEMORY_H
-#define MEMORY_H
+#ifndef MEMMAP_H
+
+#define MEMMAP_H
 
 /* Clock Module bases */
 #define CM_PER      0x44E00000

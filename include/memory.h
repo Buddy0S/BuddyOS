@@ -1,5 +1,5 @@
-#ifndef MM_H
-#define MM_H
+#ifndef MEMORY_H
+#define MEMORY_H
 
 #define KERNEL_START        0x80000000
 #define KERNEL_SIZE         0x00400000  /* 4MB */

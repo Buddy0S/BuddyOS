@@ -37,7 +37,7 @@ CFLAGS += -I $(KERNEL_INC)
 # Targets
 all: $(QEMU_KERN) kernel.bin
 
-$(QEMU_KERN): $(KERNEL_SRC)/start.o $(KERNEL_SRC)/kernel.o $(KERNEL_SRC)/uart.o $(KERNEL_SRC)/context_switch.o $(KERNEL_SRC)/process1.o $(KERNEL_SRC)/process2.o $(KERNEL_SRC)/process3.o $(KERNEL_SRC)/mm.o $(KERNEL_SRC)/proc.o
+$(QEMU_KERN): $(KERNEL_SRC)/start.o $(KERNEL_SRC)/kernel.o $(KERNEL_SRC)/uart.o $(KERNEL_SRC)/context_switch.o $(KERNEL_SRC)/process1.o $(KERNEL_SRC)/process2.o $(KERNEL_SRC)/process3.o $(KERNEL_SRC)/memory.o $(KERNEL_SRC)/proc.o
 	$(LD) $(LDFLAGS) -o $@ $^
 
 kernel.bin: $(QEMU_KERN)

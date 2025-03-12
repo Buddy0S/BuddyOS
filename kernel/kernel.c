@@ -1,6 +1,6 @@
 #include "uart.h"
 #include "proc.h"
-#include "mm.h"        
+#include "memory.h"        
 #include <stdint.h>
 
 /* Process function declarations */
