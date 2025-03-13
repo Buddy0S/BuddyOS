@@ -90,9 +90,7 @@ void process3(void) {
 
 int test_syscall(int a, int b) {
 
-    SYSCALL(0);
-
-    return a;
+    return SYSCALL(0);
 }
 
 
