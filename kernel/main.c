@@ -12,7 +12,8 @@
 PCB pcb[3];
 uint32_t proc_stacks[3][STACK_SIZE];
 
-int current_index = 0;
+
+extern int current_index = 0;
 
 /* Externally defined context switch routine (in context_switch.S) */
 extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
