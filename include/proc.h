@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <list.h>
+#include <file.h>
 
 #define MAX_PROCS   3
 #define STACK_SIZE  1024
@@ -35,20 +36,19 @@ typedef struct PCB {
     uint32_t *stack_ptr;      /* Pointer to the saved context (stack pointer) */
     uint32_t *stack_base;     /* Base address of the allocated stack */
 
-    int exitCode;             /* Code/signal from when a process is interrupted */
-
+    int exitStatus;             /* Code/signal from when a process is interrupted */
 
 } PCB;
 
 /* Global process table and stacks */
 extern PCB PROC_TABLE[MAX_PROCS];
 extern uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
-extern int CURRENT_INDEX;
+extern int current_index;
 
 /* Function declarations */
 void delay(void);
 void yield(void);
-void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid);
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority pri);
 extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
 
 #endif /* PROC_H */
