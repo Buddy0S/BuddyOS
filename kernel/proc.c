@@ -68,4 +68,7 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, Pro
        when the context is restored, execution will jump to func */
     stack_top[8] = (uint32_t) func;
     p->stack_ptr = stack_top;
+
+    /* Add this process to the ready queue */
+    list_add_tail(&ready_queue, &p->sched_node);
 }
