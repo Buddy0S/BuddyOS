@@ -23,11 +23,22 @@ void delay(void) {
 
 /* Round-robin yield: switches context to the next process */
 void yield(void) {
-    int next_index = (current_index + 1) % MAX_PROCS;
-    int old_index = current_index;
-    current_index = next_index;  /* Update current process index before switching */
-    switch_context((unsigned int **)&PROC_TABLE[old_index].stack_ptr,
-                   (unsigned int **)&PROC_TABLE[next_index].stack_ptr);
+    
+    delay();
+
+    PCB *current = current_process;
+    
+    /* Remove the head node and add it to the tail */
+    struct KList *node = list_pop(&ready_queue);
+    list_add_tail(&ready_queue, node);
+    
+    /* The new head of the ready queue is the next process */
+    PCB *next = knode_data(list_first(&ready_queue), PCB, sched_node);
+    current_process = next;
+    
+    /* Switch context from current process to the next process */
+    switch_context((unsigned int **)&current->stack_ptr,
+                   (unsigned int **)&next->stack_ptr);
 }
 
 /* Initialize a process's PCB so that when its context is restored, execution begins at func */
