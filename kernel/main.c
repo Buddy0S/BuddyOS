@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "syscall.h"
 #include "reg.h"
 #include "uart.h"
 #include "memory.h"
@@ -9,6 +10,7 @@
 /* Arrays for PCBs and their stacks */
 PCB pcb[3];
 uint32_t proc_stacks[3][STACK_SIZE];
+
 
 int current_index = 0;
 
@@ -53,40 +55,74 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid) {
     for (int i = 0; i < 8; i++) {
         stack_top[i] = 0;
     }
+
+    asm volatile("  \n\t    \
+   mrs r0, cpsr     \n\t    \
+   bic r0, r0, #0x1F\n\t    \
+   orr r0, r0, #0x1F\n\t    \
+            ");
+    
+    register uint32_t r0 asm("r0");
+    stack_top[7] = r0;
+
+    // our exception handlers store spsr into r11, so i think we should be able
+    // to initialize spsr mode here for when we eventually make context switching
+    // happen on timer interrupt or yield syscall
+
     /* Set the saved LR to the address of the process function;
        when context is restored, execution will jump to func */
     stack_top[8] = (uint32_t)func;
     p->stack_ptr = stack_top;
 }
 
+// these syscalls 1-3 do not have return values, so they will print the
+// value that was in r0 when they were called
+
 void process1(void) {
     while (1) {
         uart0_printf("Process 1\n");
+        register uint32_t sp asm("sp");
+        uart0_printf("current sp: %x\n", sp);
         delay();
-        yield();
+        SYSCALL(1);
     }
 }
 
 void process2(void) {
     while (1) {
         uart0_printf("Process 2\n");
+        register uint32_t sp asm("sp");
+        uart0_printf("current sp: %x\n", sp);
         delay();
-        yield();
+        SYSCALL(1);
     }
 }
 
 void process3(void) {
     while (1) {
         uart0_printf("Process 3\n");
+        register uint32_t sp asm("sp");
+        uart0_printf("current sp: %x\n", sp);
         delay();
-        yield();
+        SYSCALL(1);
     }
 }
 
+/* test function that calls a syscall that takes 2 arguments */
+int test_syscall_sum(int a, int b) {
+    return SYSCALL(0);
+}
+
+unsigned int *kernel_sp;
+extern void supervisor_call(void);
 
 int main(){
 
     uart0_printf("Entering Kernel\n");
+    register uint32_t sp asm("sp");
+    uart0_printf("current sp: %x\n", sp);
+    uart0_printf("return result of %d + %d is %d\n", 10, 34, test_syscall_sum(10, 34));
+
 
     /* Initialize buddyOS memory allocator */
     if (init_alloc() >= 0) {
@@ -103,7 +139,6 @@ int main(){
 
     /* Save the kernel context in a dummy variable and switch to process 1.
        Execution will jump to process1 via its saved LR. */
-    unsigned int *kernel_sp;
     switch_context(&kernel_sp, (unsigned int **)&pcb[0].stack_ptr);
 
     while(1){}	

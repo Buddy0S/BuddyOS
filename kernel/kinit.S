@@ -10,7 +10,20 @@
 .global WRITE16
 .global WRITE8
 
+.extern supervisor_call
+
 init:
+
+   mrs r0, cpsr
+   bic r0, r0, #0x1F @ clear mode bits
+   orr r0, r0, #0x13 @ set svc mode
+   msr cpsr, r0
+
+   @ load vector table into vector table base address register
+   @ our vector table is loaded at the start of sram
+   @ Cortex a8 manual 3.2.68
+   ldr r0, =vector_table
+   mcr p15, #0, r0, c12, c0, #0
 
    @ set stack pointer for SVC mode and dsiable interrupts
    mrs r0, cpsr
@@ -18,13 +31,7 @@ init:
    orr r0, r0, #0x1F @ set System mode
    msr cpsr, r0
 
-   ldr sp, = #0x8F000000 @ end of reserved
-
-   @ load vector table into vector table base address register
-   @ our vector table is loaded at the start of sram
-   @ Cortex a8 manual 3.2.68
-   @ldr r0, =__vector_load__
-   @mcr p15, #0, r0, c12, c0, #0
+   ldr sp, =#0x8F000000 @ end of reserved
 
    @ jump to main
    bl main
@@ -57,6 +64,7 @@ READ8:
 
 .global switch_context
 .type switch_context, %function
+@ this shit doesnt work abdullah
 switch_context:
     stmdb sp!, {r4-r11, lr}   /* Save registers and LR on current stack */
     str sp, [r0]              /* Store current SP into *old_sp */

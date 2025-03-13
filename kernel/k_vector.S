@@ -1,3 +1,4 @@
+
 .global vector_table
 
 @ ARM V7 Vector Table
@@ -7,7 +8,7 @@
 vector_table:
     b init                   @ Used for Reset
     b undefined_instruction
-    b temp_supervisor_call
+    b supervisor_call
     b prefetch_abort
     b data_abort
     b not_used
@@ -20,11 +21,6 @@ vector_table:
 
 undefined_instruction:
     ldr r0, =3
-    b loop
-
-temp_supervisor_call:
-
-    ldr r0, =1
     b loop
 
 prefetch_abort:
@@ -65,10 +61,37 @@ irq_interrupt:
 fiq_interrupt:
     b loop
 
-
 loop:
 
     @ jump to exception handler
-    bl exception_handler
-
+    bl kexception_handler
     b loop
+
+@ can't use svc in supervisor node
+.global supervisor_call
+supervisor_call:
+
+    @ save registers to stack
+    stmfd sp!, {r0-r3, r11, lr}
+
+    @ save address of stack for access to parameters
+    mov r1, sp
+ 
+    @ save the saved program status register
+    mrs r11, spsr
+
+    @ get svc number
+    ldr r0, [lr, #-4]
+    bic r0, #0xFF000000
+
+    @ svc num in r0, parameters array in r1
+
+    @ jump to interrupt handler 
+    bl svc_handler
+
+    msr spsr, r11 @ restore saved program status register
+    ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
+
+    subs pc, lr, #0 @ restore execution
+
+
