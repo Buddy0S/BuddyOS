@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "memory.h"
 #include "uart.h"
 
 
@@ -8,8 +9,15 @@ void yield(void) {}
 /* fork */
 int fork(void) {}
 
-/* malloc */
-void *malloc(size_t size) {}
+/* malloc (temp) */
+void *malloc(size_t size) {
+    return kmalloc(size);
+}
+
+/* free */
+void free(void *addr) {
+    kfree(addr);
+}
 
 /* get pid */
 uint32_t *getPid() {}
