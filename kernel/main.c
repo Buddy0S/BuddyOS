@@ -61,10 +61,13 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid) {
     p->stack_ptr = stack_top;
 }
 
+// these syscalls 1-3 do not have return values, so they will print the
+// value that was in r0 when they were called
+
 void process1(void) {
     while (1) {
         uart0_printf("Process 1\n");
-    SYSCALL(1);
+        uart0_printf("return value: %d\n", SYSCALL(1));
         delay();
         yield();
     }
@@ -73,7 +76,7 @@ void process1(void) {
 void process2(void) {
     while (1) {
         uart0_printf("Process 2\n");
-    SYSCALL(2);
+        uart0_printf("return value: %d\n", SYSCALL(2));
         delay();
         yield();
     }
@@ -82,14 +85,13 @@ void process2(void) {
 void process3(void) {
     while (1) {
         uart0_printf("Process 3\n");
-    SYSCALL(3);
+        uart0_printf("return value: %d\n", SYSCALL(3));
         delay();
         yield();
     }
 }
 
-int test_syscall(int a, int b) {
-
+int test_syscall_sum(int a, int b) {
     return SYSCALL(0);
 }
 
@@ -97,7 +99,7 @@ int test_syscall(int a, int b) {
 int main(){
 
     uart0_printf("Entering Kernel\n");
-    uart0_printf("return result: %d\n", test_syscall(10, 34));
+    uart0_printf("return result of %d + %d is %d\n", 10, 34, test_syscall_sum(10, 34));
 
 
     /* Initialize buddyOS memory allocator */

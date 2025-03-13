@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "interrupts.h"
 #include "led.h"
+#include "syscall.h"
 #include "timer.h"
 #include "uart.h"
 
@@ -131,6 +132,10 @@ void interrupt_handler(){
 
 }
 
+uint32_t test_syscall(int a, int b) {
+    return a + b;
+}
+
 void svc_handler(uint32_t svc_num, uint32_t args[]) {
     // arguments will be put into the args array, but technically its just
     // a pointer to the bottom of the process stack that performed the syscall
@@ -140,7 +145,13 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     uart0_printf("r1: %d\n", args[1]);
     uart0_printf("r2: %d\n", args[2]);
     uart0_printf("r3: %d\n", args[3]);
-    args[0] = 2;
+    // to give a return value for the system call, put it into args[0]
+    switch (svc_num) {
+        case TEST_SYSCALL_2_ARGS_NR:
+            // takes two arguments from r0 and r1 and returns their sum
+            args[0] = test_syscall(args[0], args[1]);
+            break;
+    }
     return;
 }
 
