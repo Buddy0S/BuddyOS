@@ -14,8 +14,8 @@ void *malloc(size_t size) {}
 /* get pid */
 uint32_t *getPid() {}
 
-/* printf */
-void printf(void *in) {}
-
 /* kill */
 int kill(uint32_t pid);
+
+/* printf */
+//void printf(void *in) {}

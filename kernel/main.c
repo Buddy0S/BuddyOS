@@ -91,6 +91,7 @@ void process3(void) {
     }
 }
 
+/* test function that calls a syscall that takes 2 arguments */
 int test_syscall_sum(int a, int b) {
     return SYSCALL(0);
 }

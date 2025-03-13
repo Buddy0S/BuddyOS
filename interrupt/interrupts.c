@@ -136,6 +136,13 @@ uint32_t test_syscall(int a, int b) {
     return a + b;
 }
 
+/* called by supervisor vector in idt when svc interrupt is raised.
+ *
+ * supervisor vector in vector_table.S passes syscall number and function
+ * arguments to this handler.
+ *
+ * marked as void return but may place a return value into r0 which will
+ * then be returned to the caller by the supervisor vector. */
 void svc_handler(uint32_t svc_num, uint32_t args[]) {
     // arguments will be put into the args array, but technically its just
     // a pointer to the bottom of the process stack that performed the syscall
@@ -147,10 +154,14 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     uart0_printf("r3: %d\n", args[3]);
     // to give a return value for the system call, put it into args[0]
     switch (svc_num) {
-        case TEST_SYSCALL_2_ARGS_NR:
+        case SYSCALL_TEST_2_ARGS_NR: // can definitely replace this number later
             // takes two arguments from r0 and r1 and returns their sum
             args[0] = test_syscall(args[0], args[1]);
             break;
+        default:
+            uart0_printf("invalid or unimplemented syscall\n");
+            break;
+
     }
     return;
 }
