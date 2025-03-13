@@ -30,7 +30,8 @@ typedef struct PCB {
     ProcessState state;       /* Process state */
     ProcessPriority prio;      /* Process priority */
 
-    KNode children;            /* A list of this proc's children */
+    struct KList children;     /* A list of this proc's children */
+    struct KList sched_node;   /* Node for the scheduler's ready queue */
 
     uint32_t *stack_ptr;      /* Pointer to the saved context (stack pointer) */
     uint32_t *stack_base;     /* Base address of the allocated stack */
