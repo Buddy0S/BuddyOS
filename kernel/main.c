@@ -9,7 +9,7 @@
 #define STACK_SIZE 1024
 
 /* Arrays for PCBs and their stacks */
-PCB pcb[3];
+extern PCB pcb[3];
 uint32_t proc_stacks[3][STACK_SIZE];
 
 
