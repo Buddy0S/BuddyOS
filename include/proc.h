@@ -36,6 +36,8 @@ typedef struct PCB {
     uint32_t *stack_ptr;      /* Pointer to the saved context (stack pointer) */
     uint32_t *stack_base;     /* Base address of the allocated stack */
 
+    uint32_t *kernel_sp;      /* Kernel stack pointer for saving kernel context */
+
     int exitStatus;             /* Code/signal from when a process is interrupted */
 
 } PCB;
