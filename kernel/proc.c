@@ -1,14 +1,20 @@
 #include "proc.h"
-#include "uart.h"    // Include uart.h if you need UART debugging in process functions
+#include "uart.h"    
 #include <stdint.h>
+#include "memory.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
 uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
-int current_index = 0;
 
-/* Externally defined context switch routine (in context_switch.S) */
-extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
+/* Global variables for current process and the ready queue */
+PCB *current_process;
+struct KList ready_queue;
+
+/* Initialize the ready queue */
+void init_ready_queue(void) {
+    list_init(&ready_queue);
+}
 
 /* Simple delay routine */
 void delay(void) {
