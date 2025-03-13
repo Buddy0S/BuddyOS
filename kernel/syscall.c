@@ -2,6 +2,8 @@
 #include "memory.h"
 #include "uart.h"
 
+extern PCB pcb;
+extern int current_index;
 
 /* yield */
 void yield(void) {}
@@ -20,7 +22,9 @@ void free(void *addr) {
 }
 
 /* get pid */
-uint32_t *getPid() {}
+uint32_t *getPid(int current_index) {
+    return pcb[current_index]->pid;
+}
 
 /* kill */
 int kill(uint32_t pid);
