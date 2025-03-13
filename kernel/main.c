@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include "interrupts.h"
 #include "syscall.h"
 #include "reg.h"
 #include "uart.h"
@@ -57,6 +56,15 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid) {
         stack_top[i] = 0;
     }
 
+    asm volatile("  \n\t    \
+   mrs r0, cpsr     \n\t    \
+   bic r0, r0, #0x1F\n\t    \
+   orr r0, r0, #0x1F\n\t    \
+            ");
+    
+    register uint32_t r0 asm("r0");
+    stack_top[7] = r0;
+
     // our exception handlers store spsr into r11, so i think we should be able
     // to initialize spsr mode here for when we eventually make context switching
     // happen on timer interrupt or yield syscall
@@ -75,9 +83,8 @@ void process1(void) {
         uart0_printf("Process 1\n");
         register uint32_t sp asm("sp");
         uart0_printf("current sp: %x\n", sp);
-        uart0_printf("return value: %d\n", SYSCALL(1));
         delay();
-        yield();
+        SYSCALL(1);
     }
 }
 
@@ -86,9 +93,8 @@ void process2(void) {
         uart0_printf("Process 2\n");
         register uint32_t sp asm("sp");
         uart0_printf("current sp: %x\n", sp);
-        uart0_printf("return value: %d\n", SYSCALL(2));
         delay();
-        yield();
+        SYSCALL(1);
     }
 }
 
@@ -97,9 +103,8 @@ void process3(void) {
         uart0_printf("Process 3\n");
         register uint32_t sp asm("sp");
         uart0_printf("current sp: %x\n", sp);
-        uart0_printf("return value: %d\n", SYSCALL(3));
         delay();
-        yield();
+        SYSCALL(1);
     }
 }
 
@@ -108,6 +113,8 @@ int test_syscall_sum(int a, int b) {
     return SYSCALL(0);
 }
 
+unsigned int *kernel_sp;
+extern void supervisor_call(void);
 
 int main(){
 
@@ -132,7 +139,6 @@ int main(){
 
     /* Save the kernel context in a dummy variable and switch to process 1.
        Execution will jump to process1 via its saved LR. */
-    unsigned int *kernel_sp;
     switch_context(&kernel_sp, (unsigned int **)&pcb[0].stack_ptr);
 
     while(1){}	

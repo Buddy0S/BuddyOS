@@ -18,6 +18,8 @@ typedef struct PCB {
     uint32_t *stack_base; /* Base address of the allocated stack */
 } PCB;
 
+void yield(void);
+
 #endif
 
 
