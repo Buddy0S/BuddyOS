@@ -37,7 +37,7 @@ void kernel_main(void) {
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
 
     /* Save the kernel stack inside the PCB instead of a dummy variable */
-    current_process->kernel_sp = kernel_stack + KERNEL_STACK_SIZE;
+    current_process->kernel_sp = KERNEL_STACKS[current_process->pid] + KERNEL_STACK_SIZE;
 
     /* Switch to the first process */
     switch_context((unsigned int **)&current_process->kernel_sp, 
