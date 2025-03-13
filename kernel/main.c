@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include "interrupts.h"
+#include "syscall.h"
 #include "reg.h"
 #include "uart.h"
 #include "memory.h"
@@ -62,6 +64,7 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid) {
 void process1(void) {
     while (1) {
         uart0_printf("Process 1\n");
+    SYSCALL(1);
         delay();
         yield();
     }
@@ -70,6 +73,7 @@ void process1(void) {
 void process2(void) {
     while (1) {
         uart0_printf("Process 2\n");
+    SYSCALL(2);
         delay();
         yield();
     }
@@ -78,15 +82,25 @@ void process2(void) {
 void process3(void) {
     while (1) {
         uart0_printf("Process 3\n");
+    SYSCALL(3);
         delay();
         yield();
     }
+}
+
+int test_syscall(int a, int b) {
+
+    SYSCALL(0);
+
+    return a;
 }
 
 
 int main(){
 
     uart0_printf("Entering Kernel\n");
+    uart0_printf("return result: %d\n", test_syscall(10, 34));
+
 
     /* Initialize buddyOS memory allocator */
     if (init_alloc() >= 0) {

@@ -37,6 +37,8 @@ supervisor_call:
     @ get svc number
     ldr r0, [lr, #-4]
 
+    bic r0, #0xFF000000
+
     @ svc num in r0, parameters array in a1
 
     @ jump to interrupt handler 
