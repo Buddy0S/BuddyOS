@@ -44,6 +44,7 @@ typedef struct PCB {
 extern PCB *current_process;
 
 /* Ready queue for processes */
+extern struct KList ready_queue;
 
 /* Global process table and stacks */
 extern PCB PROC_TABLE[MAX_PROCS];
