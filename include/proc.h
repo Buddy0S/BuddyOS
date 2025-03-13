@@ -49,12 +49,13 @@ extern struct KList ready_queue;
 /* Global process table and stacks */
 extern PCB PROC_TABLE[MAX_PROCS];
 extern uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
-extern int current_index;
+extern int current_indexi;
 
 /* Function declarations */
 void delay(void);
 void yield(void);
 void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority prio);
+void init_ready_queue(void);
 extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
 
 #endif /* PROC_H */
