@@ -9,7 +9,6 @@ extern void process2(void);
 extern void process3(void);
 
 void kernel_main(void) {
-    void *test;
     uart_puts("Welcome to BuddyOS\n");
 
     /* Initialize buddyOS memory allocator */
@@ -24,16 +23,21 @@ void kernel_main(void) {
     if (kfree(test) == -1) {
         uart_puts("kfree fail\n");
     }
+
+    /* Initialize the ready queue */
+    init_ready_queue();
     
     /* Initialize three processes (using only the first three slots) */
     init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], 0, MEDIUM);
     init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], 1, MEDIUM);
     init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], 2, MEDIUM);
 
-    /* Save the kernel context in a dummy variable and switch to process 1.
-       Execution will jump to process1 via its saved LR. */
+    /* Set the current process to the head of the ready queue */
+    current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
+
+    /* Save the kernel context in a dummy variable and switch to the first process */
     unsigned int *kernel_sp;
-    switch_context(&kernel_sp, (unsigned int **)&PROC_TABLE[0].stack_ptr);
+    switch_context(&kernel_sp, (unsigned int **)&current_process->stack_ptr);    
 
     /* Should never reach here */
     while (1);
