@@ -5,7 +5,8 @@
 #include <list.h>
 
 #define MAX_PROCS   3
-#define STACK_SIZE  1024
+#define STACK_SIZE  256
+#define KERNEL_STACK_SIZE 256
 #define NULL ((void *)0)
 
 /* Process states */
@@ -51,6 +52,7 @@ extern struct KList ready_queue;
 /* Global process table and stacks */
 extern PCB PROC_TABLE[MAX_PROCS];
 extern uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
+extern uint32_t KERNEL_STACKS[MAX_PROCS][KERNEL_STACK_SIZE];
 extern int current_indexi;
 
 /* Function declarations */
