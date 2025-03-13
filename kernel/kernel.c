@@ -9,6 +9,7 @@ extern void process2(void);
 extern void process3(void);
 
 void kernel_main(void) {
+    void *test;
     uart_puts("Welcome to BuddyOS\n");
 
     /* Initialize buddyOS memory allocator */
