@@ -36,9 +36,12 @@ void kernel_main(void) {
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
 
-    /* Save the kernel context in a dummy variable and switch to the first process */
-    unsigned int *kernel_sp;
-    switch_context(&kernel_sp, (unsigned int **)&current_process->stack_ptr);    
+    /* Save the kernel stack inside the PCB instead of a dummy variable */
+    current_process->kernel_sp = &kernel_sp;
+
+    /* Switch to the first process */
+    switch_context((unsigned int **)&current_process->kernel_sp, 
+		    (unsigned int **)&current_process->stack_ptr);    
 
     /* Should never reach here */
     while (1);
