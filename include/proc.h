@@ -48,7 +48,7 @@ extern int current_index;
 /* Function declarations */
 void delay(void);
 void yield(void);
-void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority pri);
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority prio);
 extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
 
 #endif /* PROC_H */
