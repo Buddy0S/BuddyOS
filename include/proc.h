@@ -40,6 +40,11 @@ typedef struct PCB {
 
 } PCB;
 
+/* Current running proces pointer */
+extern PCB *current_process;
+
+/* Ready queue for processes */
+
 /* Global process table and stacks */
 extern PCB PROC_TABLE[MAX_PROCS];
 extern uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
