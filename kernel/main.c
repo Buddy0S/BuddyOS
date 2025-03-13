@@ -55,6 +55,11 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid) {
     for (int i = 0; i < 8; i++) {
         stack_top[i] = 0;
     }
+
+    // our exception handlers store spsr into r11, so i think we should be able
+    // to initialize spsr mode here for when we eventually make context switching
+    // happen on timer interrupt or yield syscall
+
     /* Set the saved LR to the address of the process function;
        when context is restored, execution will jump to func */
     stack_top[8] = (uint32_t)func;
@@ -67,6 +72,8 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid) {
 void process1(void) {
     while (1) {
         uart0_printf("Process 1\n");
+        register uint32_t sp asm("sp");
+        uart0_printf("current sp: %x\n", sp);
         uart0_printf("return value: %d\n", SYSCALL(1));
         delay();
         yield();
@@ -76,6 +83,8 @@ void process1(void) {
 void process2(void) {
     while (1) {
         uart0_printf("Process 2\n");
+        register uint32_t sp asm("sp");
+        uart0_printf("current sp: %x\n", sp);
         uart0_printf("return value: %d\n", SYSCALL(2));
         delay();
         yield();
@@ -85,6 +94,8 @@ void process2(void) {
 void process3(void) {
     while (1) {
         uart0_printf("Process 3\n");
+        register uint32_t sp asm("sp");
+        uart0_printf("current sp: %x\n", sp);
         uart0_printf("return value: %d\n", SYSCALL(3));
         delay();
         yield();
@@ -100,6 +111,8 @@ int test_syscall_sum(int a, int b) {
 int main(){
 
     uart0_printf("Entering Kernel\n");
+    register uint32_t sp asm("sp");
+    uart0_printf("current sp: %x\n", sp);
     uart0_printf("return result of %d + %d is %d\n", 10, 34, test_syscall_sum(10, 34));
 
 

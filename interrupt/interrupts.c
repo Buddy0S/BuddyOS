@@ -147,6 +147,8 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     // arguments will be put into the args array, but technically its just
     // a pointer to the bottom of the process stack that performed the syscall
     uart0_printf("you just called a syscall my good buddy\n");
+    register uint32_t sp asm("sp");
+    uart0_printf("current sp: %x\n", sp);
     uart0_printf("syscall num: %d\n", svc_num);
     uart0_printf("r0: %d\n", args[0]);
     uart0_printf("r1: %d\n", args[1]);
