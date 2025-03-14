@@ -219,6 +219,14 @@
 
 #define GMII_MII_SELECT 0x0
 
+//*******************************************************************
+// Pin Muxing 
+//*******************************************************************
+
+#define DEFAULT_PIN 0x0
+#define RECEIVE_ENABLE BIT(5)
+#define PULLUP_ENABLE BIT(4)
+
 /* -----------------------------CODE------------------------------- */
 
 /*
@@ -233,6 +241,36 @@ void cpsw_select_interface(){
 }
 
 /*
+ * cpsw_pin_mux()
+ *  - pin muxing the cpsw pins
+ *  - setting pins to default of 0
+ *  - setting enable recieve on pins that recieve Input
+ *  - setting enable pullup on mdio pins
+ *
+ * */
+void cpsw_pin_mux(){
+
+    REG(CONF_MII1_COL) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MII1_CRS) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MII1_RX_ER) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MII1_TX_EN) = DEFAULT_PIN;
+    REG(CONF_MII1_RX_DV) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MII1_TXD3) = DEFAULT_PIN;
+    REG(CONF_MII1_TXD2) = DEFAULT_PIN;
+    REG(CONF_MII1_TXD1) = DEFAULT_PIN;
+    REG(CONF_MII1_TXD0) = DEFAULT_PIN;
+    REG(CONF_MII1_TX_CLK) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MII1_RX_CLK) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MII1_RXD3) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MII1_RXD2) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MII1_RXD1) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MII1_RXD0) = DEFAULT_PIN | RECEIVE_ENABLE;
+    REG(CONF_MDIO) = DEFAULT_PIN | RECEIVE_ENABLE | PULLUP_ENABLE;
+    REG(CONF_MDC) = DEFAULT_PIN | PULLUP_ENABLE;
+
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -241,4 +279,6 @@ void cpsw_select_interface(){
 void cpsw_init(){
 
     cpsw_select_interface();
+
+    cpsw_pin_mux();
 }
