@@ -244,6 +244,12 @@
 #define START_RESET BIT(0)
 #define RESET_NOTDONE BIT(0)
 
+//*******************************************************************
+// DMA                                                            
+//*******************************************************************
+
+#define DESCRIPTOR_NULL 0x00000000
+
 /* -----------------------------CODE------------------------------- */
 
 /*
@@ -334,6 +340,51 @@ void cpsw_software_reset(){
 }
 
 /*
+ * cpsw_init_cpdma_descriptors()
+ *  - init cpdma descriptors to NULL after reset
+ *
+ * */
+void cpsw_init_cpdma_descriptors(){
+
+    REG(TX0_HDP) = DESCRIPTOR_NULL;
+    REG(TX1_HDP) = DESCRIPTOR_NULL;
+    REG(TX2_HDP) = DESCRIPTOR_NULL;
+    REG(TX3_HDP) = DESCRIPTOR_NULL;
+    REG(TX4_HDP) = DESCRIPTOR_NULL;
+    REG(TX5_HDP) = DESCRIPTOR_NULL;
+    REG(TX6_HDP) = DESCRIPTOR_NULL;
+    REG(TX7_HDP) = DESCRIPTOR_NULL;
+
+    REG(RX0_HDP) = DESCRIPTOR_NULL;
+    REG(RX1_HDP) = DESCRIPTOR_NULL;
+    REG(RX2_HDP) = DESCRIPTOR_NULL;
+    REG(RX3_HDP) = DESCRIPTOR_NULL;
+    REG(RX4_HDP) = DESCRIPTOR_NULL;
+    REG(RX5_HDP) = DESCRIPTOR_NULL;
+    REG(RX6_HDP) = DESCRIPTOR_NULL;
+    REG(RX7_HDP) = DESCRIPTOR_NULL;
+
+    REG(TX0_CP) = DESCRIPTOR_NULL;
+    REG(TX1_CP) = DESCRIPTOR_NULL;
+    REG(TX2_CP) = DESCRIPTOR_NULL;
+    REG(TX3_CP) = DESCRIPTOR_NULL;
+    REG(TX4_CP) = DESCRIPTOR_NULL;
+    REG(TX5_CP) = DESCRIPTOR_NULL;
+    REG(TX6_CP) = DESCRIPTOR_NULL;
+    REG(TX7_CP) = DESCRIPTOR_NULL;
+
+    REG(RX0_CP) = DESCRIPTOR_NULL;
+    REG(RX1_CP) = DESCRIPTOR_NULL;
+    REG(RX2_CP) = DESCRIPTOR_NULL;
+    REG(RX3_CP) = DESCRIPTOR_NULL;
+    REG(RX4_CP) = DESCRIPTOR_NULL;
+    REG(RX5_CP) = DESCRIPTOR_NULL;
+    REG(RX6_CP) = DESCRIPTOR_NULL;
+    REG(RX7_CP) = DESCRIPTOR_NULL;
+    
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -348,4 +399,6 @@ void cpsw_init(){
     cpsw_enable_clocks();
 
     cpsw_software_reset();
+
+    cpsw_init_cpdma_descriptors();
 }
