@@ -237,6 +237,13 @@
 #define CPSWCLK_ENABLE BIT(1)
 #define CPSWCLK_READY BIT(4)
 
+//*******************************************************************
+// Software Reset                                                     
+//*******************************************************************
+
+#define START_RESET BIT(0)
+#define RESET_NOTDONE BIT(0)
+
 /* -----------------------------CODE------------------------------- */
 
 /*
@@ -288,13 +295,42 @@ void cpsw_pin_mux(){
  * */
 void cpsw_enable_clocks(){
 
-    REG(CM_PER_CPGMAC0_CLKCTRL) = CPGMAC0_ENABLE;
+    REG(CM_PER_CPGMAC0_CLKCTRL) |= CPGMAC0_ENABLE;
 
     while ( REG(CM_PER_CPGMAC0_CLKCTRL) & CPGMAC0_NOTREADY ){}
 
-    REG(CM_PER_CPSW_CLKSTCTRL) = CPSWCLK_ENABLE;
+    REG(CM_PER_CPSW_CLKSTCTRL) |= CPSWCLK_ENABLE;
 
     while ( !(REG(CM_PER_CPSW_CLKSTCTRL) & CPSWCLK_READY) ){}
+}
+
+/*
+ * software_reset(uint32_t module_address)
+ *  - resets a module given its reset register address
+ *
+ *  param: module_address
+ *   - Software Reset Register Address
+ *
+ * */
+void software_reset(uint32_t module_address){
+
+    REG(module_address) |= START_RESET;
+
+    while ( REG(module_address) & RESET_NOTDONE ){}
+}
+
+/*
+ * cpsw_software_reset()
+ *  - software resets the modules of cpsw
+ *
+ * */
+void cpsw_software_reset(){
+
+    software_reset(PORT1_SOFT_RESET);
+    software_reset(PORT1_SOFT_RESET);
+    software_reset(CPSW_SS_SOFT_RESET);
+    software_reset(CPSW_WR_SOFT_RESET);
+    software_reset(CPDMA_SOFT_RESET);    
 }
 
 /*
@@ -310,4 +346,6 @@ void cpsw_init(){
     cpsw_pin_mux();
 
     cpsw_enable_clocks();
+
+    cpsw_software_reset();
 }
