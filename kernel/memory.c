@@ -43,7 +43,7 @@ struct mem_list {
  */
 struct mem_block *create_mem_block(int order) {
     if (blocks_struct_addr > (KERNEL_DYNAMIC_START + KERNEL_DYNAMIC)) {
-        uart_puts("no more mem\n");
+        uart0_puts("no more mem\n");
         return NULL;
     }
     volatile struct mem_block *block_structs = (volatile struct mem_block *)blocks_struct_addr;
@@ -167,7 +167,7 @@ void *kmalloc(uint32_t size) {
     struct mem_block *alloc_block;
 
     if (size > MAX_BLOCK || size <= 0) {
-        uart_puts("invalid size\n");
+        uart0_puts("invalid size\n");
         return NULL;
     }
     
@@ -175,7 +175,7 @@ void *kmalloc(uint32_t size) {
     block_size = (MIN_BLOCK << order);
 
     if (order_arr[order]->num_free <= 0) {
-        uart_puts("no more free blocks of this order\n");
+        uart0_puts("no more free blocks of this order\n");
         return NULL;
     }
 
@@ -193,7 +193,7 @@ void *kmalloc(uint32_t size) {
     addr = alloc_block->addr;
 
     memset32(addr, 0, block_size);
-    uart_puts("kmalloc reached return\n");
+    uart0_puts("kmalloc reached return\n");
     order_arr[order]->num_free--;
     return (void *)addr;
 }
@@ -219,7 +219,7 @@ int kfree(void *ptr) {
         order_arr[order]->tail->next = free_block;
         order_arr[order]->tail = free_block;
     }
-    uart_puts("kfree reached return\n");
+    uart0_puts("kfree reached return\n");
     order_arr[order]->num_free++;
     return 0;
 
