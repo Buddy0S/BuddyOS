@@ -257,6 +257,15 @@
 #define ENABLE_ALE BIT(31)
 #define CLEAR_ALE BIT(30)
 
+//*******************************************************************
+// MDIO                                                               
+//*******************************************************************
+
+#define MDIO_ENABLE BIT(30)
+#define MDIO_CLKDIV 124
+#define MDIO_PREAMBLE BIT(20)
+#define MDIO_FAULTENB BIT(18)
+
 /* -----------------------------CODE------------------------------- */
 
 /*
@@ -403,6 +412,21 @@ void cpsw_config_ale(){
 }
 
 /*
+ * cpsw_config_mdio()
+ *  - enables mdio
+ *  - disables preamble
+ *  - enables fault detection
+ *  - sets clk div
+ *
+ * */
+void cpsw_config_mdio(){
+   
+    REG(MDIO_CONTROL) = MDIO_ENABLE | MDIO_PREAMBLE | MDIO_FAULTENB;
+
+    REG(MDIO_CONTROL) |= MDIO_CLKDIV;
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -421,4 +445,6 @@ void cpsw_init(){
     cpsw_init_cpdma_descriptors();
 
     cpsw_config_ale();
+
+    cpsw_config_mdio();
 }
