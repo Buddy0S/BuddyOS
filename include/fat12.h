@@ -58,7 +58,7 @@ typedef struct {
     uint16_t modifyDate;
     uint16_t firstClusterLow;  /* Low 16-bits of the first cluster number */
     uint32_t fileSize;
-} __attribute__((packed)) DirEntry;
+} __attribute__((packed, aligned(4))) DirEntry;
 
 
 void fat12_init(unsigned int startSector, volatile uint32_t* buffer); 

@@ -32,7 +32,7 @@ int compareFileNames(DirEntry *entry, volatile char* fileName) {
 
 }
 
-void splitFilename(char* input, char* filename, char* extension) {
+void splitFilename(volatile char* input, char* filename, char* extension) {
 	
 	int i = 0;
 	int dotLoc = -1;
@@ -210,7 +210,38 @@ uint16_t fat12_get_next_cluster(uint16_t cluster) {
 }
 
 uint16_t fat12_find_free_cluster() {
-	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
+	
+	uint16_t cluster = 2;	/* clusters 0 and 1 are reserved **/
+	uint8_t FATTable[bootSector.bytesPerSector * 2]; /*may need to straddle a sector due to 12 bits */
+	uint32_t fatSector = bootSector.reservedSectorCount;
+	uint32_t fatByteOffset = 0;
+
+	for (uint32_t sector = 0; sector < bootSector.sectorsPerFATTable; sector++) {
+		
+		MMCreadblock(fatSector + sector, (uint32_t*)FATTable);
+
+		/* Iterate through the current FAT sector */
+        for (fatByteOffset = 0; fatByteOffset < bootSector.bytesPerSector; fatByteOffset += 3) {
+            
+			/* Read two 12 bit FAT entries */
+            uint16_t entry1 = (FATTable[fatByteOffset] | (FATTable[fatByteOffset + 1] << 8)) & 0xFFF;
+            uint16_t entry2 = ((FATTable[fatByteOffset + 1] >> 4) | (FATTable[fatByteOffset + 2] << 4)) & 0xFFF;
+
+            /* Check if the first entry is free */
+            if (entry1 == FAT12_UNUSED) {
+                return cluster;
+            }
+            cluster++;
+
+            /* Check if the second entry is free */
+            if (entry2 == FAT12_UNUSED) {
+                return cluster;
+            }
+            cluster++;
+        }
+	}
+
+	return 0xFFFF; /* No clusters found */
 
 }
 
@@ -285,19 +316,15 @@ uint32_t fat12_create_dir_entry(volatile char* filename,
 		/* Check for directory end */
 		if (dirEntry.name[0] == 0x00 || dirEntry.name[0] == 0xE5) {
 			
-			if ((attributes & SUBDIR) != 0) {
-				uart0_printf("CREATING DIR\n");
-				dirEntry.name = filename;
-			}
-			else {
-				uart0_printf("REG FILE\n");
-				splitFilename(filename, &dirEntry.name, &dirEntry.ext);
-			}
-			
+			splitFilename(filename, dirEntry.name, dirEntry.ext);			
+			dirEntry.firstClusterLow = fat12_find_free_cluster();
 			dirEntry.attrib = attributes;
 			dirEntry.fileSize = 0;
 
-			MMCwriteblock(parent__dir_sector, (uint32_t*)&dirEntry);
+			uart0_printf("%s.%s - %x - %d (%d)\n", dirEntry.name, dirEntry.ext,
+			dirEntry.attrib, dirEntry.firstClusterLow, dirEntry.fileSize);
+
+			MMCwriteblock(parent_dir_sector, (uint32_t*)&dirEntry);
 			return dirEntry.firstClusterLow;
 		}
 

@@ -128,6 +128,8 @@ int main(void) {
     uart0_printf("Attempting to init fat12......\n");
     fat12_init(0, buffer);
 
+	//fat12_create_dir_entry("TEST.TXT",19, 0x20, buffer);
+
     fat12_read_file("KERNEL.BIN", (volatile uint32_t *)0x80000000);
 
     /*jump to kernel*/
