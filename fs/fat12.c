@@ -305,7 +305,6 @@ uint16_t fat12_find_free_cluster() {
 
             /* Check if the second entry is free */
             if (entry2 == FAT12_UNUSED) {
-				
 				FATTable[fatByteOffset + 1] = (FATTable[fatByteOffset + 1] & 0x0F) | ((FAT12_EOF_MAX << 4) & 0xF0);
                 FATTable[fatByteOffset + 2] = (FAT12_EOF_MAX >> 4) & 0xFF;
 
@@ -315,9 +314,7 @@ uint16_t fat12_find_free_cluster() {
             cluster++;
         }
 	}
-
-    /* No free clusters found */
-    return 0xFFFF;
+	return 0xFFFF; /* No clusters found */
 
 }
 
