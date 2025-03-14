@@ -61,7 +61,7 @@ extern int current_indexi;
 /* Function declarations */
 void delay(void);
 void yield(void);
-void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority prio);
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid);//, ProcessPriority prio);
 void init_ready_queue(void);
 extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
 
