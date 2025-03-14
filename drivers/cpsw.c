@@ -94,6 +94,9 @@
 
 #define CPDMA_SOFT_REST (CPDMA_BASE + 0x1C)
 
+#define TX_CONTROL (CPDMA_BASE + 0x4)
+#define RX_CONTROL (CPDMA_BASE + 0x14)
+
 //*******************************************************************
 // CPSW_SL REGISTERS
 //*******************************************************************
@@ -111,6 +114,7 @@
 #define CPSW_SS_BASE 0x4A100000
 
 #define CPSW_SS_SOFT_REST (CPSW_SS_BASE + 0x8)
+#define STATE_PORT_EN (CPSW_SS_BASE + 0xC)
 
 //*******************************************************************
 // CPSW_WR REGISTERS
@@ -166,3 +170,43 @@
 #define RX6_CP (CPDMA_STATERAM_BASE + 0x78)
 #define RX7_CP (CPDMA_STATERAM_BASE + 0x7C)
 
+//*******************************************************************
+// MDIO REGISTERS
+//*******************************************************************
+
+#define MDIO_BASE 0x4A101000
+
+#define MDIOCONTROL (MDIO_BASE + 0x4)
+#define MDIOALIVE (MDIO_BASE + 0x8)
+
+//*******************************************************************
+// CPSW_ALE REGISTERS
+//*******************************************************************
+
+#define CPSW_ALE_BASE 0x4A100D00
+
+#define CPSW_ALE_CONTROL (CPSW_ALE_BASE + 0x8)
+#define TBLCTL (CPSW_ALE_BASE + 0x20)
+#define TBLW2 (CPSW_ALE_BASE + 0x34)
+#define TBLW1 (CPSW_ALE_BASE + 0x38)
+#define TBLW0 (CPSW_ALE_BASE + 0x3C)
+
+#define PORTCTL0 (CPSW_ALE_BASE + 0x40)
+#define PORTCTL1 (CPSW_ALE_BASE + 0x44)
+#define PORTCTL2 (CPSW_ALE_BASE + 0x48)
+
+//*******************************************************************
+// CPSW_PORT REGISTERS
+//*******************************************************************
+
+#define CPSW_PORT_BASE 0x4A100100
+
+/* Port 1 */
+#define P1_CONTROL (CPSW_PORT_BASE + 0x100)
+#define P1_SA_LO (CPSW_PORT_BASE + 0x120)
+#define P1_SA_HI (CPSW_PORT_BASE + 0x124)
+
+/* Port 2 */
+#define P2_CONTROL (CPSW_PORT_BASE + 0x200)
+#define P2_SA_LO (CPSW_PORT_BASE + 0x220)
+#define P2_SA_HI (CPSW_PORT_BASE + 0x224)
