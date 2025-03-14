@@ -119,3 +119,50 @@
 #define CPSW_WR_BASE 0x4A101200
 
 #define CPSW_WR_SOFT_REST (CPSW_WR_BASE + 0x4)
+
+//*******************************************************************
+// CPDMA_STATERAM REGISTERS
+//*******************************************************************
+
+#define CPDMA_STATERAM_BASE 0x4A100A00
+
+/* TX Channels HDPs */
+#define TX0_HDP (CPDMA_STATERAM_BASE + 0x0)
+#define TX1_HDP (CPDMA_STATERAM_BASE + 0x4)
+#define TX2_HDP (CPDMA_STATERAM_BASE + 0x8)
+#define TX3_HDP (CPDMA_STATERAM_BASE + 0xC)
+#define TX4_HDP (CPDMA_STATERAM_BASE + 0x10)
+#define TX5_HDP (CPDMA_STATERAM_BASE + 0x14)
+#define TX6_HDP (CPDMA_STATERAM_BASE + 0x18)
+#define TX7_HDP (CPDMA_STATERAM_BASE + 0x1C)
+
+/* RX Channels HDPs */
+#define RX0_HDP (CPDMA_STATERAM_BASE + 0x20)
+#define RX1_HDP (CPDMA_STATERAM_BASE + 0x24)
+#define RX2_HDP (CPDMA_STATERAM_BASE + 0x28)
+#define RX3_HDP (CPDMA_STATERAM_BASE + 0x2C)
+#define RX4_HDP (CPDMA_STATERAM_BASE + 0x30)
+#define RX5_HDP (CPDMA_STATERAM_BASE + 0x34)
+#define RX6_HDP (CPDMA_STATERAM_BASE + 0x38)
+#define RX7_HDP (CPDMA_STATERAM_BASE + 0x3C)
+
+/* TX Channels CPs */
+#define TX0_CP (CPDMA_STATERAM_BASE + 0x40)
+#define TX1_CP (CPDMA_STATERAM_BASE + 0x44)
+#define TX2_CP (CPDMA_STATERAM_BASE + 0x48)
+#define TX3_CP (CPDMA_STATERAM_BASE + 0x4C)
+#define TX4_CP (CPDMA_STATERAM_BASE + 0x50)
+#define TX5_CP (CPDMA_STATERAM_BASE + 0x54)
+#define TX6_CP (CPDMA_STATERAM_BASE + 0x58)
+#define TX7_CP (CPDMA_STATERAM_BASE + 0x5C)
+
+/* RX Channels CPs */
+#define RX0_CP (CPDMA_STATERAM_BASE + 0x60)
+#define RX1_CP (CPDMA_STATERAM_BASE + 0x64)
+#define RX2_CP (CPDMA_STATERAM_BASE + 0x68)
+#define RX3_CP (CPDMA_STATERAM_BASE + 0x6C)
+#define RX4_CP (CPDMA_STATERAM_BASE + 0x70)
+#define RX5_CP (CPDMA_STATERAM_BASE + 0x74)
+#define RX6_CP (CPDMA_STATERAM_BASE + 0x78)
+#define RX7_CP (CPDMA_STATERAM_BASE + 0x7C)
+
