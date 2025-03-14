@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "uart.h"
 #include "fat12.h"
+#include "memory.h"
 
 fat_bs_t bootSector;
 fat12_ebs_t extendedBootRecord;
@@ -28,6 +29,50 @@ int compareFileNames(DirEntry *entry, volatile char* fileName) {
     }
 
     return 1;
+
+}
+
+void splitFilename(char* input, char* filename, char* extension) {
+	
+	int i = 0;
+	int dotLoc = -1;
+	int nameLen = 0;
+	int extLen = 0;
+
+	/* Search for dot */
+	while (input[i] != '\0') {
+		if (input[i] == '.') {
+			dotLoc = i;
+			break;
+		}
+		i++;
+	}
+
+	/* Extract file name */
+	while (nameLen < dotLoc && nameLen < 8) {
+		filename[nameLen] = input[nameLen];
+		nameLen++;
+	}
+
+	/* Pad filename with spaces if necessary */
+	while (nameLen < 8) {
+		filename[nameLen] = ' ';
+		nameLen++;
+	}
+
+	/* Extract extension */
+	i = dotLoc + 1;
+	while (input[i] != '\0' && extLen < 3) {
+		extension[extLen] = input[i];
+		extLen++;
+		i++;
+	}
+
+	/* Pad extension with spaces if necessary */
+	while (extLen < 3) {
+		extension[extLen] = ' ';
+		extLen++;
+	}
 
 }
 
@@ -164,6 +209,11 @@ uint16_t fat12_get_next_cluster(uint16_t cluster) {
 	return nextCluster;
 }
 
+uint16_t fat12_find_free_cluster() {
+	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
+
+}
+
 /* //wiki.osdev.org/FAT#FAT_12 */
 uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 	uart0_printf("Entered read file\n");
@@ -217,9 +267,9 @@ uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 }
 
 uint32_t fat12_create_dir_entry(volatile char* filename,
-	uint16_t parent_dir_sector, uint8_t attributes) {
+	uint16_t parent_dir_sector, uint8_t attributes, volatile uint32_t* buffer) {
 
-	char buf[512];
+	char* buf = (char*)buffer; /* CHANGE TO MALLOC'D ARRAY WHEN POSSIBLE */
 
     DirEntry dirEntry;
 
@@ -233,17 +283,27 @@ uint32_t fat12_create_dir_entry(volatile char* filename,
 		dirEntry = *((DirEntry*) &buf[j * 32]);
 
 		/* Check for directory end */
-		if (dirEntry.name[0] == 0x00) {
-			break; 
+		if (dirEntry.name[0] == 0x00 || dirEntry.name[0] == 0xE5) {
+			
+			if ((attributes & SUBDIR) != 0) {
+				uart0_printf("CREATING DIR\n");
+				dirEntry.name = filename;
+			}
+			else {
+				uart0_printf("REG FILE\n");
+				splitFilename(filename, &dirEntry.name, &dirEntry.ext);
+			}
+			
+			dirEntry.attrib = attributes;
+			dirEntry.fileSize = 0;
+
+			MMCwriteblock(parent__dir_sector, (uint32_t*)&dirEntry);
+			return dirEntry.firstClusterLow;
 		}
 
-		/* Check for valid entry */
-		if (dirEntry.name[0] == 0xE5) {
-			continue;
-		}
-		
-		uart0_printf("ENTRY NAME = %s\n", dirEntry.name);
 	}
+
+	return -1;
 
 
 }
