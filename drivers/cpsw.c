@@ -254,8 +254,21 @@
 // ALE                                                               
 //*******************************************************************
 
+#define MAX_ALE_ENTRIES 1024
+#define ALE_ENTRY_WORDS 3
+
 #define ENABLE_ALE BIT(31)
 #define CLEAR_ALE BIT(30)
+
+#define ALE_ENTRY_TYPE (BIT(5) | BIT(4))
+#define ALE_ENTRY_FREE 0
+
+#define MULTICAST_PORTMASK (BIT(0) | BIT(1) | BIT(2))
+#define MULTICAST_MAC_BYTE 0xFF
+#define ALE_PORT_MASK_SHIFT 2
+#define ALE_MULTICAST_ENTRY (BIT(7) | BIT(6) | BIT(4))
+
+#define TBLCTL_WRITE_READ BIT(31)
 
 //*******************************************************************
 // MDIO                                                               
@@ -277,6 +290,12 @@
 //*******************************************************************
 
 #define PORT_FORWARD (BIT(0) | BIT(1))
+
+//*******************************************************************
+// MAC                                                             
+//*******************************************************************
+
+#define MAC_ADDR_LEN 6
 
 /* -----------------------------CODE------------------------------- */
 
@@ -461,6 +480,121 @@ void cpsw_set_ports_state(){
 }
 
 /*
+ * get_ale_entry()
+ *  - reads ale entry at index into entry buffer
+ *
+ *  param: index
+ *   - index in ale table
+ *
+ *  param: entrybuffer
+ *   - pointer to buffer that will store ale entry
+ *
+ * */
+void get_ale_entry(uint32_t index, uint32_t* entrybuffer){
+
+    REG(TBLCTL) |= index;
+
+    REG(TBLCTL) &= ~TBLCTL_WRITE_READ;
+
+    entrybuffer[0] = REG(TBLW0);
+    entrybuffer[1] = REG(TBLW1);
+    entrybuffer[2] = REG(TBLW2);
+
+}
+
+/*
+ * get_ale_index()
+ *  - returns index of first free ale entry
+ *
+ * */
+int get_ale_index(){
+
+    uint32_t ale_entry_buffer[ALE_ENTRY_WORDS];
+    int index;
+    uint8_t et;
+
+    for (index = 0; index < MAX_ALE_ENTRIES; index++){
+   	get_ale_entry(index, ale_entry_buffer);
+
+	et = (((uint8_t*)(ale_entry_buffer[1]))[3] & ALE_ENTRY_TYPE);
+
+	if ( et == ALE_ENTRY_FREE) return index;	
+    }
+
+    return -1;
+
+}
+
+/*
+ * ale_set_entry()
+ *  - writes the ale entry to the given index
+ *
+ *  param: e_wn
+ *   - each individual word of the entry
+ *
+ *  param: i
+ *   - index to write in ale table
+ *
+ * */
+void ale_set_entry(uint32_t e_w0, uint32_t e_w1, uint32_t e_w2,int i){
+
+    REG(TBLW0) = e_w0;
+    REG(TBLW1) = e_w1;
+    REG(TBLW2) = e_w2;
+
+    REG(TBLCTL) |= i;
+
+    REG(TBLCTL) |= TBLCTL_WRITE_READ;
+}
+
+/*
+ * multicast_ale_entry()
+ *  - creates multicast ale entry 
+ *
+ *  param: port_mask
+ *   - value to be writen to port mask in word 2
+ *
+ *  param: multicast mac addr
+ *
+ * */
+void multicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
+
+    int index = get_ale_index();
+
+    uint32_t ale_entry_w0 = 0x0;
+    uint32_t ale_entry_w1 = 0x0;
+    uint32_t ale_entry_w2 = 0x0;
+
+    ((uint8_t*) ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
+    ((uint8_t*) ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
+    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3};
+    ((uint8_t*) ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
+
+    ((uint8_t*) ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
+    ((uint8_t*) ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
+
+    ((uint8_t*) ale_entry_w1)[3] = (uint8_t) ALE_MULTICAST_ENTRY;
+
+    ale_entry_w2 = portmask << ALE_PORT_MASK_SHIFT; 
+
+    ale_set_entry(ale_entry_w0, ale_entry_w1, ale_entry_w2, index);
+}
+
+/*
+ * cpsw_create_ale_entries()
+ *  - creates ale entries for ports
+ *  - multicast
+ *  - unicast
+ *
+ * */
+void cpsw_create_ale_entries(){
+
+    uint8_t mc_addr[MAC_ADDR_LEN] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
+
+    multicast_ale_entry(ALE_MULTICAST_PORTMASK, mc_addr);
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -485,4 +619,6 @@ void cpsw_init(){
     cpsw_config_stats();
 
     cpsw_set_ports_state();
+
+    cpsw_create_ale_entries();
 }
