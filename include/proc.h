@@ -41,6 +41,8 @@ typedef struct PCB {
 
     int exitStatus;             /* Code/signal from when a process is interrupted */
 
+    struct SRRMailbox mailbox; /* Mailbox for IPC send recieve and reply */
+
 } PCB;
 
 /* Current running proces pointer */
