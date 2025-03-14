@@ -250,6 +250,13 @@
 
 #define DESCRIPTOR_NULL 0x00000000
 
+//*******************************************************************
+// ALE                                                               
+//*******************************************************************
+
+#define ENABLE_ALE BIT(31)
+#define CLEAR_ALE BIT(30)
+
 /* -----------------------------CODE------------------------------- */
 
 /*
@@ -385,6 +392,17 @@ void cpsw_init_cpdma_descriptors(){
 }
 
 /*
+ * cpsw_config_ale()
+ *  - clears ALE table
+ *  - enables ALE
+ *
+ * */
+void cpsw_config_ale(){
+    
+    REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE;
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -401,4 +419,6 @@ void cpsw_init(){
     cpsw_software_reset();
 
     cpsw_init_cpdma_descriptors();
+
+    cpsw_config_ale();
 }
