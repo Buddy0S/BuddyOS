@@ -272,6 +272,12 @@
 
 #define STATS_DISABLE 0x00000000
 
+//*******************************************************************
+// Ports                                                             
+//*******************************************************************
+
+#define PORT_FORWARD (BIT(0) | BIT(1))
+
 /* -----------------------------CODE------------------------------- */
 
 /*
@@ -443,6 +449,18 @@ void cpsw_config_stats(){
 }
 
 /*
+ * cpsw_set_ports_state()
+ *  - sets the 3 ports state to forward
+ *
+ * */
+void cpsw_set_ports_state(){
+
+    REG(PORTCTL0) |= PORT_FORWARD;
+    REG(PORTCTL1) |= PORT_FORWARD;
+    REG(PORTCTL2) |= PORT_FORWARD;
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -465,4 +483,6 @@ void cpsw_init(){
     cpsw_config_mdio();
 
     cpsw_config_stats();
+
+    cpsw_set_ports_state();
 }
