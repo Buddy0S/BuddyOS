@@ -12,6 +12,12 @@
 #define FAT12_EOF_MIN 0xFF8 /*0xFF8 - 0xFFF: last cluster in a file*/
 #define FAT12_EOF_MAX 0xFFF
 
+/* File attributes */
+#define R_ONLY 0x01
+#define HIDDEN 0x02
+#define SYSTEM 0x04
+#define SUBDIR 0x10
+
 typedef struct fat_bs {
 	unsigned char bootJmp[3]; /* jump over disk format info to actual executable code */
 	unsigned char oemName[8]; /* original equipment manufacturer, states formatting standards */
@@ -59,4 +65,6 @@ void fat12_init(unsigned int startSector, volatile uint32_t* buffer);
 int fat12_find(volatile char* filename, volatile uint32_t* buffer,
     volatile uint16_t *startCluster, volatile uint32_t *fileSize); 
 uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer);
+uint32_t fat12_create_dir_entry(volatile char* filename,
+	uint16_t parent_dir_sector, uint8_t attributes, volatile uint32_t* buffer); 
 #endif
