@@ -262,11 +262,13 @@
 
 #define ALE_ENTRY_TYPE (BIT(5) | BIT(4))
 #define ALE_ENTRY_FREE 0
+#define ALE_PORT_MASK_SHIFT 2
 
 #define MULTICAST_PORTMASK (BIT(0) | BIT(1) | BIT(2))
-#define MULTICAST_MAC_BYTE 0xFF
-#define ALE_PORT_MASK_SHIFT 2
 #define ALE_MULTICAST_ENTRY (BIT(7) | BIT(6) | BIT(4))
+
+#define UNICAST_PORTMASK 0
+#define ALE_UNICAST_ENTRY BIT(4)
 
 #define TBLCTL_WRITE_READ BIT(31)
 
@@ -296,6 +298,16 @@
 //*******************************************************************
 
 #define MAC_ADDR_LEN 6
+
+/* ----------------------------STRUCTS----------------------------- */
+
+typedef struct cpsw_interface {
+
+    uint8_t mac_addr[MAC_ADDR_LEN];
+
+} ethernet_interface;
+
+ethernet_interface eth_interface;
 
 /* -----------------------------CODE------------------------------- */
 
@@ -581,6 +593,49 @@ void multicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
 }
 
 /*
+ *
+ * */
+void unicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
+
+    int index = get_ale_index();
+
+    uint32_t ale_entry_w0 = 0x0;
+    uint32_t ale_entry_w1 = 0x0;
+    uint32_t ale_entry_w2 = 0x0;
+
+    ((uint8_t*) ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
+    ((uint8_t*) ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
+    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3};
+    ((uint8_t*) ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
+
+    ((uint8_t*) ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
+    ((uint8_t*) ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
+
+    ((uint8_t*) ale_entry_w1)[3] = (uint8_t) ALE_UNICAST_ENTRY;
+
+    ale_entry_w2 = portmask << ALE_PORT_MASK_SHIFT;
+
+    ale_set_entry(ale_entry_w0, ale_entry_w1, ale_entry_w2, index);
+}
+
+/*
+ * get_mac()
+ *  - reads mac address from registers and stores in interface
+ *  - mac address is stored in reverse order
+ *
+ * */
+void get_mac(){
+
+    eth_interface.mac_addr[0] = BYTE1(REG(MAC_ID0_LOW));
+    eth_interface.mac_addr[1] = BYTE0(REG(MAC_ID0_LOW));
+    eth_interface.mac_addr[2] = BYTE3(REG(MAC_ID0_HI));
+    eth_interface.mac_addr[3] = BYTE2(REG(MAC_ID0_HI));
+    eth_interface.mac_addr[4] = BYTE1(REG(MAC_ID0_HI));
+    eth_interface.mac_addr[5] = BYTE0(REG(MAC_ID0_HI));
+
+}
+
+/*
  * cpsw_create_ale_entries()
  *  - creates ale entries for ports
  *  - multicast
@@ -590,8 +645,10 @@ void multicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
 void cpsw_create_ale_entries(){
 
     uint8_t mc_addr[MAC_ADDR_LEN] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
+    get_mac();
 
     multicast_ale_entry(ALE_MULTICAST_PORTMASK, mc_addr);
+    unicast_ale_entry(ALE_UNICAST_PORTMASK, eth_interface.mac_addr);
 }
 
 /*
