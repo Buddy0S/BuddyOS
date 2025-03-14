@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <list.h>
+#include <srr_ipc.h>
 
 #define MAX_PROCS   3
 #define STACK_SIZE  256

@@ -5,21 +5,19 @@
 #include "memory.h"
 #include "proc.h"
 
-#define STACK_SIZE 1024
+/* Global arrays for PCBs and their stacks */
+PCB PROC_TABLE[MAX_PROCS];
+uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
+uint32_t KERNEL_STACKS[MAX_PROCS][KERNEL_STACK_SIZE];
 
-/* Arrays for PCBs and their stacks */
-PCB pcb[3];
-uint32_t proc_stacks[3][STACK_SIZE];
+/* Global variables for current process and the ready queue */
+PCB *current_process;
+struct KList ready_queue;
 
-
-int current_index = 0;
-
-/* Externally defined context switch routine (in context_switch.S) */
-extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
-
-/* declarations for helper routines */
-void delay(void);
-void yield(void);
+/* Initialize the ready queue */
+void init_ready_queue(void) {
+    list_init(&ready_queue);
+}
 
 /* Process function declarations */
 extern void process1(void);
@@ -31,48 +29,66 @@ void delay(void) {
     for (volatile unsigned int i = 0; i < 1000000; i++);
 }
 
-/* The function switches context to the next process in an RR style, later
- * we'll use a list for this */
+/* Round-robin yield: switches context to the next process */
 void yield(void) {
-    int next_index = (current_index + 1) % 3;
-    int old_index = current_index;
-    current_index = next_index;  /* Update current process index before switching */
-    switch_context((unsigned int **)&pcb[old_index].stack_ptr,
-                   (unsigned int **)&pcb[next_index].stack_ptr);
+    
+    delay();
+
+    PCB *current = current_process;
+    
+    /* Remove the head node and add it to the tail */
+    struct KList *node = list_pop(&ready_queue);
+    list_add_tail(&ready_queue, node);
+    
+    /* The new head of the ready queue is the next process */
+    PCB *next = knode_data(list_first(&ready_queue), PCB, sched_node);
+    current_process = next;
+    
+    /* Switch context from current process to the next process */
+    switch_context((unsigned int **)&current->stack_ptr,
+                   (unsigned int **)&next->stack_ptr);
 }
 
-/* Initialize a process’s PCB so that when restored it begins execution at func */
-void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid) {
+/* Initialize a process's PCB so that when its context is restored, execution begins at func */
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority prio) {
+    /* Set basic PCB values */
     p->pid = pid;
     p->state = READY;
+    p->prio = prio;
+    p->exitStatus = 0;
     p->stack_base = stack_base;
+
+    /* Initialize the list of this proc's children */
+    list_init(&p->children);
 
     /* Set the stack pointer to the top of the process's stack */
     uint32_t *stack_top = stack_base + STACK_SIZE;
-    /* Reserve space for registers r4–r11 and LR */
+
+    /* Reserve space for registers r4–r11 and LR (9 words) */
     stack_top -= 9;
-    /* Initialize registers r4–r11 with 0 as the processes are nothing right now*/
+
+    /* Initialize registers r4–r11 with 0 */
     for (int i = 0; i < 8; i++) {
         stack_top[i] = 0;
     }
 
+    /* Initialize saved CPSR (with interrupts enabled) into register slot r11 (stack_top[7])
+       This ensures that when the process context is restored, it resumes with the proper CPSR */
     asm volatile("  \n\t    \
-   mrs r0, cpsr     \n\t    \
-   bic r0, r0, #0x1F\n\t    \
-   orr r0, r0, #0x1F\n\t    \
+       mrs r0, cpsr     \n\t    \
+       bic r0, r0, #0x1F\n\t    \
+       orr r0, r0, #0x1F\n\t    \
             ");
-    
     register uint32_t r0 asm("r0");
     stack_top[7] = r0;
 
-    // our exception handlers store spsr into r11, so i think we should be able
-    // to initialize spsr mode here for when we eventually make context switching
-    // happen on timer interrupt or yield syscall
-
     /* Set the saved LR to the address of the process function;
-       when context is restored, execution will jump to func */
-    stack_top[8] = (uint32_t)func;
+       when the context is restored, execution will jump to func */
+    stack_top[8] = (uint32_t) func;
     p->stack_ptr = stack_top;
+
+    /* Add this process to the ready queue */
+    list_add_tail(&ready_queue, &p->sched_node);
 }
 
 // these syscalls 1-3 do not have return values, so they will print the
@@ -132,16 +148,26 @@ int main(){
     }
     
 
-    /* Initialize the three processes */
-    init_process(&pcb[0], process1, proc_stacks[0], 0);
-    init_process(&pcb[1], process2, proc_stacks[1], 1);
-    init_process(&pcb[2], process3, proc_stacks[2], 2);
+    /* Initialize the ready queue */
+    init_ready_queue();
+    
+    /* Initialize three processes (using only the first three slots) with MEDIUM priority */
+    init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], 0, MEDIUM);
+    init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], 1, MEDIUM);
+    init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], 2, MEDIUM);
 
-    /* Save the kernel context in a dummy variable and switch to process 1.
-       Execution will jump to process1 via its saved LR. */
-    switch_context(&kernel_sp, (unsigned int **)&pcb[0].stack_ptr);
+    /* Set the current process to the head of the ready queue */
+    current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
 
-    while(1){}	
+    /* Save the kernel stack pointer inside the PCB for the current process.
+       Each process gets its own kernel stack stored in KERNEL_STACKS[] */
+    current_process->kernel_sp = KERNEL_STACKS[current_process->pid] + KERNEL_STACK_SIZE;
+
+    /* Switch context from the kernel to the first process.
+       The kernel stack pointer and the process stack pointer are passed to switch_context() */
+    switch_context((unsigned int **)&current_process->kernel_sp, 
+                   (unsigned int **)&current_process->stack_ptr);    
+    while (1){}	
 
     return 0;
 }
