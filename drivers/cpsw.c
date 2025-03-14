@@ -227,6 +227,16 @@
 #define RECEIVE_ENABLE BIT(5)
 #define PULLUP_ENABLE BIT(4)
 
+//*******************************************************************
+// Clocks                                                        
+//*******************************************************************
+
+#define CPGMAC0_ENABLE BIT(1)
+#define CPGMAC0_NOTREADY (BIT(16) | BIT(17))
+
+#define CPSWCLK_ENABLE BIT(1)
+#define CPSWCLK_READY BIT(4)
+
 /* -----------------------------CODE------------------------------- */
 
 /*
@@ -271,6 +281,23 @@ void cpsw_pin_mux(){
 }
 
 /*
+ * cpsw_enable_clocks()
+ *  - enables and configures the cpsw clocks
+ *  - waits for clocks to be ready
+ *
+ * */
+void cpsw_enable_clocks(){
+
+    REG(CM_PER_CPGMAC0_CLKCTRL) = CPGMAC0_ENABLE;
+
+    while ( REG(CM_PER_CPGMAC0_CLKCTRL) & CPGMAC0_NOTREADY ){}
+
+    REG(CM_PER_CPSW_CLKSTCTRL) = CPSWCLK_ENABLE;
+
+    while ( !(REG(CM_PER_CPSW_CLKSTCTRL) & CPSWCLK_READY) ){}
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -281,4 +308,6 @@ void cpsw_init(){
     cpsw_select_interface();
 
     cpsw_pin_mux();
+
+    cpsw_enable_clocks();
 }
