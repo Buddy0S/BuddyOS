@@ -76,4 +76,46 @@
 #define CONF_MDIO (CM_BASE + 0x948)
 #define CONF_MDC (CM_BASE + 0x94C)
 
+//*******************************************************************
+// CLOCK_MODULE REGISTERS
+//*******************************************************************
 
+#define CM_PER_BASE 0x44E00000
+
+/* CPSW Clock registers*/
+#define CM_PER_CPGMAC0_CLKCTRL (CM_PER_BASE + 0x14)
+#define CM_PER_CPSW_CLKSTCTRL (CM_PER_BASE + 0x144)
+
+//*******************************************************************
+// CPDMA REGISTERS
+//*******************************************************************
+
+#define CPDMA_BASE 0x4A100800
+
+#define CPDMA_SOFT_REST (CPDMA_BASE + 0x1C)
+
+//*******************************************************************
+// CPSW_SL REGISTERS
+//*******************************************************************
+
+#define PORT1_BASE 0x4A100D80
+#define PORT2_BASE 0x4A100DC0
+
+#define PORT1_SOFT_REST (PORT1_BASE + 0xC)
+#define PORT2_SOFT_REST (PORT2_BASE + 0xC)
+
+//*******************************************************************
+// CPSW_SS REGISTERS
+//*******************************************************************
+
+#define CPSW_SS_BASE 0x4A100000
+
+#define CPSW_SS_SOFT_REST (CPSW_SS_BASE + 0x8)
+
+//*******************************************************************
+// CPSW_WR REGISTERS
+//*******************************************************************
+
+#define CPSW_WR_BASE 0x4A101200
+
+#define CPSW_WR_SOFT_REST (CPSW_WR_BASE + 0x4)
