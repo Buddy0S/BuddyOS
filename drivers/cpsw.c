@@ -266,6 +266,12 @@
 #define MDIO_PREAMBLE BIT(20)
 #define MDIO_FAULTENB BIT(18)
 
+//*******************************************************************
+// STATS                                                              
+//*******************************************************************
+
+#define STATS_DISABLE 0x00000000
+
 /* -----------------------------CODE------------------------------- */
 
 /*
@@ -427,6 +433,16 @@ void cpsw_config_mdio(){
 }
 
 /*
+ * cpsw_config_stats()
+ *  - disables stats
+ *
+ * */
+void cpsw_config_stats(){
+    
+    REG(STAT_PORT_EN) = STATS_DISABLE;
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -447,4 +463,6 @@ void cpsw_init(){
     cpsw_config_ale();
 
     cpsw_config_mdio();
+
+    cpsw_config_stats();
 }
