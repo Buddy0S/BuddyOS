@@ -103,7 +103,7 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
         i++) {
 
         MMCreadblock(i, buffer);
-        //uart0_printf("Reading Sector %d ...\n", i);
+        uart0_printf("Reading Sector %d ...\n", i);
 
         char *buf = (char*)buffer;
 
@@ -213,5 +213,37 @@ uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 	}
 	uart0_printf("File read complete\n");
     return bytesRead;
+
+}
+
+uint32_t fat12_create_dir_entry(volatile char* filename,
+	uint16_t parent_dir_sector, uint8_t attributes) {
+
+	char buf[512];
+
+    DirEntry dirEntry;
+
+	MMCreadblock(parent_dir_sector, (uint32_t*)buf);
+
+	/* In FAT12, each sector has 16 directory entries */
+	for (int j = 0; j < 16; j++) {
+
+		/* Each directory entry in FAT 12 is 32 bytes long */
+		/* See DirEntry struct for fields in directory entry */
+		dirEntry = *((DirEntry*) &buf[j * 32]);
+
+		/* Check for directory end */
+		if (dirEntry.name[0] == 0x00) {
+			break; 
+		}
+
+		/* Check for valid entry */
+		if (dirEntry.name[0] == 0xE5) {
+			continue;
+		}
+		
+		uart0_printf("ENTRY NAME = %s\n", dirEntry.name);
+	}
+
 
 }
