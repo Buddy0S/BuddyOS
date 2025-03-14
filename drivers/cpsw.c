@@ -210,3 +210,35 @@
 #define P2_CONTROL (CPSW_PORT_BASE + 0x200)
 #define P2_SA_LO (CPSW_PORT_BASE + 0x220)
 #define P2_SA_HI (CPSW_PORT_BASE + 0x224)
+
+/* ------------------------REGISTER VALUES------------------------- */
+
+//*******************************************************************
+// Interface Selection
+//*******************************************************************
+
+#define GMII_MII_SELECT 0x0
+
+/* -----------------------------CODE------------------------------- */
+
+/*
+ * cpsw_select_interface()
+ *  - selects gmii/mii interface for cpsw
+ *  - sets ports 1 and 2 to use selected interface
+ *  
+ * */
+void cpsw_select_interface(){
+    
+    REG(GMII_SEL) = GMII_MII_SELECT;
+}
+
+/*
+ * cpsw_init()
+ *  - initializes the Ethernet subsystem for the BeagleBone Black
+ *  - Follow Steps outlined in Ti Manual Section 14.4.6
+ *
+ * */
+void cpsw_init(){
+
+    cpsw_select_interface();
+}
