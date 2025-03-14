@@ -652,6 +652,32 @@ void cpsw_create_ale_entries(){
 }
 
 /*
+ *
+ * */
+void cpsw_set_port_addrs(){
+
+   uint32_t mac_hi;
+   uint32_t mac_low;
+
+   get_mac();
+
+   ((uint8_t*)mac_hi)[0] = eth_inteface.mac_addr[0];
+   ((uint8_t*)mac_hi)[1] = eth_inteface.mac_addr[1];
+   ((uint8_t*)mac_hi)[2] = eth_inteface.mac_addr[2];
+   ((uint8_t*)mac_hi)[3] = eth_inteface.mac_addr[3];
+
+   ((uint8_t*)mac_low)[0] = eth_inteface.mac_addr[4];
+   ((uint8_t*)mac_low)[1] = eth_inteface.mac_addr[5];
+
+   REG(P1_SA_HI) = mac_hi;
+   REG(P1_SA_LO) |= mac_low;
+
+   REG(P2_SA_HI) = mac_hi;
+   REG(P2_SA_LO) |= mac_low;
+
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -678,4 +704,6 @@ void cpsw_init(){
     cpsw_set_ports_state();
 
     cpsw_create_ale_entries();
+
+    cpsw_set_port_addrs();
 }
