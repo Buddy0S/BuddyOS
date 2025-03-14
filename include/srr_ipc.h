@@ -22,7 +22,7 @@ struct MailEntry {
 };
 
 struct SRRMailbox {
-    struct KListp mail;
+    struct KList mail;
     int count;
     int sent_to;
     struct Mail reply;
