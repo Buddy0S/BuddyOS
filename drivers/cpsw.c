@@ -41,7 +41,7 @@
 // Bit Macro      
 //*******************************************************************
 
-#define BIT(x) 0x00000001 << x
+#define BIT(x) (1 << x)
 
 /* ---------------------------REGISTERS--------------------------- */
 
@@ -92,7 +92,7 @@
 
 #define CPDMA_BASE 0x4A100800
 
-#define CPDMA_SOFT_REST (CPDMA_BASE + 0x1C)
+#define CPDMA_SOFT_RESET (CPDMA_BASE + 0x1C)
 
 #define TX_CONTROL (CPDMA_BASE + 0x4)
 #define RX_CONTROL (CPDMA_BASE + 0x14)
@@ -104,8 +104,8 @@
 #define PORT1_BASE 0x4A100D80
 #define PORT2_BASE 0x4A100DC0
 
-#define PORT1_SOFT_REST (PORT1_BASE + 0xC)
-#define PORT2_SOFT_REST (PORT2_BASE + 0xC)
+#define PORT1_SOFT_RESET (PORT1_BASE + 0xC)
+#define PORT2_SOFT_RESET (PORT2_BASE + 0xC)
 
 //*******************************************************************
 // CPSW_SS REGISTERS
@@ -113,8 +113,8 @@
 
 #define CPSW_SS_BASE 0x4A100000
 
-#define CPSW_SS_SOFT_REST (CPSW_SS_BASE + 0x8)
-#define STATE_PORT_EN (CPSW_SS_BASE + 0xC)
+#define CPSW_SS_SOFT_RESET (CPSW_SS_BASE + 0x8)
+#define STAT_PORT_EN (CPSW_SS_BASE + 0xC)
 
 //*******************************************************************
 // CPSW_WR REGISTERS
@@ -122,7 +122,7 @@
 
 #define CPSW_WR_BASE 0x4A101200
 
-#define CPSW_WR_SOFT_REST (CPSW_WR_BASE + 0x4)
+#define CPSW_WR_SOFT_RESET (CPSW_WR_BASE + 0x4)
 
 //*******************************************************************
 // CPDMA_STATERAM REGISTERS
@@ -176,7 +176,7 @@
 
 #define MDIO_BASE 0x4A101000
 
-#define MDIOCONTROL (MDIO_BASE + 0x4)
+#define MDIO_CONTROL (MDIO_BASE + 0x4)
 #define MDIOALIVE (MDIO_BASE + 0x8)
 
 //*******************************************************************
@@ -587,13 +587,13 @@ void ale_set_entry(uint32_t e_w0, uint32_t e_w1, uint32_t e_w2,int i){
  * multicast_ale_entry()
  *  - creates multicast ale entry 
  *
- *  param: port_mask
+ *  param: portmask
  *   - value to be writen to port mask in word 2
  *
  *  param: multicast mac addr
  *
  * */
-void multicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
+void multicast_ale_entry(uint32_t portmask, uint8_t* mac_addr){
 
     int index = get_ale_index();
 
@@ -603,7 +603,7 @@ void multicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
 
     ((uint8_t*) ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
     ((uint8_t*) ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
-    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3};
+    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
     ((uint8_t*) ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
 
     ((uint8_t*) ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
@@ -617,9 +617,15 @@ void multicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
 }
 
 /*
+ *  multicast_ale_entry()
+ *  - creates unicast ale entry
  *
+ *  param: portmask
+ *   - value to be writen to port mask in word 2
+ *
+ *  param: unicast mac addr
  * */
-void unicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
+void unicast_ale_entry(uint32_t portmask, uint8_t* mac_addr){
 
     int index = get_ale_index();
 
@@ -629,7 +635,7 @@ void unicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
 
     ((uint8_t*) ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
     ((uint8_t*) ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
-    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3};
+    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
     ((uint8_t*) ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
 
     ((uint8_t*) ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
@@ -650,8 +656,8 @@ void unicast_ale_entry(uint32_t port_mask, uint8_t* mac_addr){
  * */
 void get_mac(){
 
-    eth_interface.mac_addr[0] = BYTE1(REG(MAC_ID0_LOW));
-    eth_interface.mac_addr[1] = BYTE0(REG(MAC_ID0_LOW));
+    eth_interface.mac_addr[0] = BYTE1(REG(MAC_ID0_LO));
+    eth_interface.mac_addr[1] = BYTE0(REG(MAC_ID0_LO));
     eth_interface.mac_addr[2] = BYTE3(REG(MAC_ID0_HI));
     eth_interface.mac_addr[3] = BYTE2(REG(MAC_ID0_HI));
     eth_interface.mac_addr[4] = BYTE1(REG(MAC_ID0_HI));
@@ -671,8 +677,8 @@ void cpsw_create_ale_entries(){
     uint8_t mc_addr[MAC_ADDR_LEN] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
     get_mac();
 
-    multicast_ale_entry(ALE_MULTICAST_PORTMASK, mc_addr);
-    unicast_ale_entry(ALE_UNICAST_PORTMASK, eth_interface.mac_addr);
+    multicast_ale_entry(MULTICAST_PORTMASK, mc_addr);
+    unicast_ale_entry(UNICAST_PORTMASK, eth_interface.mac_addr);
 }
 
 /*
@@ -687,13 +693,13 @@ void cpsw_set_port_addrs(){
 
    get_mac();
 
-   ((uint8_t*)mac_hi)[0] = eth_inteface.mac_addr[0];
-   ((uint8_t*)mac_hi)[1] = eth_inteface.mac_addr[1];
-   ((uint8_t*)mac_hi)[2] = eth_inteface.mac_addr[2];
-   ((uint8_t*)mac_hi)[3] = eth_inteface.mac_addr[3];
+   ((uint8_t*)mac_hi)[0] = eth_interface.mac_addr[0];
+   ((uint8_t*)mac_hi)[1] = eth_interface.mac_addr[1];
+   ((uint8_t*)mac_hi)[2] = eth_interface.mac_addr[2];
+   ((uint8_t*)mac_hi)[3] = eth_interface.mac_addr[3];
 
-   ((uint8_t*)mac_low)[0] = eth_inteface.mac_addr[4];
-   ((uint8_t*)mac_low)[1] = eth_inteface.mac_addr[5];
+   ((uint8_t*)mac_low)[0] = eth_interface.mac_addr[4];
+   ((uint8_t*)mac_low)[1] = eth_interface.mac_addr[5];
 
    REG(P1_SA_HI) = mac_hi;
    REG(P1_SA_LO) |= mac_low;
@@ -706,7 +712,7 @@ void cpsw_set_port_addrs(){
 /*
  *
  * */
-void cpsw_init_cpdma_descriptors(){
+void cpsw_setup_cpdma_descriptors(){
 
 }
 
