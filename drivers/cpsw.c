@@ -301,6 +301,8 @@
 
 /* ----------------------------STRUCTS----------------------------- */
 
+#define CPPI_RAM 0x4A102000
+
 typedef struct cpsw_interface {
 
     uint8_t mac_addr[MAC_ADDR_LEN];
@@ -308,6 +310,28 @@ typedef struct cpsw_interface {
 } ethernet_interface;
 
 ethernet_interface eth_interface;
+
+/* CPDMA header discriptors */
+typedef struct hdp {
+
+    uint32_t* next_discriptor;
+    uint32_t* buffer_pointer;
+    uint16_t buffer_length;
+    uint16_t buffer_offset;
+    uint32_t flags;
+
+} cpdma_hdp;
+
+typedef struct cpdma_channel {
+
+    cpdma_hdp* head;
+    cpdma_hdp* tail;
+
+} cpdma_ch;
+
+/* CPDMA Channels */
+cpdma_ch txch;
+cpdma_ch rxch;
 
 /* -----------------------------CODE------------------------------- */
 
@@ -652,12 +676,14 @@ void cpsw_create_ale_entries(){
 }
 
 /*
+ * cpsw_set_port_addrs()
+ *  - sets the addrs for port 1 and 2 as the mac address
  *
  * */
 void cpsw_set_port_addrs(){
 
-   uint32_t mac_hi;
-   uint32_t mac_low;
+   uint32_t mac_hi = 0;
+   uint32_t mac_low = 0;
 
    get_mac();
 
@@ -674,6 +700,13 @@ void cpsw_set_port_addrs(){
 
    REG(P2_SA_HI) = mac_hi;
    REG(P2_SA_LO) |= mac_low;
+
+}
+
+/*
+ *
+ * */
+void cpsw_init_cpdma_descriptors(){
 
 }
 
