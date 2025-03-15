@@ -843,7 +843,7 @@ void cpsw_enable_cpdma_controller(){
  * */
 void cpsw_config_interrupts(){
 
-    REG(INTC_MIR_CLEAR1) |= CPSW_INTMASK_CLEAR;
+    REG(INTC_MIR_CLEAR1) = CPSW_INTMASK_CLEAR;
 
     REG(TX_INTMASK_SET) = CPDMA_CHANNEL_INT;
     REG(RX_INTMASK_SET) = CPDMA_CHANNEL_INT;
@@ -854,6 +854,17 @@ void cpsw_config_interrupts(){
     /* Ack Interrupts */
     REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
 
+}
+
+/*
+ * cpsw_start_recieption()
+ *  - starts the recieption of packets
+ *  - write start of rx chain to register
+ *
+ * */
+void cpsw_start_recieption(){
+
+    REG(RX0_HDP) = (uint32_t) eth_interface.rxch.head;
 }
 
 /*
@@ -889,4 +900,6 @@ void cpsw_init(){
     cpsw_setup_cpdma_descriptors();
 
     cpsw_enable_cpdma_controller();
+
+    cpsw_start_recieption();
 }
