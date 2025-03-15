@@ -1,3 +1,4 @@
+#include <asm-generic/errno.h>
 #include <srr_ipc.h>
 #include <stdint.h>
 #include <syserr.h>
@@ -109,7 +110,43 @@ int receive(int* author, void* msg, uint32_t* len) {
 }
 
 int reply(int pid, void* msg, uint32_t len) {
+    PCB *sender;
+    struct SRRMailbox *s_box, *c_box;
+    void* reply;
 
+    if (msg == NULL) {
+        return -EFAULT;
+    }
+
+    sender = get_PCB(pid);
+    if (sender == NULL) {
+        return -ESRCH;
+    }
+
+    if (len == 0) {
+        return -EINVAL;
+    }
+
+    s_box = &sender->mailbox;
+    c_box = &current_process->mailbox;
+
+    if (s_box->sent_to != current_process->pid) {
+        return -EINVAL;
+    }
+
+    reply = kmalloc(len);
+
+    if (reply == NULL) {
+        return -ENOMEM;
+    }
+
+    bmemcpy(reply, msg, len);
+    s_box->reply.msg = reply;
+    s_box->reply.len = len;
+
+    wake_proccess(pid);
+
+    return 0;
 }
 
 int msg_waiting() {
