@@ -10,5 +10,6 @@
 #define EINVAL  3       //Invalid argument
 #define ENOSYS  4       //Syscall not implemented
 #define EFAULT  5       //Bad memory address
+#define EDEADLK 6       //A deadlock would occur
 
 #endif
