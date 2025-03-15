@@ -319,7 +319,7 @@ ethernet_interface eth_interface;
 /* CPDMA header discriptors */
 typedef struct hdp {
 
-    uint32_t* next_discriptor;
+    struct hdp* next_descriptor;
     uint32_t* buffer_pointer;
     uint16_t buffer_length;
     uint16_t buffer_offset;
@@ -331,6 +331,7 @@ typedef struct cpdma_channel {
 
     cpdma_hdp* head;
     cpdma_hdp* tail;
+    int num_descriptors;
 
 } cpdma_ch;
 
@@ -715,10 +716,60 @@ void cpsw_set_port_addrs(){
 }
 
 /*
+ * cpsw_setup_cpdma_descriptors()
+ *  - sets up cpdma descriptors in CPPI state ram
+ *  - half of state ram for tx other half for rx
  *
  * */
 void cpsw_setup_cpdma_descriptors(){
 
+    cpdma_hdp* tx_start;
+    cpdma_hdp* rx_start;
+    int num_descriptors;
+    cpdma_hdp* tx_cur;
+    cpdma_hdp* rx_cur;
+
+    tx_start = (cpdma_hdp*) CPPI_RAM;
+    rx_start = (cpdma_hdp*) (CPPI_RAM + (CPPI_SIZE >> 1));
+
+    num_descriptors = (CPPI_SIZE >> 1) / sizeof(cpdma_hdp);
+
+    tx_cur = tx_start;
+    rx_cur = rx_start;
+
+    /* Create Descriptor Chains */
+    for (int i = 0; i < num_descriptors - 1; i++){
+    
+        /* TX */
+
+	/* Set Next Descriptor */    
+        tx_cur = (cpdma_hdp*)((uint32_t) tx_cur + i * sizeof(cpdma_hdp));
+	tx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) tx_cur + (i + 1)*sizeof(cpdma_hdp));
+
+        /* Set Flags */
+        // TODO
+
+        /* RX */
+
+	/* Set Next Descriptor */
+	rx_cur = (cpdma_hdp*)((uint32_t) rx_cur + i * sizeof(cpdma_hdp));
+        rx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) rx_cur + (i + 1)*sizeof(cpdma_hdp));
+
+	/* Set Flags */
+        // TODO 
+
+	/* Allocate Packet Buffers */
+	// TODO
+
+    }
+
+    txch.head = tx_start;
+    txch.num_descriptors = num_descriptors;
+    txch.tail = 0;
+
+    rxch.head = rx_start;
+    rxch.num_descriptors = num_descriptors;
+    rxch.tail = 0;
 }
 
 /*
