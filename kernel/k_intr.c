@@ -97,7 +97,7 @@ void interrupt_handler(){
     volatile uint32_t irqnum = *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_IRQ) & 0x7F; 
 
 
-    uart0_printf("IRQ number %d\n", (int) irqnum);
+    //uart0_printf("IRQ number %d\n", (int) irqnum);
 
     /* TIMER 0 interrrupt*/
     if (irqnum == 66){
