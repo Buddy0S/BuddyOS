@@ -1,4 +1,5 @@
 #include <srr_ipc.h>
+#include <stdint.h>
 #include <syserr.h>
 #include <proc.h>
 
@@ -10,11 +11,11 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     uint32_t usable_len;
     
     /* input and state checking */
-    if (msg == NULL) {
+    if (msg == NULL || reply == NULL ||rlen == NULL) {
         return -EFAULT;
     }
 
-    if (len == 0) {
+    if (len == 0 || *rlen == 0) {
         return -EINVAL;
     }
 
@@ -71,7 +72,40 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
 }
 
 int receive(int* author, void* msg, uint32_t* len) {
+    struct SRRMailbox* mb;
+    uint32_t usable_len;
+    KNode *mail_node;
+    struct MailEntry *entry;
 
+    /* input and state checking */
+    if (msg == NULL || len == NULL || author == NULL) {
+        return -EFAULT;
+    }
+
+    if (*len == 0) {
+        return -EINVAL;
+    }
+
+
+    mb = current_process->mailbox;
+
+    if (mb->count == 0) {
+        /* will be woken once there is a message waiting*/
+        block();
+    }
+
+    mail_node = list_pop(&mb->mail);
+    entry = knode_data(mail_node, struct MailEntry, node);
+
+    usable_len = entry->data.len > *len ? *len : entry->data.len;
+    bmemcpy(msg, entry->data.msg, usable_len);
+    *len = usable_len;
+    *author = entry->node;
+
+    kfree(entry->data.msg);
+    kfree(entry);
+
+    return 0;
 }
 
 int reply(int pid, void* msg, uint32_t len) {
