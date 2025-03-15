@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "memory.h"
 
 /*
  * cpsw.c
@@ -297,10 +298,11 @@
 #define PORT_FORWARD (BIT(0) | BIT(1))
 
 //*******************************************************************
-// MAC                                                             
+// ETH                                                             
 //*******************************************************************
 
 #define MAC_ADDR_LEN 6
+#define MAX_PACKET_SIZE 1520
 
 //*******************************************************************
 // CPPI
@@ -765,7 +767,9 @@ void cpsw_setup_cpdma_descriptors(){
         rx_cur->flags = RX_INIT_FLAGS;
 
 	/* Allocate Packet Buffers */
-	// TODO
+	rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
+	rx_cur->buffer_length = MAX_PACKET_SIZE;
+	rx_cur->buffer_offset = 0;
 
     }
 
@@ -782,6 +786,9 @@ void cpsw_setup_cpdma_descriptors(){
     eth_interface.rxch.tail = (cpdma_hdp*)((uint32_t) rx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
     eth_interface.rxch.tail->next_descriptor = 0;
     eth_interface.rxch.tail->flags = RX_INIT_FLAGS;
+    eth_interface.rxch.tail->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
+    eth_interface.rxch.tail->buffer_length = MAX_PACKET_SIZE;
+    eth_interface.rxch.tail->buffer_offset = 0;
 
     eth_interface.rxch.free = eth_interface.rxch.head;
 }
