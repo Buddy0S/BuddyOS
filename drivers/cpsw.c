@@ -765,11 +765,13 @@ void cpsw_setup_cpdma_descriptors(){
 
     txch.head = tx_start;
     txch.num_descriptors = num_descriptors;
-    txch.tail = 0;
+    txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
+    txch.tail->next_descriptor = 0;
 
     rxch.head = rx_start;
     rxch.num_descriptors = num_descriptors;
-    rxch.tail = 0;
+    rxch.tail = (cpdma_hdp*)((uint32_t) rx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
+    rxch.tail->next_descriptor = 0;
 }
 
 /*
