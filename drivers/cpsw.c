@@ -868,6 +868,23 @@ void cpsw_start_recieption(){
 }
 
 /*
+ * print_mac()
+ * - prints ethernet interfaces mac address
+ *
+ * */
+void print_mac(){
+
+    get_mac();
+    uart0_printf("MAC ADDR ID 0: %x:%x:%x:%x:%x:%x\n",
+		    eth_interface.mac_addr[0],
+		    eth_interface.mac_addr[1],
+		    eth_interface.mac_addr[2],
+		    eth_interface.mac_addr[3],
+		    eth_interface.mac_addr[4],
+		    eth_interface.mac_addr[5]);
+}
+
+/*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
  *  - Follow Steps outlined in Ti Manual Section 14.4.6
@@ -875,31 +892,48 @@ void cpsw_start_recieption(){
  * */
 void cpsw_init(){
 
+    uart0_printf("Starting initialization of Common Port Switch\n");
+
     cpsw_select_interface();
+    uart0_printf("GMII/MII Interface Selected\n");
 
     cpsw_pin_mux();
+    uart0_printf("CPSW Pins Muxed\n");
 
     cpsw_enable_clocks();
+    uart0_printf("CPSW Clocks Enabled\n");
 
     cpsw_software_reset();
+    uart0_printf("CPSW Finished Software Reset\n");
 
     cpsw_init_cpdma_descriptors();
+    uart0_printf("CPDMA Descriptors Initialized\n");
 
     cpsw_config_ale();
+    uart0_printf("CPSW ALE Configured\n");
 
     cpsw_config_mdio();
+    uart0_printf("CPSW MDIO Configured\n");
 
     cpsw_config_stats();
+    uart0_printf("CPSW STATS Configured\n");
 
     cpsw_set_ports_state();
+    uart0_printf("CPSW Ports Set to FORWARD\n");
 
     cpsw_create_ale_entries();
+    uart0_printf("CPSW ALE Entries Created for Ports\n");
 
     cpsw_set_port_addrs();
+    uart0_printf("CPSW Ports MAC Addresses Set\n");
+    print_mac();
 
     cpsw_setup_cpdma_descriptors();
+    uart0_printf("CPDMA Descriptors Setup\n");
 
     cpsw_enable_cpdma_controller();
+    uart0_printf("CPDMA Controller enabled\n");
 
     cpsw_start_recieption();
+    uart0_printf("CPSW Packet Reception Started\n");
 }

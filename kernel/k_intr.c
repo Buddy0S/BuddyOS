@@ -46,52 +46,6 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
 }
 
 
-
-
-/*TI manual 6.2.1
- * Skiping Steps 1 and 2
- * Step 3
- * 	default all interrupts are IRQ and highest prioirity
- * 	we can change it to FRQ if we want using this step
- * 	for now we will keep all as default
- *
- * Step 4
- * 	by default all interrupts are masked
- * 	write to INTC_MIR_CLEARn to unmask
- * 	for now we will unmask all and send all to 
- * 	the default interrupt handler, which will
- * 	proccess request based on interrupt number
- * */
-void init_interrupts(void){
-
-    /* soft reset INTC*/
-    *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_SYSCONFIG) |= 0x2;
-
-    /* spin until reset finished */
-    while (!((*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_SYSSTATUS)) & 0x1)){}
-
-   
-    /* Unmasking interrupts that we need */
-
-    //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR0) = 0xFFFFFFFF;
-
-    //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR1) = 0xFFFFFFFF;
-
-
-    /* timer0 interrupt*/
-   *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = (0x1 << 2);
-
-    /* mmc interrupts*/
-   *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = (0x1);
-
-    /* UART0 interrupt */
-   *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = (0x1 << 8);
-
-   // *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = 0xFFFFFFFF;
-
-   // *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR3) = 0xFFFFFFFF;
-}
-
 int ledmode = 0;
 
 void timer_isr(){
@@ -143,7 +97,7 @@ void interrupt_handler(){
     volatile uint32_t irqnum = *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_IRQ) & 0x7F; 
 
 
-    //uart0_printf("IRQ number %d\n", (int) irqnum);
+    uart0_printf("IRQ number %d\n", (int) irqnum);
 
     /* TIMER 0 interrrupt*/
     if (irqnum == 66){
