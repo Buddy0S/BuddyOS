@@ -51,7 +51,7 @@ void yield(void) {
 }
 
 /* Initialize a process's PCB so that when its context is restored, execution begins at func */
-void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority prio) {
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, ProcessPriority prio) {
     /* Set basic PCB values */
     p->pid = p - PROC_TABLE;
     p->state = READY;
