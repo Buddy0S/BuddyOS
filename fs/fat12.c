@@ -49,9 +49,17 @@ void splitFilename(volatile char* input, char* filename, char* extension) {
 	}
 
 	/* Extract file name */
-	while (nameLen < dotLoc && nameLen < 8) {
-		filename[nameLen] = input[nameLen];
-		nameLen++;
+	if (dotLoc == -1) {
+		while (input[nameLen] != '\0' && nameLen < 8) {
+			filename[nameLen] = input[nameLen];
+			nameLen++;
+		}
+	}
+	else {
+		while (nameLen < dotLoc && nameLen < 8) {
+			filename[nameLen] = input[nameLen];
+			nameLen++;
+		}
 	}
 
 	/* Pad filename with spaces if necessary */
@@ -61,11 +69,13 @@ void splitFilename(volatile char* input, char* filename, char* extension) {
 	}
 
 	/* Extract extension */
-	i = dotLoc + 1;
-	while (input[i] != '\0' && extLen < 3) {
-		extension[extLen] = input[i];
-		extLen++;
-		i++;
+	if (dotLoc != -1) {
+		i = dotLoc + 1;
+		while (input[i] != '\0' && extLen < 3) {
+			extension[extLen] = input[i];
+			extLen++;
+			i++;
+		}
 	}
 
 	/* Pad extension with spaces if necessary */

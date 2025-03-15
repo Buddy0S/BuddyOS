@@ -129,6 +129,7 @@ int main(void) {
     fat12_init(0, buffer);
 
 	fat12_create_dir_entry("TEST.TXT",19, 0x20, buffer);
+	fat12_create_dir_entry("FOLDER",19, SUBDIR, buffer);
 
     fat12_read_file("KERNEL.BIN", (volatile uint32_t *)0x80000000);
 
