@@ -64,6 +64,9 @@ void yield(void);
 void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority prio);
 void init_ready_queue(void);
 extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
+PCB* get_PCB(int pid);
+void wake_proc(int pid);
+void block();
 
 #endif /* PROC_H */
 
