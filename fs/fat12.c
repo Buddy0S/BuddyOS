@@ -139,14 +139,14 @@ void fat12_init(unsigned int startSector, volatile uint32_t* buffer) {
 }
 
 int fat12_find(volatile char* filename, volatile uint32_t* buffer,
-    volatile uint16_t *startCluster, volatile uint32_t *fileSize) {
+    DirEntry* dirEntry) {
 
     uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
 
     uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
 
-    DirEntry dirEntry;
+    DirEntry tempEntry;
 
     //uart0_printf("Args = %s %d %d\n", filename, *startCluster, *fileSize);
 
@@ -167,22 +167,22 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
 
             /* Each directory entry in FAT 12 is 32 bytes long */
             /* See DirEntry struct for fields in directory entry */
-            dirEntry = *((DirEntry*) &buf[j * 32]);
+            tempEntry = *((DirEntry*) &buf[j * 32]);
 
             /* Check for directory end */
-            if (dirEntry.name[0] == 0x00) {
+            if (tempEntry.name[0] == 0x00) {
                 break; 
             }
 
             /* Check for valid entry */
-            if (dirEntry.name[0] == 0xE5) {
+            if (tempEntry.name[0] == 0xE5) {
                 continue;
             }
             
             /* File found - set passed pointers to appropriate values*/
-            if (compareFileNames(&dirEntry, filename)) {
-                *startCluster = dirEntry.firstClusterLow;// do we needd  this 2/20 9:21 pm Noah | (dirEntry.firstClusterHigh << 8);
-                *fileSize = dirEntry.fileSize;
+            if (compareFileNames(&tempEntry, filename)) {
+                dirEntry->firstClusterLow = tempEntry.firstClusterLow;
+                dirEntry->fileSize = tempEntry.fileSize;
                 uart0_printf("fat12_find - RETURNING 1\n");
                 return 1;
             }
@@ -271,19 +271,16 @@ uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 	uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
 
-	uint16_t startCluster;
-	uint32_t fileSize;
+	DirEntry dirEntry;
 
-	if (fat12_find(filename, buffer, &startCluster, &fileSize) == 0) {
+	if (fat12_find(filename, buffer, &dirEntry) == 0) {
 		return -1;
 	}
 
-	uart0_printf("Start Cluster = %d, Kernel Size = %d\n", startCluster,
-	fileSize);
-
    	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
 	uint32_t bytesRead = 0;
-	uint16_t loopCluster = startCluster;
+	uint16_t loopCluster = dirEntry.firstClusterLow;
+	uint32_t fileSize = dirEntry.fileSize;
 
 	/* read until EOF marker */
 	while (loopCluster < FAT12_EOF_MIN) {
@@ -351,5 +348,12 @@ uint32_t fat12_create_dir_entry(volatile char* filename,
 
 	return -1;
 
+}
+
+uint32_t fat12_write_file(volatile char* filename, uint16_t parent_dir_sector, 
+	volatile uint32_t* data, uint32_t size, volatile uint32_t* buffer) {
+
+
+	
 
 }
