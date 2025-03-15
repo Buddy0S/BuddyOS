@@ -52,7 +52,7 @@ void yield(void) {
 /* Initialize a process's PCB so that when its context is restored, execution begins at func */
 void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority prio) {
     /* Set basic PCB values */
-    p->pid = pid;
+    p->pid = p - PROC_TABLE;
     p->state = READY;
     p->prio = prio;
     p->exitStatus = 0;
@@ -152,9 +152,9 @@ int main(){
     init_ready_queue();
     
     /* Initialize three processes (using only the first three slots) with MEDIUM priority */
-    init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], 0, MEDIUM);
-    init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], 1, MEDIUM);
-    init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], 2, MEDIUM);
+    init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], MEDIUM);
+    init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], MEDIUM);
+    init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], MEDIUM);
 
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
