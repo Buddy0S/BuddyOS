@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "memory.h"
+#include "uart.h"
 
 /*
  * cpsw.c
@@ -253,6 +254,8 @@
 
 #define TX_INIT_FLAGS 0x0
 #define RX_INIT_FLAGS BIT(29)
+
+#define CPDMA_ENABLE BIT(0)
 
 //*******************************************************************
 // ALE                                                               
@@ -727,6 +730,8 @@ void cpsw_set_port_addrs(){
  * cpsw_setup_cpdma_descriptors()
  *  - sets up cpdma descriptors in CPPI state ram
  *  - half of state ram for tx other half for rx
+ *  - allocates buffers for rx channel
+ *  - tx buffers will be allocated on send
  *
  * */
 void cpsw_setup_cpdma_descriptors(){
@@ -775,6 +780,7 @@ void cpsw_setup_cpdma_descriptors(){
 
     eth_interface.txch.head = tx_start;
     eth_interface.txch.num_descriptors = num_descriptors;
+    
     eth_interface.txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
     eth_interface.txch.tail->next_descriptor = 0;
     eth_interface.txch.tail->flags = TX_INIT_FLAGS;
@@ -783,6 +789,7 @@ void cpsw_setup_cpdma_descriptors(){
 
     eth_interface.rxch.head = rx_start;
     eth_interface.rxch.num_descriptors = num_descriptors;
+    
     eth_interface.rxch.tail = (cpdma_hdp*)((uint32_t) rx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
     eth_interface.rxch.tail->next_descriptor = 0;
     eth_interface.rxch.tail->flags = RX_INIT_FLAGS;
@@ -791,6 +798,16 @@ void cpsw_setup_cpdma_descriptors(){
     eth_interface.rxch.tail->buffer_offset = 0;
 
     eth_interface.rxch.free = eth_interface.rxch.head;
+}
+
+/*
+ * cpsw_enable_cpdma_controller()
+ *  - enables the controllers for rx and tx
+ * */
+void cpsw_enable_cpda_controller(){
+
+    REG(TX_CONTROL) = CPDMA_ENABLE;
+    REG(RX_CONTROL) = CPDMA_ENABLE;
 }
 
 /*
@@ -822,4 +839,8 @@ void cpsw_init(){
     cpsw_create_ale_entries();
 
     cpsw_set_port_addrs();
+
+    cpsw_setup_cpdma_descriptors();
+
+    cpsw_enable_cpda_controller();
 }
