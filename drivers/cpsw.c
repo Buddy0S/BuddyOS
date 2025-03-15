@@ -337,9 +337,6 @@
 
 #define CPDMA_CHANNEL_INT BIT(0)
 
-#define CPDMA_CORE_TX BIT(3)
-#define CPDMA_CORE_RX BIT(2)
-
 #define EOI_TX BIT(1)
 #define EOI_RX BIT(0)
 
@@ -376,8 +373,6 @@ typedef struct cpsw_interface {
 } ethernet_interface;
 
 ethernet_interface eth_interface;
-
-
 
 /* -----------------------------CODE------------------------------- */
 
@@ -840,9 +835,24 @@ void cpsw_enable_cpdma_controller(){
 }
 
 /*
- *
+ * cpsw_config_interrupts()
+ *  - configs interrupts
+ *  - channel 0 rx dma completion
+ *  - channel 0 tx dma completion
+ *  
  * */
 void cpsw_config_interrupts(){
+
+    REG(INTC_MIR_CLEAR1) |= CPSW_INTMASK_CLEAR;
+
+    REG(TX_INTMASK_SET) = CPDMA_CHANNEL_INT;
+    REG(RX_INTMASK_SET) = CPDMA_CHANNEL_INT;
+
+    REG(C0_RX_EN) = CPDMA_CHANNEL_INT;
+    REG(C0_TX_EN) = CPDMA_CHANNEL_INT;
+
+    /* Ack Interrupts */
+    REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
 
 }
 
