@@ -229,12 +229,21 @@ uint16_t fat12_find_free_cluster() {
 
             /* Check if the first entry is free */
             if (entry1 == FAT12_UNUSED) {
-                return cluster;
+				FATTable[fatByteOffset] = (FAT12_EOF_MIN & 0xFF);
+                FATTable[fatByteOffset + 1] = (FATTable[fatByteOffset + 1] & 0xF0) | ((FAT12_EOF_MIN >> 8) & 0x0F);
+                
+				MMCwriteblock(fatSector + sector, (uint32_t*)FATTable);
+				return cluster;
             }
             cluster++;
 
             /* Check if the second entry is free */
             if (entry2 == FAT12_UNUSED) {
+				
+				FATTable[fatByteOffset + 1] = (FATTable[fatByteOffset + 1] & 0x0F) | ((FAT12_EOF_MIN << 4) & 0xF0);
+                FATTable[fatByteOffset + 2] = (FAT12_EOF_MIN >> 4) & 0xFF;
+
+				MMCwriteblock(fatSector + sector, (uint32_t*)FATTable);
                 return cluster;
             }
             cluster++;
