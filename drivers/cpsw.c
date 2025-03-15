@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include "memory.h"
+#include "uart.h"
 
 /*
  * cpsw.c
@@ -211,6 +213,21 @@
 #define P2_SA_LO (CPSW_PORT_BASE + 0x220)
 #define P2_SA_HI (CPSW_PORT_BASE + 0x224)
 
+//*******************************************************************
+// INTERRUPT REGISTERS
+//*******************************************************************
+
+#define INTERRUPTC_BASE 0x48200000
+#define INTC_MIR_CLEAR1 (INTERRUPTC_BASE + 0xA8)
+
+#define TX_INTMASK_SET (CPDMA_BASE + 0x88)
+#define RX_INTMASK_SET (CPDMA_BASE + 0xA8)
+
+#define C0_RX_EN (CPSW_WR_BASE + 0x14)
+#define C0_TX_EN (CPSW_WR_BASE + 0x18)
+
+#define CPDMA_EOI_VECTOR (CPDMA_BASE + 0x94)
+
 /* ------------------------REGISTER VALUES------------------------- */
 
 //*******************************************************************
@@ -249,6 +266,11 @@
 //*******************************************************************
 
 #define DESCRIPTOR_NULL 0x00000000
+
+#define TX_INIT_FLAGS 0x0
+#define RX_INIT_FLAGS BIT(29)
+
+#define CPDMA_ENABLE BIT(0)
 
 //*******************************************************************
 // ALE                                                               
@@ -294,10 +316,11 @@
 #define PORT_FORWARD (BIT(0) | BIT(1))
 
 //*******************************************************************
-// MAC                                                             
+// ETH                                                             
 //*******************************************************************
 
 #define MAC_ADDR_LEN 6
+#define MAX_PACKET_SIZE 1520
 
 //*******************************************************************
 // CPPI
@@ -306,20 +329,23 @@
 #define CPPI_RAM 0x4A102000
 #define CPPI_SIZE 0x2000
 
+//*******************************************************************
+// INTERRUPTS
+//*******************************************************************
+
+#define CPSW_INTMASK_CLEAR (BIT(10) | BIT(11))
+
+#define CPDMA_CHANNEL_INT BIT(0)
+
+#define EOI_TX BIT(1)
+#define EOI_RX BIT(0)
+
 /* ----------------------------STRUCTS----------------------------- */
-
-typedef struct cpsw_interface {
-
-    uint8_t mac_addr[MAC_ADDR_LEN];
-
-} ethernet_interface;
-
-ethernet_interface eth_interface;
 
 /* CPDMA header discriptors */
 typedef struct hdp {
 
-    uint32_t* next_discriptor;
+    struct hdp* next_descriptor;
     uint32_t* buffer_pointer;
     uint16_t buffer_length;
     uint16_t buffer_offset;
@@ -327,16 +353,26 @@ typedef struct hdp {
 
 } cpdma_hdp;
 
+/* CPDMA Channels */
 typedef struct cpdma_channel {
 
     cpdma_hdp* head;
     cpdma_hdp* tail;
+    cpdma_hdp* free;
+    int num_descriptors;
 
 } cpdma_ch;
 
-/* CPDMA Channels */
-cpdma_ch txch;
-cpdma_ch rxch;
+/* Ethernet Interface */
+typedef struct cpsw_interface {
+
+    uint8_t mac_addr[MAC_ADDR_LEN];
+    cpdma_ch txch;
+    cpdma_ch rxch;
+
+} ethernet_interface;
+
+ethernet_interface eth_interface;
 
 /* -----------------------------CODE------------------------------- */
 
@@ -715,10 +751,137 @@ void cpsw_set_port_addrs(){
 }
 
 /*
+ * cpsw_setup_cpdma_descriptors()
+ *  - sets up cpdma descriptors in CPPI state ram
+ *  - half of state ram for tx other half for rx
+ *  - allocates buffers for rx channel
+ *  - tx buffers will be allocated on send
  *
  * */
 void cpsw_setup_cpdma_descriptors(){
 
+    cpdma_hdp* tx_start;
+    cpdma_hdp* rx_start;
+    int num_descriptors;
+    cpdma_hdp* tx_cur;
+    cpdma_hdp* rx_cur;
+
+    tx_start = (cpdma_hdp*) CPPI_RAM;
+    rx_start = (cpdma_hdp*) (CPPI_RAM + (CPPI_SIZE >> 1));
+
+    num_descriptors = (CPPI_SIZE >> 1) / sizeof(cpdma_hdp);
+
+    tx_cur = tx_start;
+    rx_cur = rx_start;
+
+    /* Create Descriptor Chains */
+    for (int i = 0; i < num_descriptors - 1; i++){
+    
+        /* TX */
+
+	/* Set Next Descriptor */    
+        tx_cur = (cpdma_hdp*)((uint32_t) tx_cur + i * sizeof(cpdma_hdp));
+	tx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) tx_cur + (i + 1)*sizeof(cpdma_hdp));
+
+        /* Set Flags */
+        tx_cur->flags = TX_INIT_FLAGS;
+
+        /* RX */
+
+	/* Set Next Descriptor */
+	rx_cur = (cpdma_hdp*)((uint32_t) rx_cur + i * sizeof(cpdma_hdp));
+        rx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) rx_cur + (i + 1)*sizeof(cpdma_hdp));
+
+	/* Set Flags */
+        rx_cur->flags = RX_INIT_FLAGS;
+
+	/* Allocate Packet Buffers */
+	rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
+	rx_cur->buffer_length = MAX_PACKET_SIZE;
+	rx_cur->buffer_offset = 0;
+
+    }
+
+    eth_interface.txch.head = tx_start;
+    eth_interface.txch.num_descriptors = num_descriptors;
+    
+    eth_interface.txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
+    eth_interface.txch.tail->next_descriptor = 0;
+    eth_interface.txch.tail->flags = TX_INIT_FLAGS;
+
+    eth_interface.txch.free = eth_interface.txch.head;
+
+    eth_interface.rxch.head = rx_start;
+    eth_interface.rxch.num_descriptors = num_descriptors;
+    
+    eth_interface.rxch.tail = (cpdma_hdp*)((uint32_t) rx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
+    eth_interface.rxch.tail->next_descriptor = 0;
+    eth_interface.rxch.tail->flags = RX_INIT_FLAGS;
+    eth_interface.rxch.tail->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
+    eth_interface.rxch.tail->buffer_length = MAX_PACKET_SIZE;
+    eth_interface.rxch.tail->buffer_offset = 0;
+
+    eth_interface.rxch.free = eth_interface.rxch.head;
+}
+
+/*
+ * cpsw_enable_cpdma_controller()
+ *  - enables the controllers for rx and tx
+ * */
+void cpsw_enable_cpdma_controller(){
+
+    REG(TX_CONTROL) = CPDMA_ENABLE;
+    REG(RX_CONTROL) = CPDMA_ENABLE;
+}
+
+/*
+ * cpsw_config_interrupts()
+ *  - configs interrupts
+ *  - channel 0 rx dma completion
+ *  - channel 0 tx dma completion
+ *  
+ * */
+void cpsw_config_interrupts(){
+
+    REG(INTC_MIR_CLEAR1) = CPSW_INTMASK_CLEAR;
+
+    REG(TX_INTMASK_SET) = CPDMA_CHANNEL_INT;
+    REG(RX_INTMASK_SET) = CPDMA_CHANNEL_INT;
+
+    REG(C0_RX_EN) = CPDMA_CHANNEL_INT;
+    REG(C0_TX_EN) = CPDMA_CHANNEL_INT;
+
+    /* Ack Interrupts */
+    REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
+
+}
+
+/*
+ * cpsw_start_recieption()
+ *  - starts the recieption of packets
+ *  - write start of rx chain to register
+ *
+ * */
+void cpsw_start_recieption(){
+
+    REG(RX0_HDP) = (uint32_t) eth_interface.rxch.head;
+}
+
+/*
+ * print_mac()
+ * - prints ethernet interfaces mac address
+ *
+ * */
+void print_mac(){
+
+    get_mac();
+    uart0_printf("MAC ADDR ID 0: %x:%x:%x:%x:%x:%x\n",
+		    eth_interface.mac_addr[0],
+		    eth_interface.mac_addr[1],
+		    eth_interface.mac_addr[2],
+		    eth_interface.mac_addr[3],
+		    eth_interface.mac_addr[4],
+		    eth_interface.mac_addr[5]);
 }
 
 /*
@@ -729,25 +892,48 @@ void cpsw_setup_cpdma_descriptors(){
  * */
 void cpsw_init(){
 
+    uart0_printf("Starting initialization of Common Port Switch\n");
+
     cpsw_select_interface();
+    uart0_printf("GMII/MII Interface Selected\n");
 
     cpsw_pin_mux();
+    uart0_printf("CPSW Pins Muxed\n");
 
     cpsw_enable_clocks();
+    uart0_printf("CPSW Clocks Enabled\n");
 
     cpsw_software_reset();
+    uart0_printf("CPSW Finished Software Reset\n");
 
     cpsw_init_cpdma_descriptors();
+    uart0_printf("CPDMA Descriptors Initialized\n");
 
     cpsw_config_ale();
+    uart0_printf("CPSW ALE Configured\n");
 
     cpsw_config_mdio();
+    uart0_printf("CPSW MDIO Configured\n");
 
     cpsw_config_stats();
+    uart0_printf("CPSW STATS Configured\n");
 
     cpsw_set_ports_state();
+    uart0_printf("CPSW Ports Set to FORWARD\n");
 
     cpsw_create_ale_entries();
+    uart0_printf("CPSW ALE Entries Created for Ports\n");
 
     cpsw_set_port_addrs();
+    uart0_printf("CPSW Ports MAC Addresses Set\n");
+    print_mac();
+
+    cpsw_setup_cpdma_descriptors();
+    uart0_printf("CPDMA Descriptors Setup\n");
+
+    cpsw_enable_cpdma_controller();
+    uart0_printf("CPDMA Controller enabled\n");
+
+    cpsw_start_recieption();
+    uart0_printf("CPSW Packet Reception Started\n");
 }
