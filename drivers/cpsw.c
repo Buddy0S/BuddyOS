@@ -311,14 +311,6 @@
 
 /* ----------------------------STRUCTS----------------------------- */
 
-typedef struct cpsw_interface {
-
-    uint8_t mac_addr[MAC_ADDR_LEN];
-
-} ethernet_interface;
-
-ethernet_interface eth_interface;
-
 /* CPDMA header discriptors */
 typedef struct hdp {
 
@@ -330,17 +322,28 @@ typedef struct hdp {
 
 } cpdma_hdp;
 
+/* CPDMA Channels */
 typedef struct cpdma_channel {
 
     cpdma_hdp* head;
     cpdma_hdp* tail;
+    cpdma_hdp* free;
     int num_descriptors;
 
 } cpdma_ch;
 
-/* CPDMA Channels */
-cpdma_ch txch;
-cpdma_ch rxch;
+/* Ethernet Interface */
+typedef struct cpsw_interface {
+
+    uint8_t mac_addr[MAC_ADDR_LEN];
+    cpdma_ch txch;
+    cpdma_ch rxch;
+
+} ethernet_interface;
+
+ethernet_interface eth_interface;
+
+
 
 /* -----------------------------CODE------------------------------- */
 
@@ -766,17 +769,21 @@ void cpsw_setup_cpdma_descriptors(){
 
     }
 
-    txch.head = tx_start;
-    txch.num_descriptors = num_descriptors;
-    txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
-    txch.tail->next_descriptor = 0;
-    txch.tail->flags = TX_INIT_FLAGS;
+    eth_interface.txch.head = tx_start;
+    eth_interface.txch.num_descriptors = num_descriptors;
+    eth_interface.txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
+    eth_interface.txch.tail->next_descriptor = 0;
+    eth_interface.txch.tail->flags = TX_INIT_FLAGS;
 
-    rxch.head = rx_start;
-    rxch.num_descriptors = num_descriptors;
-    rxch.tail = (cpdma_hdp*)((uint32_t) rx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
-    rxch.tail->next_descriptor = 0;
-    rxch.tail->flags = RX_INIT_FLAGS;
+    eth_interface.txch.free = eth_interface.txch.head;
+
+    eth_interface.rxch.head = rx_start;
+    eth_interface.rxch.num_descriptors = num_descriptors;
+    eth_interface.rxch.tail = (cpdma_hdp*)((uint32_t) rx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
+    eth_interface.rxch.tail->next_descriptor = 0;
+    eth_interface.rxch.tail->flags = RX_INIT_FLAGS;
+
+    eth_interface.rxch.free = eth_interface.rxch.head;
 }
 
 /*
