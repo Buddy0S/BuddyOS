@@ -53,6 +53,8 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
 
     c_box->sent_to = pid;
 
+    wake_proc(pid);
+
     block();
 
     /* By now the reply has been put in */
