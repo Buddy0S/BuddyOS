@@ -302,7 +302,7 @@ uint32_t fat12_create_dir_entry(volatile char* filename,
 
 	char* buf = (char*)buffer; /* CHANGE TO MALLOC'D ARRAY WHEN POSSIBLE */
 
-    DirEntry dirEntry;
+    DirEntry *dirEntry;
 
 	MMCreadblock(parent_dir_sector, (uint32_t*)buf);
 
@@ -311,21 +311,21 @@ uint32_t fat12_create_dir_entry(volatile char* filename,
 
 		/* Each directory entry in FAT 12 is 32 bytes long */
 		/* See DirEntry struct for fields in directory entry */
-		dirEntry = *((DirEntry*) &buf[j * 32]);
+		dirEntry = (DirEntry*) &buf[j * 32];
 
 		/* Check for directory end */
-		if (dirEntry.name[0] == 0x00 || dirEntry.name[0] == 0xE5) {
+		if (dirEntry->name[0] == 0x00 || dirEntry->name[0] == 0xE5) {
 			
-			splitFilename(filename, dirEntry.name, dirEntry.ext);			
-			dirEntry.firstClusterLow = fat12_find_free_cluster();
-			dirEntry.attrib = attributes;
-			dirEntry.fileSize = 0;
+			splitFilename(filename, dirEntry->name, dirEntry->ext);			
+			dirEntry->firstClusterLow = fat12_find_free_cluster();
+			dirEntry->attrib = attributes;
+			dirEntry->fileSize = 0;
 
-			uart0_printf("%s.%s - %x - %d (%d)\n", dirEntry.name, dirEntry.ext,
-			dirEntry.attrib, dirEntry.firstClusterLow, dirEntry.fileSize);
+			uart0_printf("%s.%s - %x - %d (%d)\n", dirEntry->name, dirEntry->ext,
+			dirEntry->attrib, dirEntry->firstClusterLow, dirEntry->fileSize);
 
-			MMCwriteblock(parent_dir_sector, (uint32_t*)&dirEntry);
-			return dirEntry.firstClusterLow;
+			MMCwriteblock(parent_dir_sector, (uint32_t*)buf);
+			return dirEntry->firstClusterLow;
 		}
 
 	}
