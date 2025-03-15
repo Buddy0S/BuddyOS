@@ -213,6 +213,21 @@
 #define P2_SA_LO (CPSW_PORT_BASE + 0x220)
 #define P2_SA_HI (CPSW_PORT_BASE + 0x224)
 
+//*******************************************************************
+// INTERRUPT REGISTERS
+//*******************************************************************
+
+#define INTERRUPTC_BASE 0x48200000
+#define INTC_MIR_CLEAR1 (INTERRUPTC_BASE + 0xA8)
+
+#define TX_INTMASK_SET (CPDMA_BASE + 0x88)
+#define RX_INTMASK_SET (CPDMA_BASE + 0xA8)
+
+#define C0_RX_EN (CPSW_WR_BASE + 0x14)
+#define C0_TX_EN (CPSW_WR_BASE + 0x18)
+
+#define CPDMA_EOI_VECTOR (CPDMA_BASE + 0x94)
+
 /* ------------------------REGISTER VALUES------------------------- */
 
 //*******************************************************************
@@ -313,6 +328,20 @@
 
 #define CPPI_RAM 0x4A102000
 #define CPPI_SIZE 0x2000
+
+//*******************************************************************
+// INTERRUPTS
+//*******************************************************************
+
+#define CPSW_INTMASK_CLEAR (BIT(10) | BIT(11))
+
+#define CPDMA_CHANNEL_INT BIT(0)
+
+#define CPDMA_CORE_TX BIT(3)
+#define CPDMA_CORE_RX BIT(2)
+
+#define EOI_TX BIT(1)
+#define EOI_RX BIT(0)
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -804,10 +833,17 @@ void cpsw_setup_cpdma_descriptors(){
  * cpsw_enable_cpdma_controller()
  *  - enables the controllers for rx and tx
  * */
-void cpsw_enable_cpda_controller(){
+void cpsw_enable_cpdma_controller(){
 
     REG(TX_CONTROL) = CPDMA_ENABLE;
     REG(RX_CONTROL) = CPDMA_ENABLE;
+}
+
+/*
+ *
+ * */
+void cpsw_config_interrupts(){
+
 }
 
 /*
@@ -842,5 +878,5 @@ void cpsw_init(){
 
     cpsw_setup_cpdma_descriptors();
 
-    cpsw_enable_cpda_controller();
+    cpsw_enable_cpdma_controller();
 }
