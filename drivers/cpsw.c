@@ -250,6 +250,9 @@
 
 #define DESCRIPTOR_NULL 0x00000000
 
+#define TX_INIT_FLAGS 0x0
+#define RX_INIT_FLAGS BIT(29)
+
 //*******************************************************************
 // ALE                                                               
 //*******************************************************************
@@ -747,7 +750,7 @@ void cpsw_setup_cpdma_descriptors(){
 	tx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) tx_cur + (i + 1)*sizeof(cpdma_hdp));
 
         /* Set Flags */
-        // TODO
+        tx_cur->flags = TX_INIT_FLAGS;
 
         /* RX */
 
@@ -756,7 +759,7 @@ void cpsw_setup_cpdma_descriptors(){
         rx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) rx_cur + (i + 1)*sizeof(cpdma_hdp));
 
 	/* Set Flags */
-        // TODO 
+        rx_cur->flags = RX_INIT_FLAGS;
 
 	/* Allocate Packet Buffers */
 	// TODO
@@ -767,11 +770,13 @@ void cpsw_setup_cpdma_descriptors(){
     txch.num_descriptors = num_descriptors;
     txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
     txch.tail->next_descriptor = 0;
+    txch.tail->flags = TX_INIT_FLAGS;
 
     rxch.head = rx_start;
     rxch.num_descriptors = num_descriptors;
     rxch.tail = (cpdma_hdp*)((uint32_t) rx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
     rxch.tail->next_descriptor = 0;
+    rxch.tail->flags = RX_INIT_FLAGS;
 }
 
 /*
