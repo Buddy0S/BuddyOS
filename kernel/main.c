@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "proc.h"
 #include "vfs.h"
+#include "net.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
@@ -147,6 +148,7 @@ int main(){
     } else {
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
+<<<<<<< HEAD
 
 	/* ********* Test File system ********* */
 	
@@ -159,25 +161,38 @@ int main(){
 
 	/*****************************************/
 
+=======
+    
+    cpsw_init();
+    
+>>>>>>> cc631b8 (let the debugging begin)
     /* Initialize the ready queue */
-    init_ready_queue();
+    //init_ready_queue();
     
     /* Initialize three processes (using only the first three slots) with MEDIUM priority */
+<<<<<<< HEAD
     init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], MEDIUM);
     init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], MEDIUM);
     init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], MEDIUM);
+=======
+    //init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], 0, MEDIUM);
+    //init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], 1, MEDIUM);
+    //init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], 2, MEDIUM);
+>>>>>>> cc631b8 (let the debugging begin)
 
     /* Set the current process to the head of the ready queue */
-    current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
+    //current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
 
     /* Save the kernel stack pointer inside the PCB for the current process.
        Each process gets its own kernel stack stored in KERNEL_STACKS[] */
-    current_process->kernel_sp = KERNEL_STACKS[current_process->pid] + KERNEL_STACK_SIZE;
+   // current_process->kernel_sp = KERNEL_STACKS[current_process->pid] + KERNEL_STACK_SIZE;
 
     /* Switch context from the kernel to the first process.
        The kernel stack pointer and the process stack pointer are passed to switch_context() */
-    switch_context((unsigned int **)&current_process->kernel_sp, 
-                   (unsigned int **)&current_process->stack_ptr);    
+    //switch_context((unsigned int **)&current_process->kernel_sp, 
+      //             (unsigned int **)&current_process->stack_ptr);    
+
+    
     while (1){}	
 
     return 0;

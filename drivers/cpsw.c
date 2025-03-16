@@ -329,6 +329,8 @@
 #define CPPI_RAM 0x4A102000
 #define CPPI_SIZE 0x2000
 
+#define NUM_DESCRIPTORS 50
+
 //*******************************************************************
 // INTERRUPTS
 //*******************************************************************
@@ -719,7 +721,10 @@ void cpsw_create_ale_entries(){
     get_mac();
 
     multicast_ale_entry(MULTICAST_PORTMASK, mc_addr);
+    uart0_printf("multicast entry created\n");
+
     unicast_ale_entry(UNICAST_PORTMASK, eth_interface.mac_addr);
+    uart0_printf("unicast entry created\n");
 }
 
 /*
@@ -767,9 +772,9 @@ void cpsw_setup_cpdma_descriptors(){
     cpdma_hdp* rx_cur;
 
     tx_start = (cpdma_hdp*) CPPI_RAM;
-    rx_start = (cpdma_hdp*) (CPPI_RAM + (CPPI_SIZE >> 1));
+    rx_start = (cpdma_hdp*) (CPPI_RAM + (NUM_DESCRIPTORS * sizeof(cpdma_hdp)));
 
-    num_descriptors = (CPPI_SIZE >> 1) / sizeof(cpdma_hdp);
+    num_descriptors = NUM_DESCRIPTORS;
 
     tx_cur = tx_start;
     rx_cur = rx_start;
@@ -786,6 +791,8 @@ void cpsw_setup_cpdma_descriptors(){
         /* Set Flags */
         tx_cur->flags = TX_INIT_FLAGS;
 
+	uart0_printf("TX descriptor %d created\n",i);
+
         /* RX */
 
 	/* Set Next Descriptor */
@@ -799,6 +806,8 @@ void cpsw_setup_cpdma_descriptors(){
 	rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
 	rx_cur->buffer_length = MAX_PACKET_SIZE;
 	rx_cur->buffer_offset = 0;
+
+	uart0_printf("RX descriptor %d created\n",i);
 
     }
 
@@ -921,12 +930,12 @@ void cpsw_init(){
     cpsw_set_ports_state();
     uart0_printf("CPSW Ports Set to FORWARD\n");
 
-    cpsw_create_ale_entries();
-    uart0_printf("CPSW ALE Entries Created for Ports\n");
+    //cpsw_create_ale_entries();
+    //uart0_printf("CPSW ALE Entries Created for Ports\n");
 
-    cpsw_set_port_addrs();
-    uart0_printf("CPSW Ports MAC Addresses Set\n");
-    print_mac();
+    //cpsw_set_port_addrs();
+    //uart0_printf("CPSW Ports MAC Addresses Set\n");
+    //print_mac();
 
     cpsw_setup_cpdma_descriptors();
     uart0_printf("CPDMA Descriptors Setup\n");
