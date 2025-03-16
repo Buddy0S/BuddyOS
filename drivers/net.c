@@ -238,6 +238,14 @@ extern void buddy();
 
 #define CPDMA_EOI_VECTOR (CPDMA_BASE + 0x94)
 
+//*******************************************************************
+// GPIO REGISTERS
+//*******************************************************************
+
+#define GPIO1_BASE      0x4804C000
+#define GPIO_OE         (GPIO1_BASE + 0x134)
+#define GPIO_DATAOUT    (GPIO1_BASE + 0x13C)
+
 /* ------------------------REGISTER VALUES------------------------- */
 
 //*******************************************************************
@@ -366,6 +374,8 @@ extern void buddy();
 
 #define PORT1_PHY 0
 #define PORT2_PHY 1
+      
+#define PHY_RESET_BIT   (1 << 8)    
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -917,6 +927,8 @@ void print_mac(){
 		    eth_interface.mac_addr[5]);
 }
 
+void phy_reset();
+
 /*
  * cpsw_init()
  *  - initializes the Ethernet subsystem for the BeagleBone Black
@@ -924,6 +936,9 @@ void print_mac(){
  *
  * */
 void cpsw_init(){
+
+    uart0_printf("Enabling Power to PHY, this will take some time ...\n");	
+    phy_reset();
 
     uart0_printf("Starting initialization of Common Port Switch\n");
 
@@ -945,6 +960,7 @@ void cpsw_init(){
     cpsw_config_ale();
     uart0_printf("CPSW ALE Configured\n");
 
+    uart0_printf("Configuring MDIO this will take some time ...");
     cpsw_config_mdio();
     buddy();
     uart0_printf("CPSW MDIO Configured\n");
@@ -976,6 +992,27 @@ void cpsw_init(){
 
 
 /*
+ * phy_reset()
+ *  - secret function
+ *  - enables power to the PHY
+ *  - this took forever to figure out
+ *
+ * */
+void phy_reset(void)
+{
+    // Configure GPIO1_8 as an output by clearing its bit in the OE register.
+    REG(GPIO_OE) &= ~PHY_RESET_BIT;
+
+    // Assert PHY reset 
+    REG(GPIO_DATAOUT) &= ~PHY_RESET_BIT;
+    buddy();  
+
+    // Deassert PHY reset
+    REG(GPIO_DATAOUT) |= PHY_RESET_BIT;
+    buddy();  
+}
+
+/*
  * phy_readreg()
  *  - reads a phy reg and returns its value
  *
@@ -992,7 +1029,7 @@ uint16_t phy_readreg(uint8_t phy_addr, uint8_t reg_addr){
         return REG(MDIOUSERACCESS0) & PHY_DATA;
     }
 
-    return -1;
+    return 2;
 }
 
 /*
@@ -1013,12 +1050,6 @@ int phy_alive(){
 int phy_init(){
 
     uart0_printf("Checking if PHY is Alive\n");
-
-    uint16_t test1 = phy_readreg(PORT1_PHY,PHY_BMCR);
-    uint16_t test2 = phy_readreg(PORT2_PHY,PHY_BMCR);
-
-    uart0_printf("Port 1 BMCR %x \n", test1);
-    uart0_printf("Port 2 BMCR %x \n", test2);
 
     uart0_printf("%x\n",phy_alive());
 
