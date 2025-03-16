@@ -570,10 +570,10 @@ void cpsw_set_ports_state(){
  *
  * */
 void get_ale_entry(uint32_t index, uint32_t* entrybuffer){
+	
+    REG(TBLCTL) = index;
 
-    REG(TBLCTL) |= index;
-
-    REG(TBLCTL) &= ~TBLCTL_WRITE_READ;
+    //REG(TBLCTL) &= ~TBLCTL_WRITE_READ;
 
     entrybuffer[0] = REG(TBLW0);
     entrybuffer[1] = REG(TBLW1);
@@ -593,9 +593,14 @@ int get_ale_index(){
     uint8_t et;
 
     for (index = 0; index < MAX_ALE_ENTRIES; index++){
-   	get_ale_entry(index, ale_entry_buffer);
+   
+        uart0_printf("index %d\n",index);       
 
-	et = (((uint8_t*)(ale_entry_buffer[1]))[3] & ALE_ENTRY_TYPE);
+	get_ale_entry(index, ale_entry_buffer);
+
+	et = (((uint8_t*)(&(ale_entry_buffer[1])))[3] & (uint8_t) ALE_ENTRY_TYPE);
+
+	uart0_printf("ET: %d\n",et);
 
 	if ( et == ALE_ENTRY_FREE) return index;	
     }
@@ -617,13 +622,13 @@ int get_ale_index(){
  * */
 void ale_set_entry(uint32_t e_w0, uint32_t e_w1, uint32_t e_w2,int i){
 
+    uart0_printf("writing words\n");	
     REG(TBLW0) = e_w0;
     REG(TBLW1) = e_w1;
     REG(TBLW2) = e_w2;
 
-    REG(TBLCTL) |= i;
-
-    REG(TBLCTL) |= TBLCTL_WRITE_READ;
+    REG(TBLCTL) = i & TBLCTL_WRITE_READ;
+    
 }
 
 /*
@@ -644,15 +649,15 @@ void multicast_ale_entry(uint32_t portmask, uint8_t* mac_addr){
     uint32_t ale_entry_w1 = 0x0;
     uint32_t ale_entry_w2 = 0x0;
 
-    ((uint8_t*) ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
-    ((uint8_t*) ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
-    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
-    ((uint8_t*) ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
+    ((uint8_t*) &ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
+    ((uint8_t*) &ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
+    ((uint8_t*) &ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
+    ((uint8_t*) &ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
 
-    ((uint8_t*) ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
-    ((uint8_t*) ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
+    ((uint8_t*) &ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
+    ((uint8_t*) &ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
 
-    ((uint8_t*) ale_entry_w1)[3] = (uint8_t) ALE_MULTICAST_ENTRY;
+    ((uint8_t*) &ale_entry_w1)[3] = (uint8_t) ALE_MULTICAST_ENTRY;
 
     ale_entry_w2 = portmask << ALE_PORT_MASK_SHIFT; 
 
@@ -676,15 +681,15 @@ void unicast_ale_entry(uint32_t portmask, uint8_t* mac_addr){
     uint32_t ale_entry_w1 = 0x0;
     uint32_t ale_entry_w2 = 0x0;
 
-    ((uint8_t*) ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
-    ((uint8_t*) ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
-    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
-    ((uint8_t*) ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
+    ((uint8_t*) &ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
+    ((uint8_t*) &ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
+    ((uint8_t*) &ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
+    ((uint8_t*) &ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
 
-    ((uint8_t*) ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
-    ((uint8_t*) ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
+    ((uint8_t*) &ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
+    ((uint8_t*) &ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
 
-    ((uint8_t*) ale_entry_w1)[3] = (uint8_t) ALE_UNICAST_ENTRY;
+    ((uint8_t*) &ale_entry_w1)[3] = (uint8_t) ALE_UNICAST_ENTRY;
 
     ale_entry_w2 = portmask << ALE_PORT_MASK_SHIFT;
 
@@ -739,13 +744,13 @@ void cpsw_set_port_addrs(){
 
    get_mac();
 
-   ((uint8_t*)mac_hi)[0] = eth_interface.mac_addr[0];
-   ((uint8_t*)mac_hi)[1] = eth_interface.mac_addr[1];
-   ((uint8_t*)mac_hi)[2] = eth_interface.mac_addr[2];
-   ((uint8_t*)mac_hi)[3] = eth_interface.mac_addr[3];
+   ((uint8_t*)&mac_hi)[0] = eth_interface.mac_addr[0];
+   ((uint8_t*)&mac_hi)[1] = eth_interface.mac_addr[1];
+   ((uint8_t*)&mac_hi)[2] = eth_interface.mac_addr[2];
+   ((uint8_t*)&mac_hi)[3] = eth_interface.mac_addr[3];
 
-   ((uint8_t*)mac_low)[0] = eth_interface.mac_addr[4];
-   ((uint8_t*)mac_low)[1] = eth_interface.mac_addr[5];
+   ((uint8_t*)&mac_low)[0] = eth_interface.mac_addr[4];
+   ((uint8_t*)&mac_low)[1] = eth_interface.mac_addr[5];
 
    REG(P1_SA_HI) = mac_hi;
    REG(P1_SA_LO) |= mac_low;
@@ -791,8 +796,6 @@ void cpsw_setup_cpdma_descriptors(){
         /* Set Flags */
         tx_cur->flags = TX_INIT_FLAGS;
 
-	uart0_printf("TX descriptor %d created\n",i);
-
         /* RX */
 
 	/* Set Next Descriptor */
@@ -806,8 +809,6 @@ void cpsw_setup_cpdma_descriptors(){
 	rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
 	rx_cur->buffer_length = MAX_PACKET_SIZE;
 	rx_cur->buffer_offset = 0;
-
-	uart0_printf("RX descriptor %d created\n",i);
 
     }
 
@@ -930,12 +931,12 @@ void cpsw_init(){
     cpsw_set_ports_state();
     uart0_printf("CPSW Ports Set to FORWARD\n");
 
-    //cpsw_create_ale_entries();
-    //uart0_printf("CPSW ALE Entries Created for Ports\n");
+    cpsw_create_ale_entries();
+    uart0_printf("CPSW ALE Entries Created for Ports\n");
 
-    //cpsw_set_port_addrs();
-    //uart0_printf("CPSW Ports MAC Addresses Set\n");
-    //print_mac();
+    cpsw_set_port_addrs();
+    uart0_printf("CPSW Ports MAC Addresses Set\n");
+    print_mac();
 
     cpsw_setup_cpdma_descriptors();
     uart0_printf("CPDMA Descriptors Setup\n");
