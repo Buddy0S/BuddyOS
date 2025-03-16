@@ -376,7 +376,7 @@ typedef struct cpsw_interface {
 
 ethernet_interface eth_interface;
 
-/* -----------------------------CODE------------------------------- */
+/* --------------------------CPSW CODE----------------------------- */
 
 /*
  * cpsw_select_interface()
@@ -627,7 +627,7 @@ void ale_set_entry(uint32_t e_w0, uint32_t e_w1, uint32_t e_w2,int i){
     REG(TBLW1) = e_w1;
     REG(TBLW2) = e_w2;
 
-    REG(TBLCTL) = i & TBLCTL_WRITE_READ;
+    REG(TBLCTL) = i | TBLCTL_WRITE_READ;
     
 }
 
@@ -946,4 +946,35 @@ void cpsw_init(){
 
     cpsw_start_recieption();
     uart0_printf("CPSW Packet Reception Started\n");
+}
+
+/* --------------------------PHY CODE----------------------------- */
+
+/*
+ * phy_alive()
+ *  - returns if Ethernet PHY is plugged into board
+ *
+ * */
+int phy_alive(){
+
+    return REG(MDIOALIVE);
+}
+
+/*
+ * phy_init()
+ *  - initializes the Ethernet PHY connected to the board
+ *
+ * */
+int phy_init(){
+
+    uart0_printf("Checking if PHY is plugged in\n");
+
+    if (phy_alive()){
+        uart0_printf("Ethernet PHY Plugged in\n");
+    }else {
+        uart0_printf("Ethernet PHY not Plugged in");
+	return -1;
+    }
+
+    return 0;
 }

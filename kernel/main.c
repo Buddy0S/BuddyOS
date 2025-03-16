@@ -164,6 +164,8 @@ int main(){
 =======
     
     cpsw_init();
+
+    phy_init();
     
 >>>>>>> cc631b8 (let the debugging begin)
     /* Initialize the ready queue */
