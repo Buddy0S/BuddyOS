@@ -6,6 +6,7 @@
 #include "proc.h"
 #include "vfs.h"
 #include "net.h"
+#include "led.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
@@ -134,6 +135,44 @@ int test_syscall_sum(int a, int b) {
 unsigned int *kernel_sp;
 extern void supervisor_call(void);
 
+void buddy(void) {
+
+    volatile int i;
+    volatile int T = 500000;
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED1);
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED2);
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED3);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED0);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED1);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED2);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED3);
+
+    for (i = 0; i < T; i++);
+
+}
+
+
 int main(){
 
     uart0_printf("Entering Kernel\n");
@@ -148,7 +187,6 @@ int main(){
     } else {
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
-<<<<<<< HEAD
 
 	/* ********* Test File system ********* */
 	
@@ -161,26 +199,18 @@ int main(){
 
 	/*****************************************/
 
-=======
     
     cpsw_init();
 
     phy_init();
     
->>>>>>> cc631b8 (let the debugging begin)
     /* Initialize the ready queue */
     //init_ready_queue();
     
     /* Initialize three processes (using only the first three slots) with MEDIUM priority */
-<<<<<<< HEAD
     init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], MEDIUM);
     init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], MEDIUM);
     init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], MEDIUM);
-=======
-    //init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], 0, MEDIUM);
-    //init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], 1, MEDIUM);
-    //init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], 2, MEDIUM);
->>>>>>> cc631b8 (let the debugging begin)
 
     /* Set the current process to the head of the ready queue */
     //current_process = knode_data(list_first(&ready_queue), PCB, sched_node);

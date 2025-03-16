@@ -22,6 +22,8 @@
  *
  * */
 
+extern void buddy();
+
 /* ----------------------DATA ACCESS MACROS----------------------- */
 
 //*******************************************************************
@@ -34,16 +36,16 @@
 // Byte Extraction Macros
 //*******************************************************************
 
-#define BYTE0(x) x & 0xFF
-#define BYTE1(x) (x & 0xFF00) >> 8
-#define BYTE2(x) (x & 0xFF0000) >> 16
-#define BYTE3(x) (x & 0xFF000000) >> 24
+#define BYTE0(x) (((x) & 0xFF))
+#define BYTE1(x) ((((x) & 0xFF00)) >> 8)
+#define BYTE2(x) ((((x) & 0xFF0000)) >> 16)
+#define BYTE3(x) ((((x) & 0xFF000000)) >> 24)
 
 //******************************************************************* 
 // Bit Macro      
 //*******************************************************************
 
-#define BIT(x) (1 << x)
+#define BIT(x) (1 << (x))
 
 /* ---------------------------REGISTERS--------------------------- */
 
@@ -181,6 +183,14 @@
 #define MDIO_CONTROL (MDIO_BASE + 0x4)
 #define MDIOALIVE (MDIO_BASE + 0x8)
 
+#define MDIOUSERACCESS0 (MDIO_BASE + 0x80)
+
+//*******************************************************************
+// PHY REGISTERS
+//*******************************************************************
+
+#define PHY_BMCR 0x00
+
 //*******************************************************************
 // CPSW_ALE REGISTERS
 //*******************************************************************
@@ -302,6 +312,7 @@
 #define MDIO_CLKDIV 124
 #define MDIO_PREAMBLE BIT(20)
 #define MDIO_FAULTENB BIT(18)
+#define MDIO_CLKDIV_MASK 0xFFFF
 
 //*******************************************************************
 // STATS                                                              
@@ -341,6 +352,20 @@
 
 #define EOI_TX BIT(1)
 #define EOI_RX BIT(0)
+
+//*******************************************************************
+// PHY
+//*******************************************************************
+
+#define GO_BIT BIT(31)
+#define PHY_READ 0x00000000
+#define PHY_ADDR_SHIFT 16
+#define REG_ADDR_SHIFT 21
+#define READ_ACK BIT(29)
+#define PHY_DATA 0xFFFF
+
+#define PORT1_PHY 0
+#define PORT2_PHY 1
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -531,9 +556,7 @@ void cpsw_config_ale(){
  * */
 void cpsw_config_mdio(){
    
-    REG(MDIO_CONTROL) = MDIO_ENABLE | MDIO_PREAMBLE | MDIO_FAULTENB;
-
-    REG(MDIO_CONTROL) |= MDIO_CLKDIV;
+    REG(MDIO_CONTROL) = MDIO_ENABLE | MDIO_PREAMBLE | MDIO_FAULTENB | (MDIO_CLKDIV & MDIO_CLKDIV_MASK);
 }
 
 /*
@@ -923,6 +946,7 @@ void cpsw_init(){
     uart0_printf("CPSW ALE Configured\n");
 
     cpsw_config_mdio();
+    buddy();
     uart0_printf("CPSW MDIO Configured\n");
 
     cpsw_config_stats();
@@ -950,9 +974,30 @@ void cpsw_init(){
 
 /* --------------------------PHY CODE----------------------------- */
 
+
+/*
+ * phy_readreg()
+ *  - reads a phy reg and returns its value
+ *
+ * */
+uint16_t phy_readreg(uint8_t phy_addr, uint8_t reg_addr){
+	
+    while ( REG(MDIOUSERACCESS0) & GO_BIT){}
+
+    REG(MDIOUSERACCESS0) = (PHY_READ | GO_BIT | (reg_addr << REG_ADDR_SHIFT) | (phy_addr << PHY_ADDR_SHIFT));
+
+    while ( REG(MDIOUSERACCESS0) & GO_BIT){}
+
+    if ( REG(MDIOUSERACCESS0) & READ_ACK) {
+        return REG(MDIOUSERACCESS0) & PHY_DATA;
+    }
+
+    return -1;
+}
+
 /*
  * phy_alive()
- *  - returns if Ethernet PHY is plugged into board
+ *  - returns if Ethernet PHY is Alive
  *
  * */
 int phy_alive(){
@@ -962,17 +1007,25 @@ int phy_alive(){
 
 /*
  * phy_init()
- *  - initializes the Ethernet PHY connected to the board
+ *  - initializes the Ethernet PHY 
  *
  * */
 int phy_init(){
 
-    uart0_printf("Checking if PHY is plugged in\n");
+    uart0_printf("Checking if PHY is Alive\n");
+
+    uint16_t test1 = phy_readreg(PORT1_PHY,PHY_BMCR);
+    uint16_t test2 = phy_readreg(PORT2_PHY,PHY_BMCR);
+
+    uart0_printf("Port 1 BMCR %x \n", test1);
+    uart0_printf("Port 2 BMCR %x \n", test2);
+
+    uart0_printf("%x\n",phy_alive());
 
     if (phy_alive()){
-        uart0_printf("Ethernet PHY Plugged in\n");
+        uart0_printf("Ethernet PHY Alive\n");
     }else {
-        uart0_printf("Ethernet PHY not Plugged in");
+        uart0_printf("Ethernet PHY Not Alive\n");
 	return -1;
     }
 
