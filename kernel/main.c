@@ -198,11 +198,10 @@ int main(){
 	//uart0_printf("FS TEST = %s(%d)\n", mnt->fs_mountpoint, mnt->type);
 
 	/*****************************************/
-
     
     cpsw_init();
 
-    phy_init();
+    phy_init(); 
     
     /* Initialize the ready queue */
     //init_ready_queue();
