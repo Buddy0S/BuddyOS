@@ -701,7 +701,7 @@ void multicast_ale_entry(uint32_t portmask, uint8_t* mac_addr){
     ((uint8_t*) &ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
     ((uint8_t*) &ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
     ((uint8_t*) &ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
-    ((uint8_t*) &ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
+    ((uint8_t*) &ale_entry_w0)[3] = mac_addr[MAC_ADDR_LEN - 4];
 
     ((uint8_t*) &ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
     ((uint8_t*) &ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
@@ -733,7 +733,7 @@ void unicast_ale_entry(uint32_t portmask, uint8_t* mac_addr){
     ((uint8_t*) &ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
     ((uint8_t*) &ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
     ((uint8_t*) &ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
-    ((uint8_t*) &ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
+    ((uint8_t*) &ale_entry_w0)[3] = mac_addr[MAC_ADDR_LEN - 4];
 
     ((uint8_t*) &ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
     ((uint8_t*) &ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
