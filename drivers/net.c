@@ -104,6 +104,8 @@ extern void buddy();
 #define PORT1_SOFT_RESET (PORT1_BASE + 0xC)
 #define PORT2_SOFT_RESET (PORT2_BASE + 0xC)
 
+#define PORT1_MACCONTROL (PORT1_BASE + 0x4)
+
 //*******************************************************************
 // CPSW_SS REGISTERS
 //*******************************************************************
@@ -182,7 +184,10 @@ extern void buddy();
 // PHY REGISTERS
 //*******************************************************************
 
-#define PHY_BCR 0x00
+#define PHY_BCR 0
+#define PHY_BSR 1
+#define PHY_AUTONEG_ADV 4
+#define PHY_PARTNER_CAP 5
 
 //*******************************************************************
 // CPSW_ALE REGISTERS
@@ -369,6 +374,22 @@ extern void buddy();
 #define PHY1 0
       
 #define PHY_RESET_BIT BIT(8)    
+
+#define PHY100 BIT(7)
+#define PHY100_FD BIT(8)
+
+#define PHY10 BIT(5)
+#define PHY10_FD BIT(6)
+
+#define AUTO_NEG_ENABLE BIT(12)
+#define AUTO_NEG_CLEAR (BIT(5) | BIT(6) | BIT(7) | BIT(8))
+#define AUTO_NEG_RESTART BIT(9)
+#define AUTO_NEG_COMPLETE BIT(5)
+
+#define FULL_DUPLEX BIT(0)
+#define HALF_DUPLEX 0x0
+#define IN_BAND BIT(18)
+#define CLEAR_TRANSFER (BIT(7) | BIT(0))
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -920,6 +941,18 @@ void print_mac(){
 		    eth_interface.mac_addr[5]);
 }
 
+/*
+ * cpsw_set_transfer
+ *  - sets transfer mode for port 1
+ *
+ * */
+void cpsw_set_transfer(uint32_t transfer){
+
+    REG(PORT1_MACCONTROL) &= ~CLEAR_TRANSFER;
+
+    REG(PORT1_MACCONTROL) |= transfer;
+}
+
 void phy_reset();
 
 /*
@@ -1043,6 +1076,95 @@ void phy_writereg(uint8_t phy_addr, uint8_t reg_addr, uint16_t data){
 }
 
 /*
+ *  phy_get_autoneg_status()
+ *   - returns status of auto negotiation
+ *
+ * */
+int phy_get_autoneg_status(uint8_t phy_addr){
+
+    return phy_readreg(phy_addr,PHY_BSR) & AUTO_NEG_COMPLETE;
+}
+
+/*
+ * phy_autonegotiate()
+ *  - sets transfer capabilites of port 1
+ *  - advertizes our capabilites 
+ *  - sets transfer mode based on capablities of partner
+ *
+ * */
+int phy_autonegotiate(uint8_t phy_addr){
+
+    uint16_t data;
+    uint16_t data_a;
+    uint16_t data_p;    
+    uint32_t transfer;
+    uint16_t advert = PHY100 | PHY100_FD | PHY10 | PHY10_FD;
+
+    data = phy_readreg(phy_addr, PHY_BCR);
+
+    data |= AUTO_NEG_ENABLE;
+
+    phy_writereg(phy_addr, PHY_BCR, data);
+
+    data = phy_readreg(phy_addr, PHY_BCR);
+
+    data_a = phy_readreg(phy_addr, PHY_AUTONEG_ADV);
+
+    data_a &= ~AUTO_NEG_CLEAR;
+
+    data_a |= advert;
+
+    phy_writereg(phy_addr, PHY_AUTONEG_ADV, data_a);
+
+    data |= AUTO_NEG_RESTART;
+
+    phy_writereg(phy_addr, PHY_BCR, data);
+
+    for (int i = 0; i < 200; i++){
+    
+	uart0_printf("PHY attempting auto negotiation, this will take a while..\n"); 
+        buddy();
+	if ( phy_get_autoneg_status(phy_addr) ) break;
+
+	if (i == 199){
+	
+	    uart0_printf("AUTO NEG FAILED\n");
+		
+	    return -1;
+	}
+    }
+
+    uart0_printf("AUTO NEG SUCCESSFUL\n");
+
+    data_p = phy_readreg(phy_addr, PHY_PARTNER_CAP);
+
+    if ( data_p & PHY100_FD ){
+        uart0_printf("Setting transfer Mode to 100mbps Full Duplex\n");
+	transfer = FULL_DUPLEX;
+
+    }else if ( data_p & PHY100 ){
+        uart0_printf("Setting transfer Mode to 100mbps \n");	    
+        transfer = HALF_DUPLEX;
+
+    }else if ( data_p & PHY10_FD ){
+        uart0_printf("Setting transfer Mode to 10mbps Full Duplex\n");
+        transfer = IN_BAND | FULL_DUPLEX;
+
+    }else if ( data_p & PHY10 ){
+        uart0_printf("Setting transfer Mode to 10mbps\n");
+	transfer = IN_BAND | HALF_DUPLEX;
+
+    }else {
+    
+        uart0_printf("No valid Transfer\n");
+	return -1;
+    }
+
+    cpsw_set_transfer(transfer);
+
+}
+
+/*
  * phy_alive()
  *  - returns if Ethernet PHY is Alive
  *
@@ -1061,14 +1183,14 @@ int phy_init(){
 
     uart0_printf("Checking if PHY is Alive\n");
 
-    uart0_printf("PHY1 BCR %x\n",phy_readreg(PHY1,PHY_BCR));
-
     if (phy_alive()){
         uart0_printf("Ethernet PHY Alive\n");
     }else {
         uart0_printf("Ethernet PHY Not Alive\n");
 	return -1;
     }
+
+    phy_autonegotiate(PHY1);
 
     return 0;
 }
