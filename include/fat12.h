@@ -67,6 +67,6 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
 uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer);
 uint32_t fat12_create_dir_entry(volatile char* filename,
 	uint16_t parent_dir_sector, uint8_t attributes, volatile uint32_t* buffer); 
-uint32_t fat12_write_file(volatile char* filename, void* data,
+uint32_t fat12_write_file(volatile char* filename, volatile char* data,
 	uint32_t size, volatile uint32_t* tempBuffer); 
 #endif
