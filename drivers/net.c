@@ -831,12 +831,12 @@ void cpsw_setup_cpdma_descriptors(){
     tx_start = (cpdma_hdp*) CPPI_RAM;
     rx_start = (cpdma_hdp*) (CPPI_RAM + (NUM_DESCRIPTORS * sizeof(cpdma_hdp)));
 
-    uart0_printf("TEST1 %x | %x ", (NUM_DESCRIPTORS * sizeof(cpdma_hdp)),rx_start );
-
     num_descriptors = NUM_DESCRIPTORS;
 
     tx_cur = tx_start;
     rx_cur = rx_start;
+
+    uart0_printf("sizeof cpdma_hdp %x\n",sizeof(cpdma_hdp));
 
     /* Create Descriptor Chains */
     for (int i = 0; i < num_descriptors - 1; i++){
@@ -844,8 +844,8 @@ void cpsw_setup_cpdma_descriptors(){
         /* TX */
 
 	/* Set Next Descriptor */    
-        tx_cur = (cpdma_hdp*)((uint32_t) tx_cur + i * sizeof(cpdma_hdp));
-	tx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) tx_cur + (i + 1)*sizeof(cpdma_hdp));
+        tx_cur = (cpdma_hdp*)((uint32_t) tx_start + (i * sizeof(cpdma_hdp)));
+	tx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) tx_cur + sizeof(cpdma_hdp));
 
         /* Set Flags */
         tx_cur->flags = TX_INIT_FLAGS;
@@ -853,8 +853,8 @@ void cpsw_setup_cpdma_descriptors(){
         /* RX */
 
 	/* Set Next Descriptor */
-	rx_cur = (cpdma_hdp*)((uint32_t) rx_cur + i * sizeof(cpdma_hdp));
-        rx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) rx_cur + (i + 1)*sizeof(cpdma_hdp));
+	rx_cur = (cpdma_hdp*)((uint32_t) rx_start + (i * sizeof(cpdma_hdp)));
+        rx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) rx_cur + sizeof(cpdma_hdp));
 
 	/* Set Flags */
         rx_cur->flags = RX_INIT_FLAGS;
@@ -862,6 +862,10 @@ void cpsw_setup_cpdma_descriptors(){
 	/* Allocate Packet Buffers */
 	rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
 	rx_cur->buffer_length = MAX_PACKET_SIZE;
+
+	uart0_printf("RX_CUR  %x -> next %x\n",rx_cur,rx_cur->next_descriptor);
+	uart0_printf("RX_CUR flags %x\n", rx_cur->flags);
+	uart0_printf("index %d\n",i);
 
     }
 
@@ -1213,7 +1217,7 @@ void debug(){
     uart0_printf("RX CP %x\n",REG(RX0_CP));
     uart0_printf("RX CP flags %x\n",((cpdma_hdp*)REG(RX0_CP))->flags);
     uart0_printf("RX CP next %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor);
-    uart0_printf("RX CP next flags %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor->flags);
+    //uart0_printf("RX CP next flags %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor->flags);
     uart0_printf("RXCH tail %x\n",eth_interface.rxch.tail);
     uart0_printf("RXCH tail flags %x\n",eth_interface.rxch.tail->flags);
 
