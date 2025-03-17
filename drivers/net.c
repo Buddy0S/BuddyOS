@@ -3,21 +3,14 @@
 #include "uart.h"
 
 /*
- * cpsw.c
+ * net.c
  *
- * This file contains the driver code for the BeagleBone Black
- * AM335x Sitara™ Processors Common Platform Switch
- *
- * Initializes Ethernet Sub System:
- *  - GMII/MII Interface
- *  - Normal Priorty Mode
- *  - VLAN Unaware
- *  - Single MAC
- *  - Statistics Disabled
- *  - RX and TX DMA Completion Interrupts
- *  - Channel 0 for both RX and TX
- *  - Ports in Forward State
- *
+ * This file contains the driver code to use Network capabilities of
+ * the BeagleBone Black
+ * 
+ * - AM335x Sitara™ Processors Common Platform Switch Driver
+ * - Microchip LAN8710A PHY Driver
+ * 
  * Author: Marwan Mostafa 
  *
  * */
@@ -189,7 +182,7 @@ extern void buddy();
 // PHY REGISTERS
 //*******************************************************************
 
-#define PHY_BMCR 0x00
+#define PHY_BCR 0x00
 
 //*******************************************************************
 // CPSW_ALE REGISTERS
@@ -367,15 +360,15 @@ extern void buddy();
 
 #define GO_BIT BIT(31)
 #define PHY_READ 0x00000000
+#define PHY_WRITE BIT(30)
 #define PHY_ADDR_SHIFT 16
 #define REG_ADDR_SHIFT 21
 #define READ_ACK BIT(29)
 #define PHY_DATA 0xFFFF
 
-#define PORT1_PHY 0
-#define PORT2_PHY 1
+#define PHY1 0
       
-#define PHY_RESET_BIT   (1 << 8)    
+#define PHY_RESET_BIT BIT(8)    
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -990,12 +983,15 @@ void cpsw_init(){
 
 /* --------------------------PHY CODE----------------------------- */
 
-
 /*
  * phy_reset()
  *  - secret function
- *  - enables power to the PHY
+ *  - enables power/resets the PHY
  *  - this took forever to figure out
+ *  - GPIO1_8 pin can be used to reset PHY
+ *  - this was found in am335x-bone-common.dtsi from the linux kernel
+ *  - needs to wait a max amount of time after aserting and deasserting PHY reset
+ *  - buddy function can handle this
  *
  * */
 void phy_reset(void)
@@ -1033,6 +1029,20 @@ uint16_t phy_readreg(uint8_t phy_addr, uint8_t reg_addr){
 }
 
 /*
+ * phy_writereg()
+ *  - writes data to a phy reg
+ *
+ * */
+void phy_writereg(uint8_t phy_addr, uint8_t reg_addr, uint16_t data){
+
+    while ( REG(MDIOUSERACCESS0) & GO_BIT){}
+
+    REG(MDIOUSERACCESS0) = (PHY_WRITE | GO_BIT | (reg_addr << REG_ADDR_SHIFT) | (phy_addr << PHY_ADDR_SHIFT) | data);
+
+    while ( REG(MDIOUSERACCESS0) & GO_BIT){}
+}
+
+/*
  * phy_alive()
  *  - returns if Ethernet PHY is Alive
  *
@@ -1051,7 +1061,7 @@ int phy_init(){
 
     uart0_printf("Checking if PHY is Alive\n");
 
-    uart0_printf("%x\n",phy_alive());
+    uart0_printf("PHY1 BCR %x\n",phy_readreg(PHY1,PHY_BCR));
 
     if (phy_alive()){
         uart0_printf("Ethernet PHY Alive\n");
