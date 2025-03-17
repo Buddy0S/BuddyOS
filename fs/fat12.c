@@ -390,11 +390,11 @@ uint32_t fat12_write_file(volatile char* filename, void* data,
 	uint32_t size, volatile uint32_t* tempBuffer) {
 
 	DirEntry *fileEntry;
-	uint16_t cluster, tempCluster, entryIndex;
+	uint16_t cluster, prevEnd; 
 	uint32_t bytesWritten = 0;
-	uint32_t sector;
+	uint32_t sector, entryIndex;
 	uint32_t dirSector = fat12_find(filename, tempBuffer, &entryIndex);
-	uint32_t firstDataCluster = bootSector.reservedSectorCount +
+	uint32_t firstDataSector = bootSector.reservedSectorCount +
 		(bootSector.FATTableCount * bootSector.sectorsPerFATTable) +
 		((bootSector.rootEntryCount * 32) / bootSector.bytesPerSector);
 
@@ -432,5 +432,5 @@ uint32_t fat12_write_file(volatile char* filename, void* data,
 
 	MMCreadblock(dirSector, tempBuffer);
 
-
+	return bytesWritten;
 }
