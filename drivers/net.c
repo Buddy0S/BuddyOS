@@ -94,6 +94,8 @@ extern void buddy();
 #define TX_CONTROL (CPDMA_BASE + 0x4)
 #define RX_CONTROL (CPDMA_BASE + 0x14)
 
+#define DMASTATUS (CPDMA_BASE + 0x24)
+
 //*******************************************************************
 // CPSW_SL REGISTERS
 //*******************************************************************
@@ -399,10 +401,10 @@ extern void buddy();
 /* CPDMA header discriptors */
 typedef struct hdp {
 
-    struct hdp* next_descriptor;
-    uint32_t* buffer_pointer;
-    uint32_t buffer_length;
-    uint32_t flags;
+    volatile struct hdp* next_descriptor;
+    volatile uint32_t* buffer_pointer;
+    volatile uint32_t buffer_length;
+    volatile uint32_t flags;
 
 } cpdma_hdp;
 
@@ -569,7 +571,7 @@ void cpsw_init_cpdma_descriptors(){
  * */
 void cpsw_config_ale(){
     
-    REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE;
+    REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE | BIT(4) | BIT(8);
 }
 
 /*
@@ -963,7 +965,7 @@ void cpsw_set_transfer(uint32_t transfer){
  * */
 void cpsw_enable_gmii(){
   
-    REG(PORT1_MACCONTROL) |= GMII_ENABLE;
+    REG(PORT1_MACCONTROL) |= GMII_ENABLE | OH_MBPS;
 
 }
 
@@ -1026,6 +1028,7 @@ void cpsw_init(){
 
     cpsw_start_recieption();
     uart0_printf("CPSW Packet Reception Started\n");
+  
 }
 
 /* --------------------------PHY CODE----------------------------- */
@@ -1226,7 +1229,23 @@ int phy_init(){
     cpsw_enable_gmii();
     uart0_printf("Enabling Frame Sending and Recieving\n");
 
-    uart0_printf("TEST %x\n",((cpdma_hdp*)REG(RX0_HDP))->buffer_length);
+    uart0_printf("RX_HDP FLAGS %x\n",((cpdma_hdp*)REG(RX0_HDP))->flags);
+
+    uart0_printf("ALECONTROL %x\n",REG(CPSW_ALE_CONTROL));
+
+    uart0_printf("RXCH flags %x\n",eth_interface.rxch.head->flags);
+
+    uart0_printf("RXCONTROL %x\n",REG(RX_CONTROL));
+
+    uart0_printf("DAMSTATUS %x\n",REG(DMASTATUS));
+
+    while(1){
+        buddy();
+	uart0_printf("RXCH flags %x\n",eth_interface.rxch.head->flags);
+        uart0_printf("DAMSTATUS %x\n",REG(DMASTATUS));
+	uart0_printf("DMA INT RAW STATUS %x\n",REG(CPDMA_BASE + 0xA0));
+	uart0_printf("DMA INT MASKED STATUS %x\n",REG(CPDMA_BASE + 0xA4));
+    } 
 
     return 0;
 }

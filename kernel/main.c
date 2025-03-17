@@ -186,10 +186,10 @@ int main(){
     } else {
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
-    
+
     cpsw_init();
 
-    phy_init();
+    phy_init(); 
     
     /* Initialize the ready queue */
     //init_ready_queue();
