@@ -389,10 +389,14 @@ uint32_t fat12_create_dir_entry(volatile char* filename,
 uint32_t fat12_write_file(volatile char* filename, void* data,
 	uint32_t size, volatile uint32_t* tempBuffer) {
 
-	DirEntry fileEntry;
+	DirEntry *fileEntry;
 	uint16_t cluster, tempCluster, entryIndex;
 	uint32_t bytesWritten = 0;
-	uint32_t dirSector = fat12_find(filename, tempBuffer, &entryIndex); 
+	uint32_t sector;
+	uint32_t dirSector = fat12_find(filename, tempBuffer, &entryIndex);
+	uint32_t firstDataCluster = bootSector.reservedSectorCount +
+		(bootSector.FATTableCount * bootSector.sectorsPerFATTable) +
+		((bootSector.rootEntryCount * 32) / bootSector.bytesPerSector);
 
 	/* File not found */
 	if (dirSector == 0) {
@@ -401,9 +405,9 @@ uint32_t fat12_write_file(volatile char* filename, void* data,
 
 	MMCreadblock(dirSector, tempBuffer);
 
-	fileEntry = ((DirEntry*)tempBuffer)[entryIndex];
+	fileEntry = &((DirEntry*)tempBuffer)[entryIndex];
 
-	cluster = fileEntry.firstClusterLow;
+	cluster = fileEntry->firstClusterLow;
 
 	while (bytesWritten < size) {
 		if (cluster >= FAT12_EOF_MIN && cluster <= FAT12_EOF_MAX) {
@@ -413,17 +417,20 @@ uint32_t fat12_write_file(volatile char* filename, void* data,
 			fat12_set_next_cluster(prevEnd, cluster);
 			fat12_set_next_cluster(cluster, FAT12_EOF_MIN);
 		}
+
+		sector = firstDataSector + ((cluster - 2) * bootSector.sectorsPerCluster);
+
+		MMCwriteblock(sector, (uint32_t*)((char*)data + bytesWritten));
+		
+		bytesWritten += bootSector.bytesPerSector * bootSector.sectorsPerCluster;
+		cluster = fat12_get_next_cluster(cluster);
+
+
 	}
 
+	fileEntry->fileSize = size;
 
-
-
-
-
-
-
-	
-
+	MMCreadblock(dirSector, tempBuffer);
 
 
 }
