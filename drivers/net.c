@@ -177,6 +177,7 @@ extern void buddy();
 
 #define MDIO_CONTROL (MDIO_BASE + 0x4)
 #define MDIOALIVE (MDIO_BASE + 0x8)
+#define MDIOLINK (MDIO_BASE + 0xC)
 
 #define MDIOUSERACCESS0 (MDIO_BASE + 0x80)
 
@@ -1120,13 +1121,13 @@ int phy_autonegotiate(uint8_t phy_addr){
 
     phy_writereg(phy_addr, PHY_BCR, data);
 
-    for (int i = 0; i < 200; i++){
+    for (int i = 0; i < 5; i++){
     
 	uart0_printf("PHY attempting auto negotiation, this will take a while..\n"); 
         buddy();
 	if ( phy_get_autoneg_status(phy_addr) ) break;
 
-	if (i == 199){
+	if (i == 4){
 	
 	    uart0_printf("AUTO NEG FAILED\n");
 		
@@ -1175,6 +1176,16 @@ int phy_alive(){
 }
 
 /*
+ * phy_link()
+ *  - returns if Ethernet PHY link is up
+ *
+ * */
+int phy_link(){
+
+    return REG(MDIOLINK);
+}
+
+/*
  * phy_init()
  *  - initializes the Ethernet PHY 
  *
@@ -1191,6 +1202,13 @@ int phy_init(){
     }
 
     phy_autonegotiate(PHY1);
+
+    if (phy_link()){
+        uart0_printf("Ethernet Cable Linked\n");
+    }else {
+        uart0_printf("Ethernet Cable Not Linked\n");
+        return -1;
+    }
 
     return 0;
 }
