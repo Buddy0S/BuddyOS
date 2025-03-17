@@ -252,6 +252,8 @@ extern void buddy();
 //*******************************************************************
 
 #define GMII_MII_SELECT 0x0
+#define GMII_ENABLE BIT(5)
+#define OH_MBPS (BIT(16) | BIT(15))
 
 //*******************************************************************
 // Pin Muxing 
@@ -954,6 +956,18 @@ void cpsw_set_transfer(uint32_t transfer){
     REG(PORT1_MACCONTROL) |= transfer;
 }
 
+/*
+ * cpsw_enable_gmii()
+ *  - enables gmii
+ *  - must be done before and packets can be sent or recieved
+ *
+ * */
+void cpsw_enable_gmii(){
+  
+    REG(PORT1_MACCONTROL) |= GMII_ENABLE;
+
+}
+
 void phy_reset();
 
 /*
@@ -1209,6 +1223,9 @@ int phy_init(){
         uart0_printf("Ethernet Cable Not Linked\n");
         return -1;
     }
+
+    cpsw_enable_gmii();
+    uart0_printf("Enabling Frame Sending and Recieving\n");
 
     return 0;
 }
