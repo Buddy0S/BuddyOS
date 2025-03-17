@@ -355,7 +355,7 @@ extern void buddy();
 // INTERRUPTS
 //*******************************************************************
 
-#define CPSW_INTMASK_CLEAR (BIT(10) | BIT(11))
+#define CPSW_INTMASK_CLEAR (BIT(10) | BIT(9))
 
 #define CPDMA_CHANNEL_INT BIT(0)
 
@@ -401,8 +401,7 @@ typedef struct hdp {
 
     struct hdp* next_descriptor;
     uint32_t* buffer_pointer;
-    uint16_t buffer_length;
-    uint16_t buffer_offset;
+    uint32_t buffer_length;
     uint32_t flags;
 
 } cpdma_hdp;
@@ -829,6 +828,8 @@ void cpsw_setup_cpdma_descriptors(){
     tx_start = (cpdma_hdp*) CPPI_RAM;
     rx_start = (cpdma_hdp*) (CPPI_RAM + (NUM_DESCRIPTORS * sizeof(cpdma_hdp)));
 
+    uart0_printf("TEST1 %x | %x ", (NUM_DESCRIPTORS * sizeof(cpdma_hdp)),rx_start );
+
     num_descriptors = NUM_DESCRIPTORS;
 
     tx_cur = tx_start;
@@ -858,7 +859,6 @@ void cpsw_setup_cpdma_descriptors(){
 	/* Allocate Packet Buffers */
 	rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
 	rx_cur->buffer_length = MAX_PACKET_SIZE;
-	rx_cur->buffer_offset = 0;
 
     }
 
@@ -879,7 +879,6 @@ void cpsw_setup_cpdma_descriptors(){
     eth_interface.rxch.tail->flags = RX_INIT_FLAGS;
     eth_interface.rxch.tail->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
     eth_interface.rxch.tail->buffer_length = MAX_PACKET_SIZE;
-    eth_interface.rxch.tail->buffer_offset = 0;
 
     eth_interface.rxch.free = eth_interface.rxch.head;
 }
@@ -932,16 +931,16 @@ void cpsw_start_recieption(){
  * - prints ethernet interfaces mac address
  *
  * */
-void print_mac(){
+void print_mac(uint8_t* mac_addr){
 
     get_mac();
     uart0_printf("MAC ADDR ID 0: %x:%x:%x:%x:%x:%x\n",
-		    eth_interface.mac_addr[0],
-		    eth_interface.mac_addr[1],
-		    eth_interface.mac_addr[2],
-		    eth_interface.mac_addr[3],
-		    eth_interface.mac_addr[4],
-		    eth_interface.mac_addr[5]);
+		    mac_addr[0],
+		    mac_addr[1],
+		    mac_addr[2],
+		    mac_addr[3],
+		    mac_addr[4],
+		    mac_addr[5]);
 }
 
 /*
@@ -1017,7 +1016,7 @@ void cpsw_init(){
 
     cpsw_set_port_addrs();
     uart0_printf("CPSW Ports MAC Addresses Set\n");
-    print_mac();
+    print_mac(eth_interface.mac_addr);
 
     cpsw_setup_cpdma_descriptors();
     uart0_printf("CPDMA Descriptors Setup\n");
@@ -1226,6 +1225,8 @@ int phy_init(){
 
     cpsw_enable_gmii();
     uart0_printf("Enabling Frame Sending and Recieving\n");
+
+    uart0_printf("TEST %x\n",((cpdma_hdp*)REG(RX0_HDP))->buffer_length);
 
     return 0;
 }
