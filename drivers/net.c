@@ -571,7 +571,8 @@ void cpsw_init_cpdma_descriptors(){
  * */
 void cpsw_config_ale(){
     
-    REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE | BIT(4) | BIT(8);
+    //REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE | BIT(4) | BIT(8);
+    REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE;
 }
 
 /*
@@ -1201,6 +1202,23 @@ int phy_link(){
     return REG(MDIOLINK);
 }
 
+void debug(){
+
+    buddy();
+    uart0_printf("RXCH head %x\n",eth_interface.rxch.head);
+    uart0_printf("RXCH head flags %x\n",eth_interface.rxch.head->flags);
+    uart0_printf("DMASTATUS %x\n",REG(DMASTATUS));
+    uart0_printf("DMA INT RAW STATUS %x\n",REG(CPDMA_BASE + 0xA0));
+    uart0_printf("DMA INT MASKED STATUS %x\n",REG(CPDMA_BASE + 0xA4));
+    uart0_printf("RX CP %x\n",REG(RX0_CP));
+    uart0_printf("RX CP flags %x\n",((cpdma_hdp*)REG(RX0_CP))->flags);
+    uart0_printf("RX CP next %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor);
+    uart0_printf("RX CP next flags %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor->flags);
+    uart0_printf("RXCH tail %x\n",eth_interface.rxch.tail);
+    uart0_printf("RXCH tail flags %x\n",eth_interface.rxch.tail->flags);
+
+}
+
 /*
  * phy_init()
  *  - initializes the Ethernet PHY 
@@ -1229,6 +1247,8 @@ int phy_init(){
     cpsw_enable_gmii();
     uart0_printf("Enabling Frame Sending and Recieving\n");
 
+    uart0_printf("RX CP %x\n",REG(RX0_CP));
+
     uart0_printf("RX_HDP FLAGS %x\n",((cpdma_hdp*)REG(RX0_HDP))->flags);
 
     uart0_printf("ALECONTROL %x\n",REG(CPSW_ALE_CONTROL));
@@ -1240,11 +1260,7 @@ int phy_init(){
     uart0_printf("DAMSTATUS %x\n",REG(DMASTATUS));
 
     while(1){
-        buddy();
-	uart0_printf("RXCH flags %x\n",eth_interface.rxch.head->flags);
-        uart0_printf("DAMSTATUS %x\n",REG(DMASTATUS));
-	uart0_printf("DMA INT RAW STATUS %x\n",REG(CPDMA_BASE + 0xA0));
-	uart0_printf("DMA INT MASKED STATUS %x\n",REG(CPDMA_BASE + 0xA4));
+       debug(); 
     } 
 
     return 0;
