@@ -31,7 +31,7 @@ typedef struct {
 } file_descriptor;
 
 int vfs_mount(char* target, int fs_type);
-int vfs_open(char* path, flags);
+int vfs_open(char* path, int flags);
 int vfs_close(int fd);
 uint32_t vfs_read(int fd, char* read_buffer, int bytes);
 uint32_t vfs_write(int fd, char* write_buffer, int bytes);
