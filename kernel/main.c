@@ -3,6 +3,7 @@
 #include "reg.h"
 #include "uart.h"
 #include "memory.h"
+#include "list.h"
 #include "proc.h"
 #include "vfs.h"
 #include "net.h"
@@ -14,7 +15,7 @@ uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
 
 /* Global variables for current process, kernel process, and the ready queue */
 PCB *current_process;
-PCB *kernel_process;
+PCB kernel_process;
 
 struct KList ready_queue;
 
@@ -219,7 +220,7 @@ int main(){
 
     /* Switch context from the kernel to the first process.
        The kernel stack pointer and the process stack pointer are passed to switch_context() */
-    switch_context((unsigned int **)&current_process->kernel_sp, 
+    switch_context((unsigned int **)&kernel_process.stack_ptr, 
                    (unsigned int **)&current_process->stack_ptr);    
 
     
