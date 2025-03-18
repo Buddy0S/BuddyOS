@@ -30,10 +30,6 @@ enum ProcessPriority {
 /* Process context */
 typedef struct context {
     /* general purpose */
-    int32_t r0;
-    int32_t r1;
-    int32_t r2;
-    int32_t r3;
     int32_t r4;
     int32_t r5;
     int32_t r6;
@@ -59,6 +55,11 @@ typedef struct PCB {
     uint32_t *stack_base;           /* Base address of the allocated stack */
     uint32_t *stack_ptr;            /* Pointer to the saved context (stack pointer) */
     context context;
+
+    uint32_t r0;
+    uint32_t r1;
+    uint32_t r2;
+    uint32_t r3;
 
     struct KList children;          /* A list of this proc's children */
     struct KList sched_node;        /* Node for the scheduler's ready queue */
