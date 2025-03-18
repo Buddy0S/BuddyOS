@@ -62,6 +62,8 @@ READ8:
     ldrb r0,[r0]
     bx lr
 
+.extern testprint
+
 .global switch_context
 .type switch_context, %function
 switch_context:
@@ -71,11 +73,11 @@ switch_context:
     *   end of context  64
     */
     
-    add r2, r0, #64                 /* Get pointer to context */
+    add r2, r0, #68                 /* Get pointer to context */
     stmdb r2!, {r4-r11, lr}         /* Save registers and LR on current stack */
     str sp, [r0, #28]               /* Store current SP into *old_sp */
     ldr sp, [r1, #28]               /* Load new SP from *new_sp */
-    add r3, r1, #64                 /* Gets pointer to context */
+    add r3, r1, #32                 /* Gets pointer to context */
     ldmia r3!, {r4-r11, lr}         /* Restore registers and LR from new process stack */
 
     bx lr                           /* Branch to new process (thru restored LR) */
