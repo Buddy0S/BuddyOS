@@ -36,12 +36,27 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     uart0_printf("r3: %d\n", args[3]);
 
 
-    uart0_printf("kernel sp: %x\n", kernel_process.stack_ptr);
-    uart0_printf("kernel return addr: %x\n", kernel_process.context.lr);
-    uart0_printf("kernel r11: %x\n", kernel_process.context.r11);
-    switch_context(process, &kernel_process);
+    uart0_printf("kernel sp: %x\n", kernel_process->stack_ptr);
+    uart0_printf("kernel return addr: %x\n", kernel_process->context.lr);
 
+
+    uart0_printf("current sp: %x\n", sp);
+
+    switch_to_dispatch(current_process, kernel_process);
     uart0_printf("returned monkey\n");
+    /*
+    uart0_printf("current sp: %x\n", sp);
+        asm volatile("  \n\t    \
+                mov r11, lr     \n\t    \
+       " : : : "r11");
+
+    uart0_printf("current lr: %x\n", r11);
+
+        asm volatile("  \n\t    \
+                mrs r11, spsr     \n\t    \
+       " : : : "r11");
+    uart0_printf("current spsr: %x\n", r11);
+    */
 }
 
 
