@@ -81,11 +81,11 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
        orr r0, r0, #0x1F\n\t    \
             ");
     register uint32_t r0 asm("r0");
-    stack_top[7] = r0;
+    p->context.r11 = r0;
 
     /* Set the saved LR to the address of the process function;
        when the context is restored, execution will jump to func */
-    stack_top[8] = (uint32_t) func;
+    p->context.lr = (int32_t)func;
     p->stack_ptr = stack_top;
 
     /* Add this process to the ready queue */
@@ -138,7 +138,6 @@ int main(){
     uart0_printf("Entering Kernel\n");
     register uint32_t sp asm("sp");
     uart0_printf("current sp: %x\n", sp);
-    uart0_printf("return result of %d + %d is %d\n", 10, 34, test_syscall_sum(10, 34));
 
 
     /* Initialize buddyOS memory allocator */
