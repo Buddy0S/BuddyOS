@@ -219,7 +219,7 @@ int kfree(void *ptr) {
         order_arr[order]->tail->next = free_block;
         order_arr[order]->tail = free_block;
     }
-    uart0_puts("kfree reached return\n");
+    //uart0_puts("kfree reached return\n");
     order_arr[order]->num_free++;
     return 0;
 
