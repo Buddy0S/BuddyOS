@@ -986,8 +986,6 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
     tx_desc->buffer_length = size;
     tx_desc->flags = TX_INIT_FLAGS;
 
-    uart0_printf("FLAGS BEFORE %x | %x\n",tx_desc->flags,REG(CPDMA_BASE + 0x80));
-
     REG(TX0_HDP) = (uint32_t) tx_desc;
 
     uart0_printf("Transmiting Packet\n");
@@ -996,8 +994,6 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
     while (!REG(CPDMA_BASE + 0x80)){}
 
     uart0_printf("Packet Transmited\n");
-
-    uart0_printf("FLAGS AFTER %x\n",tx_desc->flags);
 
     REG(TX0_CP) = (uint32_t) tx_desc;
 
@@ -1021,21 +1017,14 @@ int cpsw_recv(){
 
     if (!status){
         uart0_printf("No Packets\n");
-	uart0_printf("RX_CUR %x\n",start);
-        uart0_printf("RX_CUR flags %x\n",start->flags);
-	uart0_printf("RX end %x\n",end);
 	return -1;
     }
 
     uart0_printf("Starting Packet Processing\n");
 
-    uart0_printf("RX_START %x\n",start);
-    uart0_printf("RX_START flags %x\n",start->flags);
-
     while (!(start->flags & BIT(29))){
     
-        uart0_printf("RX_CUR %x\n",start);
-	uart0_printf("RX_CUR flags %x\n",start->flags);
+        uart0_printf("Packet Recieved\n");
 
 	start->flags = RX_INIT_FLAGS;
 	start->buffer_length = MAX_PACKET_SIZE;
@@ -1047,7 +1036,7 @@ int cpsw_recv(){
 	// End of queue
 	if (start == 0){   
 	    eoq = 1;
-            uart0_printf("end of queue reached");
+            uart0_printf("End of queue reached\n");
             cpsw_start_recieption();	    
 	    break;
 	}
@@ -1058,14 +1047,7 @@ int cpsw_recv(){
     if (eoq) eth_interface.rxch.free = eth_interface.rxch.head;
     else eth_interface.rxch.free = (volatile cpdma_hdp*)  start;
 
-    uart0_printf("RX_END %x\n",end);
-    uart0_printf("RX_END flags %x\n",end->flags);
-
-    uart0_printf("DMASTATUS %x\n",REG(DMASTATUS));
-
     REG(CPDMA_EOI_VECTOR) = EOI_RX;
-
-    uart0_printf("status %d \n",REG(CPDMA_BASE + 0xA0));
 
     return 0;
 
@@ -1352,8 +1334,8 @@ int phy_init(){
     while(1){
        cpsw_recv();
        buddy();
-       //uint32_t* packet = (uint32_t*) kmalloc(MAX_PACKET_SIZE);
-       //cpsw_transmit(packet,MAX_PACKET_SIZE);
+       uint32_t* packet = (uint32_t*) kmalloc(MAX_PACKET_SIZE);
+       cpsw_transmit(packet,MAX_PACKET_SIZE);
     } 
 
     return 0;
