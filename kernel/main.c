@@ -220,10 +220,8 @@ int main(){
 
     /* Switch context from the kernel to the first process.
        The kernel stack pointer and the process stack pointer are passed to switch_context() */
-    switch_context((unsigned int **)&kernel_process.stack_ptr, 
-                   (unsigned int **)&current_process->stack_ptr);    
-
-    
+    switch_context((unsigned int **)&kernel_process, 
+                   (unsigned int **)current_process);    
     while (1){}	
 
     return 0;

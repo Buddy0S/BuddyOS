@@ -11,20 +11,20 @@
 #define NULL ((void *)0)
 
 /* Process states */
-typedef enum {
+enum ProcessState {
     READY,
     RUNNING,
     BLOCKED,
     DEAD
-} ProcessState;
+};
 
 
 /* Process priorities */
-typedef enum {
+enum ProcessPriority {
   LOW,
   MEDIUM,
   HIGH
-} ProcessPriority;
+};
 
 
 /* Process context */
@@ -45,32 +45,30 @@ typedef struct context {
     
     int32_t lr; /* link register */
 
-
 } context;
 
 
 /* Process Control Block (PCB) definition */
 typedef struct PCB {
-    int pid;                  /* Process ID */
-    int ppid;                 /* Parent process ID */
-    ProcessState state;       /* Process state */
-    ProcessPriority prio;      /* Process priority */
+    int32_t pid;                    /* Process ID */
+    int32_t ppid;                   /* Parent process ID */
+    int32_t state;                  /* Process state */
+    int32_t prio;                   /* Process priority */
+    int32_t exitStatus;             /* Code/signal from when a process is interrupted */
 
-    struct KList children;     /* A list of this proc's children */
-    struct KList sched_node;   /* Node for the scheduler's ready queue */
-
-    uint32_t *stack_ptr;      /* Pointer to the saved context (stack pointer) */
-    uint32_t *stack_base;     /* Base address of the allocated stack */
-
-    int exitStatus;             /* Code/signal from when a process is interrupted */
-
-    struct SRRMailbox mailbox; /* Mailbox for IPC send recieve and reply */
-
+    uint32_t *stack_base;           /* Base address of the allocated stack */
+    uint32_t *stack_ptr;            /* Pointer to the saved context (stack pointer) */
     context context;
+
+    struct KList children;          /* A list of this proc's children */
+    struct KList sched_node;        /* Node for the scheduler's ready queue */
+
+    struct SRRMailbox mailbox;      /* Mailbox for IPC send recieve and reply */ 
 
 } PCB;
 
-/* Current running proces pointer */
+
+/* Current running process pointer */
 extern PCB *current_process;
 extern PCB kernel_process;
 
@@ -87,8 +85,6 @@ void delay(void);
 void yield(void);
 void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, ProcessPriority prio);
 void init_ready_queue(void);
-extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
+extern void switch_context(PCB *from, PCB *to);
 
 #endif /* PROC_H */
-
-
