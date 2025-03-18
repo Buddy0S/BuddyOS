@@ -64,6 +64,7 @@ void timer_isr(){
     else if (ledmode == 1){
         LEDoff(LED0);
 
+    int32_t r11;
         LEDoff(LED1);
 
         LEDoff(LED2);
