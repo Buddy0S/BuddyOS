@@ -32,10 +32,7 @@ void delay(void) {
 }
 
 /* Round-robin yield: switches context to the next process */
-void yield(void) {
-    
-    delay();
-
+void schedule(void) {
     PCB *current = current_process;
     
     /* Remove the head node and add it to the tail */
@@ -45,9 +42,6 @@ void yield(void) {
     /* The new head of the ready queue is the next process */
     PCB *next = knode_data(list_first(&ready_queue), PCB, sched_node);
     current_process = next;
-    
-    /* Switch context from current process to the next process */
-    switch_context(current, next);
 }
 
 /* Initialize a process's PCB so that when its context is restored, execution begins at func */
@@ -155,6 +149,8 @@ int main(){
     init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], MEDIUM);
     init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], MEDIUM);
     init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], MEDIUM);
+
+    uart0_printf("process gonan jump to %x\n", process1);
 
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
