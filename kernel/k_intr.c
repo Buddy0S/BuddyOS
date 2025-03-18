@@ -24,10 +24,8 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
 
     PCB *process = current_process; /* our current process */
 
-    process->r0 = args[0];
-    process->r1= args[1];
-    process->r2 = args[2];
-    process->r3 = args[3];
+    process->r_args = args;
+    process->syscall_num = svc_num;
 
     register uint32_t sp asm("sp");
     uart0_printf("current sp: %x\n", sp);
@@ -37,8 +35,9 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     uart0_printf("r2: %d\n", args[2]);
     uart0_printf("r3: %d\n", args[3]);
 
+    switch_context(process, &kernel_process);
 
-
+    uart0_printf("returned monkey\n");
 }
 
 

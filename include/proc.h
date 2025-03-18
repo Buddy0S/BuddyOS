@@ -51,15 +51,13 @@ typedef struct PCB {
     int32_t state;                  /* Process state */
     int32_t prio;                   /* Process priority */
     int32_t exitStatus;             /* Code/signal from when a process is interrupted */
+    int32_t syscall_num;
 
     uint32_t *stack_base;           /* Base address of the allocated stack */
     uint32_t *stack_ptr;            /* Pointer to the saved context (stack pointer) */
     context context;
 
-    uint32_t r0;
-    uint32_t r1;
-    uint32_t r2;
-    uint32_t r3;
+    uint32_t *r_args;
 
     struct KList children;          /* A list of this proc's children */
     struct KList sched_node;        /* Node for the scheduler's ready queue */
