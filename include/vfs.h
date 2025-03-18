@@ -8,7 +8,7 @@
 extern mountpoint mountpoints[MAX_MOUNTPOINTS]; 
 
 typedef struct {
-	int fs_type;
+	int type;
 	char fs_mountpoint[VFS_PATH_LEN];
 	fs_ops operations;
 } mountpoint;
@@ -30,7 +30,7 @@ typedef struct {
 	char* file_buffer;
 } file_descriptor;
 
-int vfs_mount(char* target, int fs_type);
+int vfs_mount(char* target, int type);
 int vfs_open(char* path, int flags);
 int vfs_close(int fd);
 uint32_t vfs_read(int fd, char* read_buffer, int bytes);

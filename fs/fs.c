@@ -2,7 +2,7 @@
 #include "fat12.h"
 #include "memory.h"
 
-fs_ops fat12_fs = {
+fs_ops fat12_ops = {
 	.open = fat12_open;
 	.close = NULL;
 	.read = fat12_read;
