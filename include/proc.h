@@ -84,7 +84,7 @@ extern int current_index;
 /* Function declarations */
 void delay(void);
 void yield(void);
-void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, ProcessPriority prio);
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio);
 void init_ready_queue(void);
 extern void switch_context(PCB *from, PCB *to);
 

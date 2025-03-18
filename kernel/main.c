@@ -50,12 +50,11 @@ void yield(void) {
     current_process = next;
     
     /* Switch context from current process to the next process */
-    switch_context((unsigned int **)&current->stack_ptr,
-                   (unsigned int **)&next->stack_ptr);
+    switch_context(current, next);
 }
 
 /* Initialize a process's PCB so that when its context is restored, execution begins at func */
-void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, ProcessPriority prio) {
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio) {
     /* Set basic PCB values */
     p->pid = p - PROC_TABLE;
     p->state = READY;
@@ -220,8 +219,7 @@ int main(){
 
     /* Switch context from the kernel to the first process.
        The kernel stack pointer and the process stack pointer are passed to switch_context() */
-    switch_context((unsigned int **)&kernel_process, 
-                   (unsigned int **)current_process);    
+    switch_context(&kernel_process, current_process);    
     while (1){}	
 
     return 0;
