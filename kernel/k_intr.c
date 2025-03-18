@@ -21,6 +21,14 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     // arguments will be put into the args array, but technically its just
     // a pointer to the bottom of the process stack that performed the syscall
     uart0_printf("you just called a syscall my good buddy\n");
+
+    PCB *process = current_process; /* our current process */
+
+    process->r0 = args[0];
+    process->r1= args[1];
+    process->r2 = args[2];
+    process->r3 = args[3];
+
     register uint32_t sp asm("sp");
     uart0_printf("current sp: %x\n", sp);
     uart0_printf("syscall num: %d\n", svc_num);
@@ -28,21 +36,9 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     uart0_printf("r1: %d\n", args[1]);
     uart0_printf("r2: %d\n", args[2]);
     uart0_printf("r3: %d\n", args[3]);
-    // to give a return value for the system call, put it into args[0]
-    switch (svc_num) {
-        case SYSCALL_TEST_2_ARGS_NR: // can definitely replace this number later
-            // takes two arguments from r0 and r1 and returns their sum
-            args[0] = test_syscall(args[0], args[1]);
-            break;
-        case SYSCALL_YIELD_NR:
-            yield();
-            break;
-        default:
-            uart0_printf("invalid or unimplemented syscall\n");
-            break;
 
-    }
-    return;
+
+
 }
 
 
