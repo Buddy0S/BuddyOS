@@ -72,6 +72,7 @@ typedef struct PCB {
 
 /* Current running proces pointer */
 extern PCB *current_process;
+extern PCB kernel_process;
 
 /* Ready queue for processes */
 extern struct KList ready_queue;
@@ -79,7 +80,7 @@ extern struct KList ready_queue;
 /* Global process table and stacks */
 extern PCB PROC_TABLE[MAX_PROCS];
 extern uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
-extern int current_indexi;
+extern int current_index;
 
 /* Function declarations */
 void delay(void);
