@@ -71,6 +71,7 @@ loop:
 .global supervisor_call
 supervisor_call:
 
+    cpsid if
     @ save registers to stack
     stmfd sp!, {r0-r3, r11, lr}
 
@@ -89,9 +90,11 @@ supervisor_call:
     @ jump to interrupt handler 
     bl svc_handler
 
+
     msr spsr, r11 @ restore saved program status register
     ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
-
+    
+    cpsie if
     subs pc, lr, #0 @ restore execution
 
 

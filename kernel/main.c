@@ -12,7 +12,8 @@ uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
 
 /* Global variables for current process, kernel process, and the ready queue */
 PCB *current_process;
-PCB kernel_process;
+PCB kernel_p;
+PCB *kernel_process = &kernel_p;
 
 struct KList ready_queue;
 
@@ -56,31 +57,30 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
     /* Initialize the list of this proc's children */
     list_init(&p->children);
 
-    /* Set the stack pointer to the top of the process's stack */
-    uint32_t *stack_top = stack_base + STACK_SIZE;
-
-    /* Reserve space for registers r4–r11 and LR (9 words) */
-    stack_top -= 9;
-
     /* Initialize registers r4–r11 with 0 */
     for (int i = 0; i < 8; i++) {
-        stack_top[i] = 0;
+        ((uint32_t*)(&p->context))[i] = 0;
+
     }
 
-    /* Initialize saved CPSR (with interrupts enabled) into register slot r11 (stack_top[7])
+    /* Initialize saved SPSR (with interrupts enabled) into stored SPSR.
        This ensures that when the process context is restored, it resumes with the proper CPSR */
     asm volatile("  \n\t    \
-       mrs r0, cpsr     \n\t    \
+       mrs r0, spsr     \n\t    \
        bic r0, r0, #0x1F\n\t    \
-       orr r0, r0, #0x1F\n\t    \
+       orr r0, r0, #0x10\n\t    \
             ");
     register uint32_t r0 asm("r0");
-    p->context.r11 = r0;
+    p->cpsr = r0;
 
     /* Set the saved LR to the address of the process function;
        when the context is restored, execution will jump to func */
     p->context.lr = (int32_t)func;
-    p->stack_ptr = stack_top;
+
+    /* Set the stack pointer to the top of the process's stack */
+    p->stack_ptr = stack_base + STACK_SIZE;
+
+    p->started = false;
 
     /* Add this process to the ready queue */
     list_add_tail(&ready_queue, &p->sched_node);
@@ -94,6 +94,11 @@ void process1(void) {
         uart0_printf("Process 1\n");
         register uint32_t sp asm("sp");
         uart0_printf("current sp: %x\n", sp);
+        register uint32_t r0 asm("r0");
+        asm volatile("  \n\t    \
+                mrs r0, cpsr     \n\t    \
+                "::: "r0");
+        uart0_printf("current cpsr: %x\n", r0);
         delay();
         SYSCALL(1);
     }
@@ -104,6 +109,12 @@ void process2(void) {
         uart0_printf("Process 2\n");
         register uint32_t sp asm("sp");
         uart0_printf("current sp: %x\n", sp);
+        register uint32_t r0 asm("r0");
+        asm volatile("  \n\t    \
+                mrs r0, cpsr     \n\t    \
+                "::: "r0");
+        uart0_printf("current cpsr: %x\n", r0);
+
         delay();
         SYSCALL(1);
     }
@@ -140,17 +151,15 @@ int main(){
     } else {
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
-    
+
 
     /* Initialize the ready queue */
     init_ready_queue();
-    
+
     /* Initialize three processes (using only the first three slots) with MEDIUM priority */
     init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], MEDIUM);
-    init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], MEDIUM);
-    init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], MEDIUM);
 
-    uart0_printf("process gonan jump to %x\n", process1);
+    uart0_printf("process gonan jump to %x\n", process2);
 
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);

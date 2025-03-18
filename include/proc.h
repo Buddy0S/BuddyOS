@@ -2,13 +2,13 @@
 #define PROC_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <list.h>
 #include <srr_ipc.h>
 
 #define MAX_PROCS   3
 #define STACK_SIZE  256
 #define KERNEL_STACK_SIZE 256
-#define NULL ((void *)0)
 
 /* Process states */
 enum ProcessState {
@@ -55,9 +55,13 @@ typedef struct PCB {
 
     uint32_t *stack_base;           /* Base address of the allocated stack */
     uint32_t *stack_ptr;            /* Pointer to the saved context (stack pointer) */
-    context context;
+    context context;                /* registers that need to be saved on context switch */
+    uint32_t cpsr;                  /* cpsr at the time the process was context switched from */
+    uint32_t *svc_sp;            /* Pointer to the saved context (stack pointer) */
 
     uint32_t *r_args;
+
+    bool started;
 
     struct KList children;          /* A list of this proc's children */
     struct KList sched_node;        /* Node for the scheduler's ready queue */
@@ -69,7 +73,7 @@ typedef struct PCB {
 
 /* Current running process pointer */
 extern PCB *current_process;
-extern PCB kernel_process;
+extern PCB *kernel_process;
 
 /* Ready queue for processes */
 extern struct KList ready_queue;
@@ -84,6 +88,8 @@ void delay(void);
 void yield(void);
 void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio);
 void init_ready_queue(void);
-extern void switch_context(PCB *from, PCB *to);
+extern void switch_to_svc(PCB *from, PCB *to);
+extern void switch_to_start(PCB *from, PCB *to);
+extern void switch_to_dispatch(PCB *from, PCB *to);
 
 #endif /* PROC_H */
