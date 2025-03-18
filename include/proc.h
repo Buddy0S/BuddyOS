@@ -18,12 +18,36 @@ typedef enum {
     DEAD
 } ProcessState;
 
+
 /* Process priorities */
 typedef enum {
   LOW,
   MEDIUM,
   HIGH
 } ProcessPriority;
+
+
+/* Process context */
+typedef struct context {
+    /* general purpose */
+    int32_t r0;
+    int32_t r1;
+    int32_t r2;
+    int32_t r3;
+    int32_t r4;
+    int32_t r5;
+    int32_t r6;
+    int32_t r7;
+    int32_t r8;
+    int32_t r9;
+    int32_t r10;
+    int32_t r11;
+    
+    int32_t lr; /* link register */
+
+
+} context;
+
 
 /* Process Control Block (PCB) definition */
 typedef struct PCB {
@@ -38,11 +62,11 @@ typedef struct PCB {
     uint32_t *stack_ptr;      /* Pointer to the saved context (stack pointer) */
     uint32_t *stack_base;     /* Base address of the allocated stack */
 
-    uint32_t *kernel_sp;      /* Kernel stack pointer for saving kernel context */
-
     int exitStatus;             /* Code/signal from when a process is interrupted */
 
     struct SRRMailbox mailbox; /* Mailbox for IPC send recieve and reply */
+
+    context context;
 
 } PCB;
 
@@ -55,7 +79,6 @@ extern struct KList ready_queue;
 /* Global process table and stacks */
 extern PCB PROC_TABLE[MAX_PROCS];
 extern uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
-extern uint32_t KERNEL_STACKS[MAX_PROCS][KERNEL_STACK_SIZE];
 extern int current_indexi;
 
 /* Function declarations */
