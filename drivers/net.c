@@ -974,10 +974,20 @@ void cpsw_enable_gmii(){
 
 }
 
-void cpsw_recv(){
+int cpsw_recv(){
 
     volatile cpdma_hdp* start = eth_interface.rxch.head;
     volatile cpdma_hdp* end = (cpdma_hdp* )REG(RX0_CP);
+
+    // int status raw need to replace this with macro
+    uint32_t status = REG(CPDMA_BASE + 0xA0);
+
+    if (!status){
+        uart0_printf("No Packets\n");
+	return -1;
+    }
+
+    uart0_printf("Starting Packet Processing\n");
 
     while (start != end){
     
@@ -990,6 +1000,13 @@ void cpsw_recv(){
 
     uart0_printf("RX_CUR %x\n",end);
     uart0_printf("RX_CUR flags %x\n",end->flags);
+
+    REG(RX0_CP) = (uint32_t) start;
+
+    REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
+
+    return 0;
+
 
 }
 
@@ -1271,7 +1288,6 @@ int phy_init(){
     uart0_printf("Enabling Frame Sending and Recieving\n");
 
     while(1){
-       buddy();
        cpsw_recv();
     } 
 
