@@ -201,10 +201,10 @@ int main(){
     
     cpsw_init();
 
-    phy_init(); 
+    //phy_init(); 
     
     /* Initialize the ready queue */
-    //init_ready_queue();
+    init_ready_queue();
     
     /* Initialize three processes (using only the first three slots) with MEDIUM priority */
     init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], MEDIUM);
@@ -212,16 +212,16 @@ int main(){
     init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], MEDIUM);
 
     /* Set the current process to the head of the ready queue */
-    //current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
+    current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
 
     /* Save the kernel stack pointer inside the PCB for the current process.
        Each process gets its own kernel stack stored in KERNEL_STACKS[] */
-   // current_process->kernel_sp = KERNEL_STACKS[current_process->pid] + KERNEL_STACK_SIZE;
+    current_process->kernel_sp = KERNEL_STACKS[current_process->pid] + KERNEL_STACK_SIZE;
 
     /* Switch context from the kernel to the first process.
        The kernel stack pointer and the process stack pointer are passed to switch_context() */
-    //switch_context((unsigned int **)&current_process->kernel_sp, 
-      //             (unsigned int **)&current_process->stack_ptr);    
+    switch_context((unsigned int **)&current_process->kernel_sp, 
+                   (unsigned int **)&current_process->stack_ptr);    
 
     
     while (1){}	
