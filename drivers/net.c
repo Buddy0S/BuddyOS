@@ -863,9 +863,9 @@ void cpsw_setup_cpdma_descriptors(){
 	rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
 	rx_cur->buffer_length = MAX_PACKET_SIZE;
 
-	uart0_printf("RX_CUR  %x -> next %x\n",rx_cur,rx_cur->next_descriptor);
-	uart0_printf("RX_CUR flags %x\n", rx_cur->flags);
-	uart0_printf("index %d\n",i);
+	//uart0_printf("RX_CUR  %x -> next %x\n",rx_cur,rx_cur->next_descriptor);
+	//uart0_printf("RX_CUR flags %x\n", rx_cur->flags);
+	//uart0_printf("index %d\n",i);
 
     }
 
@@ -971,6 +971,25 @@ void cpsw_set_transfer(uint32_t transfer){
 void cpsw_enable_gmii(){
   
     REG(PORT1_MACCONTROL) |= GMII_ENABLE | OH_MBPS;
+
+}
+
+void cpsw_recv(){
+
+    volatile cpdma_hdp* start = eth_interface.rxch.head;
+    volatile cpdma_hdp* end = (cpdma_hdp* )REG(RX0_CP);
+
+    while (start != end){
+    
+        uart0_printf("RX_CUR %x\n",start);
+	uart0_printf("RX_CUR flags %x\n",start->flags);
+
+	start = start->next_descriptor;
+
+    }
+
+    uart0_printf("RX_CUR %x\n",end);
+    uart0_printf("RX_CUR flags %x\n",end->flags);
 
 }
 
@@ -1251,20 +1270,9 @@ int phy_init(){
     cpsw_enable_gmii();
     uart0_printf("Enabling Frame Sending and Recieving\n");
 
-    uart0_printf("RX CP %x\n",REG(RX0_CP));
-
-    uart0_printf("RX_HDP FLAGS %x\n",((cpdma_hdp*)REG(RX0_HDP))->flags);
-
-    uart0_printf("ALECONTROL %x\n",REG(CPSW_ALE_CONTROL));
-
-    uart0_printf("RXCH flags %x\n",eth_interface.rxch.head->flags);
-
-    uart0_printf("RXCONTROL %x\n",REG(RX_CONTROL));
-
-    uart0_printf("DAMSTATUS %x\n",REG(DMASTATUS));
-
     while(1){
-       debug(); 
+       buddy();
+       cpsw_recv();
     } 
 
     return 0;
