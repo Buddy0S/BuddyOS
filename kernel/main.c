@@ -4,6 +4,8 @@
 #include "uart.h"
 #include "memory.h"
 #include "proc.h"
+#include "net.h"
+#include "led.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
@@ -132,6 +134,44 @@ int test_syscall_sum(int a, int b) {
 unsigned int *kernel_sp;
 extern void supervisor_call(void);
 
+void buddy(void) {
+
+    volatile int i;
+    volatile int T = 500000;
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED1);
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED2);
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED3);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED0);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED1);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED2);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED3);
+
+    for (i = 0; i < T; i++);
+
+}
+
+
 int main(){
 
     uart0_printf("Entering Kernel\n");
@@ -146,8 +186,11 @@ int main(){
     } else {
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
-    
 
+    //cpsw_init();
+
+    //phy_init(); 
+    
     /* Initialize the ready queue */
     init_ready_queue();
     
@@ -167,6 +210,8 @@ int main(){
        The kernel stack pointer and the process stack pointer are passed to switch_context() */
     switch_context((unsigned int **)&current_process->kernel_sp, 
                    (unsigned int **)&current_process->stack_ptr);    
+
+    
     while (1){}	
 
     return 0;

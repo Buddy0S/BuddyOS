@@ -3,24 +3,19 @@
 #include "uart.h"
 
 /*
- * cpsw.c
+ * net.c
  *
- * This file contains the driver code for the BeagleBone Black
- * AM335x Sitara™ Processors Common Platform Switch
- *
- * Initializes Ethernet Sub System:
- *  - GMII/MII Interface
- *  - Normal Priorty Mode
- *  - VLAN Unaware
- *  - Single MAC
- *  - Statistics Disabled
- *  - RX and TX DMA Completion Interrupts
- *  - Channel 0 for both RX and TX
- *  - Ports in Forward State
- *
+ * This file contains the driver code to use Network capabilities of
+ * the BeagleBone Black
+ * 
+ * - AM335x Sitara™ Processors Common Platform Switch Driver
+ * - Microchip LAN8710A PHY Driver
+ * 
  * Author: Marwan Mostafa 
  *
  * */
+
+extern void buddy();
 
 /* ----------------------DATA ACCESS MACROS----------------------- */
 
@@ -34,16 +29,16 @@
 // Byte Extraction Macros
 //*******************************************************************
 
-#define BYTE0(x) x & 0xFF
-#define BYTE1(x) (x & 0xFF00) >> 8
-#define BYTE2(x) (x & 0xFF0000) >> 16
-#define BYTE3(x) (x & 0xFF000000) >> 24
+#define BYTE0(x) (((x) & 0xFF))
+#define BYTE1(x) ((((x) & 0xFF00)) >> 8)
+#define BYTE2(x) ((((x) & 0xFF0000)) >> 16)
+#define BYTE3(x) ((((x) & 0xFF000000)) >> 24)
 
 //******************************************************************* 
 // Bit Macro      
 //*******************************************************************
 
-#define BIT(x) (1 << x)
+#define BIT(x) (1 << (x))
 
 /* ---------------------------REGISTERS--------------------------- */
 
@@ -99,6 +94,8 @@
 #define TX_CONTROL (CPDMA_BASE + 0x4)
 #define RX_CONTROL (CPDMA_BASE + 0x14)
 
+#define DMASTATUS (CPDMA_BASE + 0x24)
+
 //*******************************************************************
 // CPSW_SL REGISTERS
 //*******************************************************************
@@ -108,6 +105,8 @@
 
 #define PORT1_SOFT_RESET (PORT1_BASE + 0xC)
 #define PORT2_SOFT_RESET (PORT2_BASE + 0xC)
+
+#define PORT1_MACCONTROL (PORT1_BASE + 0x4)
 
 //*******************************************************************
 // CPSW_SS REGISTERS
@@ -180,6 +179,18 @@
 
 #define MDIO_CONTROL (MDIO_BASE + 0x4)
 #define MDIOALIVE (MDIO_BASE + 0x8)
+#define MDIOLINK (MDIO_BASE + 0xC)
+
+#define MDIOUSERACCESS0 (MDIO_BASE + 0x80)
+
+//*******************************************************************
+// PHY REGISTERS
+//*******************************************************************
+
+#define PHY_BCR 0
+#define PHY_BSR 1
+#define PHY_AUTONEG_ADV 4
+#define PHY_PARTNER_CAP 5
 
 //*******************************************************************
 // CPSW_ALE REGISTERS
@@ -228,6 +239,14 @@
 
 #define CPDMA_EOI_VECTOR (CPDMA_BASE + 0x94)
 
+//*******************************************************************
+// GPIO REGISTERS
+//*******************************************************************
+
+#define GPIO1_BASE      0x4804C000
+#define GPIO_OE         (GPIO1_BASE + 0x134)
+#define GPIO_DATAOUT    (GPIO1_BASE + 0x13C)
+
 /* ------------------------REGISTER VALUES------------------------- */
 
 //*******************************************************************
@@ -235,6 +254,8 @@
 //*******************************************************************
 
 #define GMII_MII_SELECT 0x0
+#define GMII_ENABLE BIT(5)
+#define OH_MBPS (BIT(16) | BIT(15))
 
 //*******************************************************************
 // Pin Muxing 
@@ -267,7 +288,7 @@
 
 #define DESCRIPTOR_NULL 0x00000000
 
-#define TX_INIT_FLAGS 0x0
+#define TX_INIT_FLAGS (BIT(29) | BIT(30) | BIT(31))
 #define RX_INIT_FLAGS BIT(29)
 
 #define CPDMA_ENABLE BIT(0)
@@ -302,6 +323,7 @@
 #define MDIO_CLKDIV 124
 #define MDIO_PREAMBLE BIT(20)
 #define MDIO_FAULTENB BIT(18)
+#define MDIO_CLKDIV_MASK 0xFFFF
 
 //*******************************************************************
 // STATS                                                              
@@ -329,27 +351,60 @@
 #define CPPI_RAM 0x4A102000
 #define CPPI_SIZE 0x2000
 
+#define NUM_DESCRIPTORS 50
+
 //*******************************************************************
 // INTERRUPTS
 //*******************************************************************
 
-#define CPSW_INTMASK_CLEAR (BIT(10) | BIT(11))
+#define CPSW_INTMASK_CLEAR (BIT(10) | BIT(9))
 
 #define CPDMA_CHANNEL_INT BIT(0)
 
 #define EOI_TX BIT(1)
 #define EOI_RX BIT(0)
 
+//*******************************************************************
+// PHY
+//*******************************************************************
+
+#define GO_BIT BIT(31)
+#define PHY_READ 0x00000000
+#define PHY_WRITE BIT(30)
+#define PHY_ADDR_SHIFT 16
+#define REG_ADDR_SHIFT 21
+#define READ_ACK BIT(29)
+#define PHY_DATA 0xFFFF
+
+#define PHY1 0
+      
+#define PHY_RESET_BIT BIT(8)    
+
+#define PHY100 BIT(7)
+#define PHY100_FD BIT(8)
+
+#define PHY10 BIT(5)
+#define PHY10_FD BIT(6)
+
+#define AUTO_NEG_ENABLE BIT(12)
+#define AUTO_NEG_CLEAR (BIT(5) | BIT(6) | BIT(7) | BIT(8))
+#define AUTO_NEG_RESTART BIT(9)
+#define AUTO_NEG_COMPLETE BIT(5)
+
+#define FULL_DUPLEX BIT(0)
+#define HALF_DUPLEX 0x0
+#define IN_BAND BIT(18)
+#define CLEAR_TRANSFER (BIT(7) | BIT(0))
+
 /* ----------------------------STRUCTS----------------------------- */
 
 /* CPDMA header discriptors */
 typedef struct hdp {
 
-    struct hdp* next_descriptor;
-    uint32_t* buffer_pointer;
-    uint16_t buffer_length;
-    uint16_t buffer_offset;
-    uint32_t flags;
+    volatile struct hdp* next_descriptor;
+    volatile uint32_t* buffer_pointer;
+    volatile uint32_t buffer_length;
+    volatile uint32_t flags;
 
 } cpdma_hdp;
 
@@ -374,7 +429,7 @@ typedef struct cpsw_interface {
 
 ethernet_interface eth_interface;
 
-/* -----------------------------CODE------------------------------- */
+/* --------------------------CPSW CODE----------------------------- */
 
 /*
  * cpsw_select_interface()
@@ -516,6 +571,7 @@ void cpsw_init_cpdma_descriptors(){
  * */
 void cpsw_config_ale(){
     
+    //REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE | BIT(4) | BIT(8);
     REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE;
 }
 
@@ -529,9 +585,7 @@ void cpsw_config_ale(){
  * */
 void cpsw_config_mdio(){
    
-    REG(MDIO_CONTROL) = MDIO_ENABLE | MDIO_PREAMBLE | MDIO_FAULTENB;
-
-    REG(MDIO_CONTROL) |= MDIO_CLKDIV;
+    REG(MDIO_CONTROL) = MDIO_ENABLE | MDIO_PREAMBLE | MDIO_FAULTENB | (MDIO_CLKDIV & MDIO_CLKDIV_MASK);
 }
 
 /*
@@ -568,10 +622,10 @@ void cpsw_set_ports_state(){
  *
  * */
 void get_ale_entry(uint32_t index, uint32_t* entrybuffer){
+	
+    REG(TBLCTL) = index;
 
-    REG(TBLCTL) |= index;
-
-    REG(TBLCTL) &= ~TBLCTL_WRITE_READ;
+    //REG(TBLCTL) &= ~TBLCTL_WRITE_READ;
 
     entrybuffer[0] = REG(TBLW0);
     entrybuffer[1] = REG(TBLW1);
@@ -591,9 +645,14 @@ int get_ale_index(){
     uint8_t et;
 
     for (index = 0; index < MAX_ALE_ENTRIES; index++){
-   	get_ale_entry(index, ale_entry_buffer);
+   
+        uart0_printf("index %d\n",index);       
 
-	et = (((uint8_t*)(ale_entry_buffer[1]))[3] & ALE_ENTRY_TYPE);
+	get_ale_entry(index, ale_entry_buffer);
+
+	et = (((uint8_t*)(&(ale_entry_buffer[1])))[3] & (uint8_t) ALE_ENTRY_TYPE);
+
+	uart0_printf("ET: %d\n",et);
 
 	if ( et == ALE_ENTRY_FREE) return index;	
     }
@@ -615,13 +674,13 @@ int get_ale_index(){
  * */
 void ale_set_entry(uint32_t e_w0, uint32_t e_w1, uint32_t e_w2,int i){
 
+    uart0_printf("writing words\n");	
     REG(TBLW0) = e_w0;
     REG(TBLW1) = e_w1;
     REG(TBLW2) = e_w2;
 
-    REG(TBLCTL) |= i;
-
-    REG(TBLCTL) |= TBLCTL_WRITE_READ;
+    REG(TBLCTL) = i | TBLCTL_WRITE_READ;
+    
 }
 
 /*
@@ -642,15 +701,15 @@ void multicast_ale_entry(uint32_t portmask, uint8_t* mac_addr){
     uint32_t ale_entry_w1 = 0x0;
     uint32_t ale_entry_w2 = 0x0;
 
-    ((uint8_t*) ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
-    ((uint8_t*) ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
-    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
-    ((uint8_t*) ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
+    ((uint8_t*) &ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
+    ((uint8_t*) &ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
+    ((uint8_t*) &ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
+    ((uint8_t*) &ale_entry_w0)[3] = mac_addr[MAC_ADDR_LEN - 4];
 
-    ((uint8_t*) ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
-    ((uint8_t*) ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
+    ((uint8_t*) &ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
+    ((uint8_t*) &ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
 
-    ((uint8_t*) ale_entry_w1)[3] = (uint8_t) ALE_MULTICAST_ENTRY;
+    ((uint8_t*) &ale_entry_w1)[3] = (uint8_t) ALE_MULTICAST_ENTRY;
 
     ale_entry_w2 = portmask << ALE_PORT_MASK_SHIFT; 
 
@@ -674,15 +733,15 @@ void unicast_ale_entry(uint32_t portmask, uint8_t* mac_addr){
     uint32_t ale_entry_w1 = 0x0;
     uint32_t ale_entry_w2 = 0x0;
 
-    ((uint8_t*) ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
-    ((uint8_t*) ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
-    ((uint8_t*) ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
-    ((uint8_t*) ale_entry_w0)[4] = mac_addr[MAC_ADDR_LEN - 4];
+    ((uint8_t*) &ale_entry_w0)[0] = mac_addr[MAC_ADDR_LEN - 1];
+    ((uint8_t*) &ale_entry_w0)[1] = mac_addr[MAC_ADDR_LEN - 2];
+    ((uint8_t*) &ale_entry_w0)[2] = mac_addr[MAC_ADDR_LEN - 3];
+    ((uint8_t*) &ale_entry_w0)[3] = mac_addr[MAC_ADDR_LEN - 4];
 
-    ((uint8_t*) ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
-    ((uint8_t*) ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
+    ((uint8_t*) &ale_entry_w1)[0] = mac_addr[MAC_ADDR_LEN - 5];
+    ((uint8_t*) &ale_entry_w1)[1] = mac_addr[MAC_ADDR_LEN - 6];
 
-    ((uint8_t*) ale_entry_w1)[3] = (uint8_t) ALE_UNICAST_ENTRY;
+    ((uint8_t*) &ale_entry_w1)[3] = (uint8_t) ALE_UNICAST_ENTRY;
 
     ale_entry_w2 = portmask << ALE_PORT_MASK_SHIFT;
 
@@ -719,7 +778,10 @@ void cpsw_create_ale_entries(){
     get_mac();
 
     multicast_ale_entry(MULTICAST_PORTMASK, mc_addr);
+    uart0_printf("multicast entry created\n");
+
     unicast_ale_entry(UNICAST_PORTMASK, eth_interface.mac_addr);
+    uart0_printf("unicast entry created\n");
 }
 
 /*
@@ -734,13 +796,13 @@ void cpsw_set_port_addrs(){
 
    get_mac();
 
-   ((uint8_t*)mac_hi)[0] = eth_interface.mac_addr[0];
-   ((uint8_t*)mac_hi)[1] = eth_interface.mac_addr[1];
-   ((uint8_t*)mac_hi)[2] = eth_interface.mac_addr[2];
-   ((uint8_t*)mac_hi)[3] = eth_interface.mac_addr[3];
+   ((uint8_t*)&mac_hi)[0] = eth_interface.mac_addr[0];
+   ((uint8_t*)&mac_hi)[1] = eth_interface.mac_addr[1];
+   ((uint8_t*)&mac_hi)[2] = eth_interface.mac_addr[2];
+   ((uint8_t*)&mac_hi)[3] = eth_interface.mac_addr[3];
 
-   ((uint8_t*)mac_low)[0] = eth_interface.mac_addr[4];
-   ((uint8_t*)mac_low)[1] = eth_interface.mac_addr[5];
+   ((uint8_t*)&mac_low)[0] = eth_interface.mac_addr[4];
+   ((uint8_t*)&mac_low)[1] = eth_interface.mac_addr[5];
 
    REG(P1_SA_HI) = mac_hi;
    REG(P1_SA_LO) |= mac_low;
@@ -767,12 +829,14 @@ void cpsw_setup_cpdma_descriptors(){
     cpdma_hdp* rx_cur;
 
     tx_start = (cpdma_hdp*) CPPI_RAM;
-    rx_start = (cpdma_hdp*) (CPPI_RAM + (CPPI_SIZE >> 1));
+    rx_start = (cpdma_hdp*) (CPPI_RAM + (NUM_DESCRIPTORS * sizeof(cpdma_hdp)));
 
-    num_descriptors = (CPPI_SIZE >> 1) / sizeof(cpdma_hdp);
+    num_descriptors = NUM_DESCRIPTORS;
 
     tx_cur = tx_start;
     rx_cur = rx_start;
+
+    uart0_printf("sizeof cpdma_hdp %x\n",sizeof(cpdma_hdp));
 
     /* Create Descriptor Chains */
     for (int i = 0; i < num_descriptors - 1; i++){
@@ -780,17 +844,17 @@ void cpsw_setup_cpdma_descriptors(){
         /* TX */
 
 	/* Set Next Descriptor */    
-        tx_cur = (cpdma_hdp*)((uint32_t) tx_cur + i * sizeof(cpdma_hdp));
-	tx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) tx_cur + (i + 1)*sizeof(cpdma_hdp));
+        //tx_cur = (cpdma_hdp*)((uint32_t) tx_start + (i * sizeof(cpdma_hdp)));
+	//tx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) tx_cur + sizeof(cpdma_hdp));
 
         /* Set Flags */
-        tx_cur->flags = TX_INIT_FLAGS;
+        //tx_cur->flags = TX_INIT_FLAGS;
 
         /* RX */
 
 	/* Set Next Descriptor */
-	rx_cur = (cpdma_hdp*)((uint32_t) rx_cur + i * sizeof(cpdma_hdp));
-        rx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) rx_cur + (i + 1)*sizeof(cpdma_hdp));
+	rx_cur = (cpdma_hdp*)((uint32_t) rx_start + (i * sizeof(cpdma_hdp)));
+        rx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) rx_cur + sizeof(cpdma_hdp));
 
 	/* Set Flags */
         rx_cur->flags = RX_INIT_FLAGS;
@@ -798,18 +862,25 @@ void cpsw_setup_cpdma_descriptors(){
 	/* Allocate Packet Buffers */
 	rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
 	rx_cur->buffer_length = MAX_PACKET_SIZE;
-	rx_cur->buffer_offset = 0;
+
+	//uart0_printf("RX_CUR  %x -> next %x\n",rx_cur,rx_cur->next_descriptor);
+	//uart0_printf("RX_CUR flags %x\n", rx_cur->flags);
+	//uart0_printf("index %d\n",i);
 
     }
 
-    eth_interface.txch.head = tx_start;
-    eth_interface.txch.num_descriptors = num_descriptors;
-    
-    eth_interface.txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
-    eth_interface.txch.tail->next_descriptor = 0;
-    eth_interface.txch.tail->flags = TX_INIT_FLAGS;
+    tx_start->next_descriptor = 0;
+    tx_start->flags = TX_INIT_FLAGS;
 
-    eth_interface.txch.free = eth_interface.txch.head;
+    eth_interface.txch.head = tx_start;
+    eth_interface.txch.num_descriptors = 1;
+
+    
+    //eth_interface.txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
+    //eth_interface.txch.tail->next_descriptor = 0;
+    //eth_interface.txch.tail->flags = TX_INIT_FLAGS;
+
+    //eth_interface.txch.free = eth_interface.txch.head;
 
     eth_interface.rxch.head = rx_start;
     eth_interface.rxch.num_descriptors = num_descriptors;
@@ -819,7 +890,6 @@ void cpsw_setup_cpdma_descriptors(){
     eth_interface.rxch.tail->flags = RX_INIT_FLAGS;
     eth_interface.rxch.tail->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
     eth_interface.rxch.tail->buffer_length = MAX_PACKET_SIZE;
-    eth_interface.rxch.tail->buffer_offset = 0;
 
     eth_interface.rxch.free = eth_interface.rxch.head;
 }
@@ -872,17 +942,119 @@ void cpsw_start_recieption(){
  * - prints ethernet interfaces mac address
  *
  * */
-void print_mac(){
+void print_mac(uint8_t* mac_addr){
 
     get_mac();
     uart0_printf("MAC ADDR ID 0: %x:%x:%x:%x:%x:%x\n",
-		    eth_interface.mac_addr[0],
-		    eth_interface.mac_addr[1],
-		    eth_interface.mac_addr[2],
-		    eth_interface.mac_addr[3],
-		    eth_interface.mac_addr[4],
-		    eth_interface.mac_addr[5]);
+		    mac_addr[0],
+		    mac_addr[1],
+		    mac_addr[2],
+		    mac_addr[3],
+		    mac_addr[4],
+		    mac_addr[5]);
 }
+
+/*
+ * cpsw_set_transfer
+ *  - sets transfer mode for port 1
+ *
+ * */
+void cpsw_set_transfer(uint32_t transfer){
+
+    REG(PORT1_MACCONTROL) &= ~CLEAR_TRANSFER;
+
+    REG(PORT1_MACCONTROL) |= transfer;
+}
+
+/*
+ * cpsw_enable_gmii()
+ *  - enables gmii
+ *  - must be done before and packets can be sent or recieved
+ *
+ * */
+void cpsw_enable_gmii(){
+  
+    REG(PORT1_MACCONTROL) |= GMII_ENABLE | OH_MBPS;
+
+}
+
+int cpsw_transmit(uint32_t* packet, uint32_t size){
+
+    cpdma_hdp* tx_desc = eth_interface.txch.head;
+
+    tx_desc->buffer_pointer = packet;
+    tx_desc->buffer_length = size;
+    tx_desc->flags = TX_INIT_FLAGS;
+
+    REG(TX0_HDP) = (uint32_t) tx_desc;
+
+    uart0_printf("Transmiting Packet\n");
+
+    // TX INT STAT RAW
+    while (!REG(CPDMA_BASE + 0x80)){}
+
+    uart0_printf("Packet Transmited\n");
+
+    REG(TX0_CP) = (uint32_t) tx_desc;
+
+    REG(CPDMA_EOI_VECTOR) = EOI_TX;
+
+    kfree(packet);
+
+    return REG(CPDMA_BASE + 0x80);
+
+}
+
+int cpsw_recv(){
+
+    volatile cpdma_hdp* start = eth_interface.rxch.free;
+    volatile cpdma_hdp* end = (cpdma_hdp* )REG(RX0_CP);
+
+    int eoq = 0;
+
+    // int status raw need to replace this with macro
+    uint32_t status = REG(CPDMA_BASE + 0xA0);
+
+    if (!status){
+        uart0_printf("No Packets\n");
+	return -1;
+    }
+
+    uart0_printf("Starting Packet Processing\n");
+
+    while (!(start->flags & BIT(29))){
+    
+        uart0_printf("Packet Recieved\n");
+
+	start->flags = RX_INIT_FLAGS;
+	start->buffer_length = MAX_PACKET_SIZE;
+	
+        REG(RX0_CP) = (uint32_t) start;
+
+	start = start->next_descriptor;
+
+	// End of queue
+	if (start == 0){   
+	    eoq = 1;
+            uart0_printf("End of queue reached\n");
+            cpsw_start_recieption();	    
+	    break;
+	}
+
+
+    }
+
+    if (eoq) eth_interface.rxch.free = eth_interface.rxch.head;
+    else eth_interface.rxch.free = (volatile cpdma_hdp*)  start;
+
+    REG(CPDMA_EOI_VECTOR) = EOI_RX;
+
+    return 0;
+
+
+}
+
+void phy_reset();
 
 /*
  * cpsw_init()
@@ -891,6 +1063,9 @@ void print_mac(){
  *
  * */
 void cpsw_init(){
+
+    uart0_printf("Enabling Power to PHY, this will take some time ...\n");	
+    phy_reset();
 
     uart0_printf("Starting initialization of Common Port Switch\n");
 
@@ -912,7 +1087,9 @@ void cpsw_init(){
     cpsw_config_ale();
     uart0_printf("CPSW ALE Configured\n");
 
+    uart0_printf("Configuring MDIO this will take some time ...");
     cpsw_config_mdio();
+    buddy();
     uart0_printf("CPSW MDIO Configured\n");
 
     cpsw_config_stats();
@@ -926,7 +1103,7 @@ void cpsw_init(){
 
     cpsw_set_port_addrs();
     uart0_printf("CPSW Ports MAC Addresses Set\n");
-    print_mac();
+    print_mac(eth_interface.mac_addr);
 
     cpsw_setup_cpdma_descriptors();
     uart0_printf("CPDMA Descriptors Setup\n");
@@ -936,4 +1113,230 @@ void cpsw_init(){
 
     cpsw_start_recieption();
     uart0_printf("CPSW Packet Reception Started\n");
+  
+}
+
+/* --------------------------PHY CODE----------------------------- */
+
+/*
+ * phy_reset()
+ *  - secret function
+ *  - enables power/resets the PHY
+ *  - this took forever to figure out
+ *  - GPIO1_8 pin can be used to reset PHY
+ *  - this was found in am335x-bone-common.dtsi from the linux kernel
+ *  - needs to wait a max amount of time after aserting and deasserting PHY reset
+ *  - buddy function can handle this
+ *
+ * */
+void phy_reset(void)
+{
+    // Configure GPIO1_8 as an output by clearing its bit in the OE register.
+    REG(GPIO_OE) &= ~PHY_RESET_BIT;
+
+    // Assert PHY reset 
+    REG(GPIO_DATAOUT) &= ~PHY_RESET_BIT;
+    buddy();  
+
+    // Deassert PHY reset
+    REG(GPIO_DATAOUT) |= PHY_RESET_BIT;
+    buddy();  
+}
+
+/*
+ * phy_readreg()
+ *  - reads a phy reg and returns its value
+ *
+ * */
+uint16_t phy_readreg(uint8_t phy_addr, uint8_t reg_addr){
+	
+    while ( REG(MDIOUSERACCESS0) & GO_BIT){}
+
+    REG(MDIOUSERACCESS0) = (PHY_READ | GO_BIT | (reg_addr << REG_ADDR_SHIFT) | (phy_addr << PHY_ADDR_SHIFT));
+
+    while ( REG(MDIOUSERACCESS0) & GO_BIT){}
+
+    if ( REG(MDIOUSERACCESS0) & READ_ACK) {
+        return REG(MDIOUSERACCESS0) & PHY_DATA;
+    }
+
+    return 2;
+}
+
+/*
+ * phy_writereg()
+ *  - writes data to a phy reg
+ *
+ * */
+void phy_writereg(uint8_t phy_addr, uint8_t reg_addr, uint16_t data){
+
+    while ( REG(MDIOUSERACCESS0) & GO_BIT){}
+
+    REG(MDIOUSERACCESS0) = (PHY_WRITE | GO_BIT | (reg_addr << REG_ADDR_SHIFT) | (phy_addr << PHY_ADDR_SHIFT) | data);
+
+    while ( REG(MDIOUSERACCESS0) & GO_BIT){}
+}
+
+/*
+ *  phy_get_autoneg_status()
+ *   - returns status of auto negotiation
+ *
+ * */
+int phy_get_autoneg_status(uint8_t phy_addr){
+
+    return phy_readreg(phy_addr,PHY_BSR) & AUTO_NEG_COMPLETE;
+}
+
+/*
+ * phy_autonegotiate()
+ *  - sets transfer capabilites of port 1
+ *  - advertizes our capabilites 
+ *  - sets transfer mode based on capablities of partner
+ *
+ * */
+int phy_autonegotiate(uint8_t phy_addr){
+
+    uint16_t data;
+    uint16_t data_a;
+    uint16_t data_p;    
+    uint32_t transfer;
+    uint16_t advert = PHY100 | PHY100_FD | PHY10 | PHY10_FD;
+
+    data = phy_readreg(phy_addr, PHY_BCR);
+
+    data |= AUTO_NEG_ENABLE;
+
+    phy_writereg(phy_addr, PHY_BCR, data);
+
+    data = phy_readreg(phy_addr, PHY_BCR);
+
+    data_a = phy_readreg(phy_addr, PHY_AUTONEG_ADV);
+
+    data_a &= ~AUTO_NEG_CLEAR;
+
+    data_a |= advert;
+
+    phy_writereg(phy_addr, PHY_AUTONEG_ADV, data_a);
+
+    data |= AUTO_NEG_RESTART;
+
+    phy_writereg(phy_addr, PHY_BCR, data);
+
+    for (int i = 0; i < 5; i++){
+    
+	uart0_printf("PHY attempting auto negotiation, this will take a while..\n"); 
+        buddy();
+	if ( phy_get_autoneg_status(phy_addr) ) break;
+
+	if (i == 4){
+	
+	    uart0_printf("AUTO NEG FAILED\n");
+		
+	    return -1;
+	}
+    }
+
+    uart0_printf("AUTO NEG SUCCESSFUL\n");
+
+    data_p = phy_readreg(phy_addr, PHY_PARTNER_CAP);
+
+    if ( data_p & PHY100_FD ){
+        uart0_printf("Setting transfer Mode to 100mbps Full Duplex\n");
+	transfer = FULL_DUPLEX;
+
+    }else if ( data_p & PHY100 ){
+        uart0_printf("Setting transfer Mode to 100mbps \n");	    
+        transfer = HALF_DUPLEX;
+
+    }else if ( data_p & PHY10_FD ){
+        uart0_printf("Setting transfer Mode to 10mbps Full Duplex\n");
+        transfer = IN_BAND | FULL_DUPLEX;
+
+    }else if ( data_p & PHY10 ){
+        uart0_printf("Setting transfer Mode to 10mbps\n");
+	transfer = IN_BAND | HALF_DUPLEX;
+
+    }else {
+    
+        uart0_printf("No valid Transfer\n");
+	return -1;
+    }
+
+    cpsw_set_transfer(transfer);
+
+}
+
+/*
+ * phy_alive()
+ *  - returns if Ethernet PHY is Alive
+ *
+ * */
+int phy_alive(){
+
+    return REG(MDIOALIVE);
+}
+
+/*
+ * phy_link()
+ *  - returns if Ethernet PHY link is up
+ *
+ * */
+int phy_link(){
+
+    return REG(MDIOLINK);
+}
+
+void debug(){
+
+    buddy();
+    uart0_printf("RXCH head %x\n",eth_interface.rxch.head);
+    uart0_printf("RXCH head flags %x\n",eth_interface.rxch.head->flags);
+    uart0_printf("DMASTATUS %x\n",REG(DMASTATUS));
+    uart0_printf("DMA INT RAW STATUS %x\n",REG(CPDMA_BASE + 0xA0));
+    uart0_printf("DMA INT MASKED STATUS %x\n",REG(CPDMA_BASE + 0xA4));
+    uart0_printf("RX CP %x\n",REG(RX0_CP));
+    uart0_printf("RX CP flags %x\n",((cpdma_hdp*)REG(RX0_CP))->flags);
+    uart0_printf("RX CP next %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor);
+    //uart0_printf("RX CP next flags %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor->flags);
+    uart0_printf("RXCH tail %x\n",eth_interface.rxch.tail);
+    uart0_printf("RXCH tail flags %x\n",eth_interface.rxch.tail->flags);
+
+}
+
+/*
+ * phy_init()
+ *  - initializes the Ethernet PHY 
+ *
+ * */
+int phy_init(){
+
+    uart0_printf("Checking if PHY is Alive\n");
+
+    if (phy_alive()){
+        uart0_printf("Ethernet PHY Alive\n");
+    }else {
+        uart0_printf("Ethernet PHY Not Alive\n");
+	return -1;
+    }
+
+    phy_autonegotiate(PHY1);
+
+    if (phy_link()){
+        uart0_printf("Ethernet Cable Linked\n");
+    }else {
+        uart0_printf("Ethernet Cable Not Linked\n");
+        return -1;
+    }
+
+    cpsw_enable_gmii();
+    uart0_printf("Enabling Frame Sending and Recieving\n");
+
+    while(1){
+       cpsw_recv();
+       buddy();
+       uint32_t* packet = (uint32_t*) kmalloc(MAX_PACKET_SIZE);
+       cpsw_transmit(packet,MAX_PACKET_SIZE);
+    } 
+
+    return 0;
 }

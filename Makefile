@@ -78,10 +78,10 @@ $(BUILD_DIR)kernel.o: kernel/main.c
 $(BUILD_DIR)memory.o: kernel/memory.c
 	$(PREFIX)gcc $(CFLAGS) kernel/memory.c -o $@
 
-$(BUILD_DIR)cpsw.o: drivers/cpsw.c
-	$(PREFIX)gcc $(CFLAGS) drivers/cpsw.c -o $@
+$(BUILD_DIR)net.o: drivers/net.c
+	$(PREFIX)gcc $(CFLAGS) drivers/net.c -o $@
 
-kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)cpsw.o 
+kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)net.o $(BUILD_DIR)led.o 
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 kernel.bin: kernel.elf
