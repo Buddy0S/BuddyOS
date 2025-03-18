@@ -11,10 +11,11 @@
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
 uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
-uint32_t KERNEL_STACKS[MAX_PROCS][KERNEL_STACK_SIZE];
 
-/* Global variables for current process and the ready queue */
+/* Global variables for current process, kernel process, and the ready queue */
 PCB *current_process;
+PCB *kernel_process;
+
 struct KList ready_queue;
 
 /* Initialize the ready queue */
@@ -132,7 +133,6 @@ int test_syscall_sum(int a, int b) {
     return SYSCALL(0);
 }
 
-unsigned int *kernel_sp;
 extern void supervisor_call(void);
 
 void buddy(void) {
@@ -216,9 +216,6 @@ int main(){
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
 
-    /* Save the kernel stack pointer inside the PCB for the current process.
-       Each process gets its own kernel stack stored in KERNEL_STACKS[] */
-    current_process->kernel_sp = KERNEL_STACKS[current_process->pid] + KERNEL_STACK_SIZE;
 
     /* Switch context from the kernel to the first process.
        The kernel stack pointer and the process stack pointer are passed to switch_context() */
