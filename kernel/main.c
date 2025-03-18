@@ -134,6 +134,7 @@ int test_syscall_sum(int a, int b) {
 }
 
 extern void supervisor_call(void);
+extern void dispatcher(void);
 
 void buddy(void) {
 
@@ -216,11 +217,10 @@ int main(){
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
 
+    /* Call dispatcher */
+    dispatcher();
 
-    /* Switch context from the kernel to the first process.
-       The kernel stack pointer and the process stack pointer are passed to switch_context() */
-    switch_context(&kernel_process, current_process);    
-    while (1){}	
+    while (1) {}	
 
     return 0;
 }
