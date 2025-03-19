@@ -401,12 +401,12 @@ extern void buddy();
 /* CPDMA header discriptors */
 typedef struct hdp {
 
-    volatile struct hdp* next_descriptor;
-    volatile uint32_t* buffer_pointer;
+    struct hdp* next_descriptor;
+    uint32_t* buffer_pointer;
     volatile uint32_t buffer_length;
     volatile uint32_t flags;
 
-} cpdma_hdp;
+} __attribute__((packed)) cpdma_hdp;
 
 /* CPDMA Channels */
 typedef struct cpdma_channel {
@@ -428,6 +428,14 @@ typedef struct cpsw_interface {
 } ethernet_interface;
 
 ethernet_interface eth_interface;
+
+typedef struct eth_header {
+
+    uint8_t destination_mac[MAC_ADDR_LEN];
+    uint8_t source_mac[MAC_ADDR_LEN];
+    uint16_t type;
+
+} __attribute__((packed)) ethernet_header;
 
 /* --------------------------CPSW CODE----------------------------- */
 
@@ -978,6 +986,25 @@ void cpsw_enable_gmii(){
 
 }
 
+/*
+ * dumps the hex of a buffer
+ *  - used to dump packet data
+ *
+ * */
+void hex_dump(uint32_t* data, int len){
+
+    uart0_printf("HEX DUMP\n");	
+    for (int i = 0; i < len; i++){
+    
+        uart0_printf("%x\n",data[i]); 
+    }
+}
+
+/*
+ * cpsw_transmit()
+ *  - transmits a packet given the buffer containg the packet
+ *
+ * */
 int cpsw_transmit(uint32_t* packet, uint32_t size){
 
     cpdma_hdp* tx_desc = eth_interface.txch.head;
@@ -1006,26 +1033,44 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
 }
 
+/*
+ *
+ * */
+void process_packet(uint8_t* packet, int size){
+
+     uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
+
+     hex_dump((uint32_t*)packet,size);
+}
+
+/*
+ * cpsw_recv()
+ *  - checks DMA RX channel for any packets
+ *  - Processes Packets
+ *
+ * */
 int cpsw_recv(){
 
-    volatile cpdma_hdp* start = eth_interface.rxch.free;
-    volatile cpdma_hdp* end = (cpdma_hdp* )REG(RX0_CP);
+    cpdma_hdp* start = eth_interface.rxch.free;
+    cpdma_hdp* end = (cpdma_hdp* )REG(RX0_CP);
 
     int eoq = 0;
 
     // int status raw need to replace this with macro
     uint32_t status = REG(CPDMA_BASE + 0xA0);
 
+    uart0_printf("Starting Packet Processing\n");
+
     if (!status){
         uart0_printf("No Packets\n");
 	return -1;
     }
 
-    uart0_printf("Starting Packet Processing\n");
-
     while (!(start->flags & BIT(29))){
     
         uart0_printf("Packet Recieved\n");
+
+	process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
 
 	start->flags = RX_INIT_FLAGS;
 	start->buffer_length = MAX_PACKET_SIZE;
@@ -1046,7 +1091,7 @@ int cpsw_recv(){
     }
 
     if (eoq) eth_interface.rxch.free = eth_interface.rxch.head;
-    else eth_interface.rxch.free = (volatile cpdma_hdp*)  start;
+    else eth_interface.rxch.free = start;
 
     REG(CPDMA_EOI_VECTOR) = EOI_RX;
 
@@ -1335,9 +1380,25 @@ int phy_init(){
     while(1){
        cpsw_recv();
        buddy();
-       uint32_t* packet = (uint32_t*) kmalloc(MAX_PACKET_SIZE);
-       cpsw_transmit(packet,MAX_PACKET_SIZE);
+       //uint32_t* packet = (uint32_t*) kmalloc(MAX_PACKET_SIZE);
+       //cpsw_transmit(packet,MAX_PACKET_SIZE);
     } 
 
     return 0;
+}
+
+/* --------------------------ETHERNET----------------------------- */
+
+/*
+ *
+ * */
+void eth_recv(uint8_t* frame, int size){
+
+}
+
+/*
+ *
+ * */
+void eth_transmit(uint8_t* frame, int size){
+
 }
