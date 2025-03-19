@@ -985,6 +985,7 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
     tx_desc->buffer_pointer = packet;
     tx_desc->buffer_length = size;
     tx_desc->flags = TX_INIT_FLAGS;
+    tx_desc->flags |= size;
 
     REG(TX0_HDP) = (uint32_t) tx_desc;
 
