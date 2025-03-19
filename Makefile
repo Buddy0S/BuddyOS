@@ -83,6 +83,9 @@ $(BUILD_DIR)kernel.o: kernel/main.c
 $(BUILD_DIR)memory.o: kernel/memory.c
 	$(PREFIX)gcc $(CFLAGS) kernel/memory.c -o $@
 
+$(BUILD_DIR)string.o: misc/string.c
+	$(PREFIX)gcc $(CFLAGS) misc/string.c -o $@
+
 kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o\
 $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o\
 $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)fs.o $(BUILD_DIR)vfs.o 
