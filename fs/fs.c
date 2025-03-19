@@ -3,7 +3,7 @@
 #include "fat12.h"
 #include "memory.h"
 
-int fat12_open(const char* path, int flags);
+file_descriptor* fat12_open(const char* path, int flags);
 uint32_t fat12_read(int fd, char* read_buffer, int bytes);
 uint32_t fat12_write(int fd, char* write_buffer, int bytes);
 int fat12_close(int fd);
@@ -16,7 +16,7 @@ fs_ops fat12_ops = {
 
 extern file_descriptor vfs_openFiles[MAX_OPENED_FILES]; 
 
-int fat12_open(const char* path, int flags) {
+file_descriptor* fat12_open(const char* path, int flags) {
 	return 0;
 }
 

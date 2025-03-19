@@ -148,7 +148,16 @@ int main(){
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
 
+	/* ********* Test File system ********* */
 	
+	vfs_mount("/", FAT12);
+	vfs_mount("/home", FAT12);
+
+	vfs_open("/home/user/folder/file", 2);
+
+	//uart0_printf("FS TEST = %s(%d)\n", mnt->fs_mountpoint, mnt->type);
+
+	/*****************************************/
 
     /* Initialize the ready queue */
     init_ready_queue();

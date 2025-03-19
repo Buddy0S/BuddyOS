@@ -2,13 +2,15 @@
 #include "vfs.h"
 #include "memory.h"
 #include "string.h"
+#include "uart.h"
 
 #define NULL (void*)0
 
 /* Global Variables */
 mountpoint vfs_mountpoints[MAX_MOUNTPOINTS];
-file_descriptor vfs_openFiles[MAX_OPENED_FILES];
+file_descriptor* vfs_openFiles[MAX_OPENED_FILES];
 int mountedCount = 0;
+int openCount = 0;
 
 extern fs_ops fat12_ops;
 
@@ -57,7 +59,28 @@ int vfs_mount(char* target, int type) {
 }
 
 int vfs_open(char* path, int flags) {
+	
+	mountpoint *mnt = get_mountpoint(path);
+	char relPath[VFS_PATH_LEN];
+	file_descriptor* fdOpen = NULL;
+
+	if (mnt != NULL) {
+		
+		fdOpen = mnt->operations.open(path + strlen(mnt->fs_mountpoint) + 1,
+			flags);
+
+		if (fdOpen != NULL) {
+
+			vfs_openFiles[openCount] = fdOpen;
+			openCount++;
+			
+		}
+
+
+	}
+
 	return 0;
+
 }
 
 int vfs_close(int fd) {
