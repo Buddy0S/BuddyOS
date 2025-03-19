@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "vfs.h"
 #include "memory.h"
+#include "string.h"
 
 /* Global Variables */
 mountpoint vfs_mountpoints[MAX_MOUNTPOINTS];
@@ -23,11 +24,9 @@ int vfs_mount(char* target, int type) {
 
 	vfs_mountpoints[mountedCount].type = type;
 	
-	while (target[i] != '\0') {
-		vfs_mountpoints[mountedCount].fs_mountpoint[i] = target[i];
-		i++;
+	if (!strcpy(vfs_mountpoints[mountedCount].fs_mountpoint, target)) {
+		return -1;
 	}
-	vfs_mountpoints[mountedCount].fs_mountpoint[i] = '\0';
 
 	if (type == FAT12) {
 		vfs_mountpoints[mountedCount].operations = fat12_ops;
