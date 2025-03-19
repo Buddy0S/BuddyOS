@@ -953,7 +953,7 @@ void cpsw_start_recieption(){
 void print_mac(uint8_t* mac_addr){
 
     get_mac();
-    uart0_printf("MAC ADDR ID 0: %x:%x:%x:%x:%x:%x\n",
+    uart0_printf("MAC ADDR: %x:%x:%x:%x:%x:%x\n",
 		    mac_addr[0],
 		    mac_addr[1],
 		    mac_addr[2],
@@ -987,16 +987,42 @@ void cpsw_enable_gmii(){
 }
 
 /*
+ * ntohl()
+ *  - returns input network word to host word
+ *
+ * */
+uint32_t ntohl(uint32_t net) {
+    return ((net & 0x000000FF) << 24) |
+           ((net & 0x0000FF00) << 8)  |
+           ((net & 0x00FF0000) >> 8)  |
+           ((net & 0xFF000000) >> 24);
+}
+
+/*
+ * htonl()
+ *  - returns input host word to network word
+ *
+ * */
+uint32_t htonl(uint32_t host) {
+    return ((host & 0x000000FF) << 24) |
+           ((host & 0x0000FF00) << 8)  |
+           ((host & 0x00FF0000) >> 8)  |
+           ((host & 0xFF000000) >> 24);
+}
+
+/*
  * dumps the hex of a buffer
  *  - used to dump packet data
  *
  * */
 void hex_dump(uint32_t* data, int len){
 
+    len = len / sizeof(uint32_t);
+
     uart0_printf("HEX DUMP\n");	
     for (int i = 0; i < len; i++){
     
-        uart0_printf("%x\n",data[i]); 
+        uart0_printf("%x\n",ntohl(data[i])); 
     }
 }
 
@@ -1033,6 +1059,8 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
 }
 
+void eth_recv(uint32_t* frame, int size);
+
 /*
  *
  * */
@@ -1040,7 +1068,11 @@ void process_packet(uint8_t* packet, int size){
 
      uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
 
-     hex_dump((uint32_t*)packet,size);
+     //hex_dump((uint32_t*)packet,size);
+
+     eth_recv((uint32_t*)packet,size);
+
+
 }
 
 /*
@@ -1392,13 +1424,51 @@ int phy_init(){
 /*
  *
  * */
-void eth_recv(uint8_t* frame, int size){
+void eth_recv(uint32_t* frame, int size){
+    
+    ethernet_header frame_header;
+
+    uint32_t word1 = 0;
+    uint32_t word2 = 0;
+    uint32_t word3 = 0;
+    uint32_t word4 = 0;
+
+    uart0_printf("Processing Frame\n");
+
+    word1 = ntohl(frame[0]);
+    word2 = ntohl(frame[1]);
+    word3 = ntohl(frame[2]);
+    word4 = ntohl(frame[3]);
+
+    frame_header.destination_mac[0] = BYTE3(word1);
+    frame_header.destination_mac[1] = BYTE2(word1);
+    frame_header.destination_mac[2] = BYTE1(word1);
+    frame_header.destination_mac[3] = BYTE0(word1);
+    frame_header.destination_mac[4] = BYTE3(word2);
+    frame_header.destination_mac[5] = BYTE2(word2);
+
+    uart0_printf("Destination MAC: \n");
+    print_mac(frame_header.destination_mac);
+
+    frame_header.source_mac[0] = BYTE1(word2);
+    frame_header.source_mac[1] = BYTE0(word2);
+    frame_header.source_mac[2] = BYTE3(word3);
+    frame_header.source_mac[3] = BYTE2(word3);
+    frame_header.source_mac[4] = BYTE1(word3);
+    frame_header.source_mac[5] = BYTE0(word3);
+
+    uart0_printf("Source MAC: \n");
+    print_mac(frame_header.source_mac);
+
+    frame_header.type = (BYTE3(word4) << 8) | (BYTE2(word4));
+
+    uart0_printf("Frame Type: %x \n",frame_header.type);
 
 }
 
 /*
  *
  * */
-void eth_transmit(uint8_t* frame, int size){
+void eth_transmit(uint32_t* frame, int size){
 
 }
