@@ -3,6 +3,8 @@
 #include "memory.h"
 #include "string.h"
 
+#define NULL (void*)0
+
 /* Global Variables */
 mountpoint vfs_mountpoints[MAX_MOUNTPOINTS];
 file_descriptor vfs_openFiles[MAX_OPENED_FILES];
@@ -10,9 +12,9 @@ int mountedCount = 0;
 
 extern fs_ops fat12_ops;
 
-mountpoint get_mountpoint(char* path) {
+mountpoint *get_mountpoint(char* path) {
 	
-	mountpoint mntPnt;
+	mountpoint* mntPnt = NULL;
 	int longestMatch = -1;
 	int mntPntLen = 0;
 
@@ -22,7 +24,7 @@ mountpoint get_mountpoint(char* path) {
 		if (strncmp(path, vfs_mountpoints[i].fs_mountpoint, mntPntLen) == 0) {
 			if (mntPntLen > longestMatch) {
 				longestMatch = mntPntLen;
-				mntPnt = vfs_mountpoints[i]; 
+				mntPnt = &vfs_mountpoints[i]; 
 			}
 		}
 	}
