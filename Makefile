@@ -72,14 +72,14 @@ $(BUILD_DIR)k_vector.o : kernel/k_vector.S | $(BUILD_DIR)
 $(BUILD_DIR)k_intr.o : kernel/k_intr.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(KCFLAGS) kernel/k_intr.c -o $@
 
+$(BUILD_DIR)dispatcher.o: kernel/dispatcher.c
+	$(PREFIX)gcc $(KCFLAGS) kernel/dispatcher.c -o $@
+
 $(BUILD_DIR)fs.o: fs/fs.c
 	$(PREFIX)gcc $(CFLAGS) fs/fs.c -o $@
 
 $(BUILD_DIR)vfs.o: $(BUILD_DIR)fs.o fs/vfs.c 
 	$(PREFIX)gcc $(CFLAGS) fs/vfs.c -o $@
-
-$(BUILD_DIR)dispatcher.o: kernel/dispatcher.c
-	$(PREFIX)gcc $(KCFLAGS) kernel/dispatcher.c -o $@
 
 $(BUILD_DIR)memory.o: kernel/memory.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/memory.c -o $@

@@ -33,7 +33,6 @@ mountpoint *get_mountpoint(char* path) {
 	}
 
 	return mntPnt;
-
 }
 
 int vfs_mount(char* target, int type) {

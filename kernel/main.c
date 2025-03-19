@@ -8,6 +8,7 @@
 #include "vfs.h"
 #include "net.h"
 #include "led.h"
+#include "vfs.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
