@@ -19,7 +19,6 @@ fs_ops fat12_ops = {
 extern file_descriptor vfs_openFiles[MAX_OPENED_FILES]; 
 
 file_descriptor* fat12_open(const char* path, int flags) {
-	
 	uint32_t tempBuffer[128];
 	file_descriptor* fdOpen;
 	uint32_t entryIndex;
