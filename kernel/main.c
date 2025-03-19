@@ -4,6 +4,7 @@
 #include "uart.h"
 #include "memory.h"
 #include "proc.h"
+#include "vfs.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];

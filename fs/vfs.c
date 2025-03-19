@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "vfs.h"
 #include "memory.h"
 
@@ -5,10 +6,11 @@
 mountpoint vfs_mountpoints[MAX_MOUNTPOINTS];
 file_descriptor vfs_openFiles[MAX_OPENED_FILES];
 int mountedCount = 0;
+
 extern fs_ops fat12_ops;
 
 mountpoint get_mountpoint(char* path) {
-	return null;
+	return;
 }
 
 int vfs_mount(char* target, int type) {

@@ -196,6 +196,7 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
 }
 
 /* //wiki.osdev.org/FAT#FAT_12 */
+
 uint16_t fat12_get_next_cluster(uint16_t cluster) {
 	//uart0_printf("Entered getNextCluster\n");
 	uint16_t nextCluster;
@@ -249,6 +250,31 @@ void fat12_set_next_cluster(uint16_t cluster, uint16_t nextCluster) {
     MMCwriteblock(fatSector, (uint32_t*)FATTable);
 }
 
+void fat12_print_cluster_chain(uint16_t firstCluster) {
+    uint16_t cluster = firstCluster;
+    uint16_t nextCluster;
+
+    uart0_printf("Cluster chain for file (starting at cluster %d):\n", cluster);
+
+    while (cluster < FAT12_EOF_MIN || cluster > FAT12_EOF_MAX) {
+        uart0_printf("%d -> ", cluster);
+
+        // Get the next cluster in the chain
+        nextCluster = fat12_get_next_cluster(cluster);
+
+        // Check for invalid cluster or end of chain
+        if (nextCluster == 0xFFFF || nextCluster >= FAT12_EOF_MIN) {
+            uart0_printf("%d\n", nextCluster);
+            break;
+        }
+
+        cluster = nextCluster;
+    }
+
+    if (cluster >= FAT12_EOF_MIN && cluster <= FAT12_EOF_MAX) {
+        uart0_printf("EOF\n");
+    }
+}
 
 uint16_t fat12_find_free_cluster() {
 	
@@ -386,32 +412,6 @@ uint32_t fat12_create_dir_entry(volatile char* filename,
 
 	return -1;
 
-}
-
-void fat12_print_cluster_chain(uint16_t firstCluster) {
-    uint16_t cluster = firstCluster;
-    uint16_t nextCluster;
-
-    uart0_printf("Cluster chain for file (starting at cluster %d):\n", cluster);
-
-    while (cluster < FAT12_EOF_MIN || cluster > FAT12_EOF_MAX) {
-        uart0_printf("%d -> ", cluster);
-
-        // Get the next cluster in the chain
-        nextCluster = fat12_get_next_cluster(cluster);
-
-        // Check for invalid cluster or end of chain
-        if (nextCluster == 0xFFFF || nextCluster >= FAT12_EOF_MIN) {
-            uart0_printf("%d\n", nextCluster);
-            break;
-        }
-
-        cluster = nextCluster;
-    }
-
-    if (cluster >= FAT12_EOF_MIN && cluster <= FAT12_EOF_MAX) {
-        uart0_printf("EOF\n");
-    }
 }
 
 uint32_t fat12_write_file(volatile char* filename, volatile char* data,

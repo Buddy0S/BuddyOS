@@ -71,6 +71,11 @@ $(BUILD_DIR)k_vector.o : kernel/k_vector.S | $(BUILD_DIR)
 $(BUILD_DIR)k_intr.o : kernel/k_intr.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) kernel/k_intr.c -o $@
 
+$(BUILD_DIR)fs.o: fs/fs.c
+	$(PREFIX)gcc $(CFLAGS) fs/fs.c -o $@
+
+$(BUILD_DIR)vfs.o: $(BUILD_DIR)fs.o fs/vfs.c 
+	$(PREFIX)gcc $(CFLAGS) fs/vfs.c -o $@
 
 $(BUILD_DIR)kernel.o: kernel/main.c
 	$(PREFIX)gcc $(CFLAGS) kernel/main.c -o $@
@@ -78,7 +83,9 @@ $(BUILD_DIR)kernel.o: kernel/main.c
 $(BUILD_DIR)memory.o: kernel/memory.c
 	$(PREFIX)gcc $(CFLAGS) kernel/memory.c -o $@
 
-kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o 
+kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o\
+$(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o\
+$(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)fs.o $(BUILD_DIR)vfs.o 
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 kernel.bin: kernel.elf

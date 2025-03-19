@@ -3,15 +3,9 @@
 
 #define VFS_PATH_LEN 64
 #define MAX_MOUNTPOINTS 8
-#define MAX_OPENED_FILES 16;
+#define MAX_OPENED_FILES 16
 
-extern mountpoint mountpoints[MAX_MOUNTPOINTS]; 
-
-typedef struct {
-	int type;
-	char fs_mountpoint[VFS_PATH_LEN];
-	fs_ops operations;
-} mountpoint;
+#define FAT12 12
 
 typedef struct {
 	int (*open)(const char* path, int flags);
@@ -29,6 +23,14 @@ typedef struct {
 	int file_size;
 	char* file_buffer;
 } file_descriptor;
+
+typedef struct {
+	int type;
+	char fs_mountpoint[VFS_PATH_LEN];
+	fs_ops operations;
+} mountpoint;
+
+extern mountpoint mountpoints[MAX_MOUNTPOINTS]; 
 
 int vfs_mount(char* target, int type);
 int vfs_open(char* path, int flags);
