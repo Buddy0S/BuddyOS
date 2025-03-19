@@ -11,7 +11,24 @@ int mountedCount = 0;
 extern fs_ops fat12_ops;
 
 mountpoint get_mountpoint(char* path) {
-	return;
+	
+	mountpoint mntPnt;
+	int longestMatch = -1;
+	int mntPntLen = 0;
+
+	for (int i = 0; i < mountedCount; i++) {
+		mntPntLen = strlen(vfs_mountpoints[i].fs_mountpoint);
+
+		if (strncmp(path, vfs_mountpoints[i].fs_mountpoint, mntPntLen) == 0) {
+			if (mntPntLen > longestMatch) {
+				longestMatch = mntPntLen;
+				mntPnt = vfs_mountpoints[i]; 
+			}
+		}
+	}
+
+	return mntPnt;
+
 }
 
 int vfs_mount(char* target, int type) {
