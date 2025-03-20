@@ -163,11 +163,11 @@ int main(){
 
 	/*****************************************/
     
-	cpsw_init();
+	//cpsw_init();
 
-    phy_init(); 
+    //phy_init(); 
     
-	init_network_stack(); 
+	//init_network_stack(); 
     
     /* Initialize the ready queue */
     init_ready_queue();
