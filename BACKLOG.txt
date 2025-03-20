@@ -60,7 +60,6 @@ init sdram -- DONE
 - Alexei
     - sdram starts at 0x80000000
 
-
 setup mmc loading:
 - Marwan 
   - mmc init
@@ -73,6 +72,19 @@ memory allocator
     - wrote implementation
 - Alexei
     - tested on hardware
+
+contex switch to kernel:
+- Marwan
+- jump / hand execution to kernel
+
+IDT in kernel
+- Alexei
+
+syscall handler
+- Alexei
+    - everything!!!!
+- Abdullah/Emily
+    - context switching
 
 # TODO
 
@@ -108,10 +120,3 @@ FAT load kernel or Load from raw: -- IN PROGRESS
 Create Test Kernel:
 - Marwan
 
-contex switch to kernel: -- IN PROGRESS
-- Marwan
-- jump / hand execution to kernel
-
-ISR in kernel
-- Kevin
-- Alexei

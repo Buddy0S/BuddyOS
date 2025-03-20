@@ -2,52 +2,82 @@
 #define PROC_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <list.h>
 #include <srr_ipc.h>
 
 #define MAX_PROCS   3
 #define STACK_SIZE  256
 #define KERNEL_STACK_SIZE 256
-#define NULL ((void *)0)
 
 /* Process states */
-typedef enum {
+enum ProcessState {
     READY,
     RUNNING,
     BLOCKED,
     DEAD
-} ProcessState;
+};
+
+enum TrapReason {
+    SYSCALL,
+    INTERRUPT,
+};
+
 
 /* Process priorities */
-typedef enum {
+enum ProcessPriority {
   LOW,
   MEDIUM,
   HIGH
-} ProcessPriority;
+};
+
+
+/* Process context */
+typedef struct context {
+    /* general purpose */
+    int32_t r4;
+    int32_t r5;
+    int32_t r6;
+    int32_t r7;
+    int32_t r8;
+    int32_t r9;
+    int32_t r10;
+    int32_t r11;
+
+    int32_t lr; /* link register */
+} context;
+
 
 /* Process Control Block (PCB) definition */
 typedef struct PCB {
-    int pid;                  /* Process ID */
-    int ppid;                 /* Parent process ID */
-    ProcessState state;       /* Process state */
-    ProcessPriority prio;      /* Process priority */
+    int32_t pid;                    /* Process ID */
+    int32_t ppid;                   /* Parent process ID */
+    int32_t state;                  /* Process state */
+    int32_t prio;                   /* Process priority */
+    int32_t exitStatus;             /* Code/signal from when a process is interrupted */
+    int32_t syscall_num;
 
-    struct KList children;     /* A list of this proc's children */
-    struct KList sched_node;   /* Node for the scheduler's ready queue */
+    uint32_t *stack_base;           /* Base address of the allocated stack */
+    uint32_t *stack_ptr;            /* Pointer to the saved context (stack pointer) */
+    context context;                /* registers that need to be saved on context switch */
+    uint32_t *saved_sp;            /* Pointer to the suspended process' sp (when in svc mode) */
+    uint32_t saved_lr;            /* Pointer to the suspended process' lr (when in svc mode) */
 
-    uint32_t *stack_ptr;      /* Pointer to the saved context (stack pointer) */
-    uint32_t *stack_base;     /* Base address of the allocated stack */
+    uint32_t *r_args;
+    int32_t trap_reason;
+    bool started;
 
-    uint32_t *kernel_sp;      /* Kernel stack pointer for saving kernel context */
+    struct KList children;          /* A list of this proc's children */
+    struct KList sched_node;        /* Node for the scheduler's ready queue */
 
-    int exitStatus;             /* Code/signal from when a process is interrupted */
-
-    struct SRRMailbox mailbox; /* Mailbox for IPC send recieve and reply */
+    struct SRRMailbox mailbox;      /* Mailbox for IPC send recieve and reply */ 
 
 } PCB;
 
-/* Current running proces pointer */
+
+/* Current running process pointer */
 extern PCB *current_process;
+extern PCB *kernel_process;
 
 /* Ready queue for processes */
 extern struct KList ready_queue;
@@ -55,16 +85,15 @@ extern struct KList ready_queue;
 /* Global process table and stacks */
 extern PCB PROC_TABLE[MAX_PROCS];
 extern uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
-extern uint32_t KERNEL_STACKS[MAX_PROCS][KERNEL_STACK_SIZE];
-extern int current_indexi;
+extern int current_index;
 
 /* Function declarations */
 void delay(void);
 void yield(void);
-void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, ProcessPriority prio);
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio);
 void init_ready_queue(void);
-extern void switch_context(unsigned int **old_sp, unsigned int **new_sp);
+extern void switch_to_svc(PCB *from, PCB *to);
+extern void switch_to_start(PCB *from, PCB *to);
+extern void switch_to_dispatch(PCB *from, PCB *to);
 
 #endif /* PROC_H */
-
-
