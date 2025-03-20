@@ -67,11 +67,14 @@ loop:
     bl kexception_handler
     b loop
 
+.extern testprint
+
 @ can't use svc in supervisor node
 .global supervisor_call
 supervisor_call:
 
     @ save registers to stack
+    sub sp, sp, #4 @ stack hole just in case
     stmfd sp!, {r0-r3, r11, lr}
 
     @ save address of stack for access to parameters
@@ -91,6 +94,7 @@ supervisor_call:
 
     msr spsr, r11 @ restore saved program status register
     ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
+    add sp, sp, #4
 
     subs pc, lr, #0 @ restore execution
 
