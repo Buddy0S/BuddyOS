@@ -80,7 +80,7 @@ int vfs_open(char* path, int flags) {
 				if (vfs_openFiles[i] == NULL) {
 					vfs_openFiles[i] = fdOpen;
 					openCount++;
-					return i;
+					return i; /* Return fd id */
 				}
 			}
 		}
@@ -104,11 +104,12 @@ int vfs_close(int fd) {
 		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
 		mnt = vfs_mountpoints[mountpoint_id];
 
-		result = mnt.close(vfs_openFiles[fd]);
+		result = mnt.operations.close(vfs_openFiles[fd]);
 
 		if (result) {
 			vfs_openFiles[fd] = NULL;
 			openCount--;
+			return 0;
 		}
 		else {
 			return -2; /* Could not close */
@@ -125,9 +126,27 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 
 	int mountpoint_id;
 	mountpoint mnt;
+	int bytesRead = 0;
 
 	if (vfs_openFiles[fd] != NULL) {
-		mountpoint_id = vfs_openFiles
+		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
+		mnt = vfs_mountpoints[mountpoint_id];
+
+		bytesRead = mnt.operations.read(fd, read_buffer, bytes);
+
+		/* Maybe move to fs.c */
+		if (vfs_openFiles[fd]->read_offset + bytes <
+			vfs_openFiles[fd]->file_size) {
+				
+			vfs_openFiles[fd]->read_offset += bytes;	
+		}
+		else {
+			vfs_openFiles[fd]->read_offset = vfs_openFiles[fd]->file_size;	
+		}
+		/**********************/
+
+		return bytesRead;
+
 	}
 	else {
 		return -1; /* File not open */
