@@ -224,3 +224,20 @@ int kfree(void *ptr) {
     return 0;
 
 }
+
+int kmemcpy(void *src_ptr, void *dst_ptr, uint32_t size) {
+    if (src_ptr == NULL || dst_ptr == NULL || size == 0) {
+        return -1;
+    }
+
+    uint32_t *src = (uint32_t *)src_ptr;
+    uint32_t *dst = (uint32_t *)dst_ptr;
+    uint32_t count = size / sizeof(uint32_t);
+
+    for (uint32_t i = 0; i < count; ++i) {
+        dst[i] = src[i];
+    }
+
+    return 0;
+}
+

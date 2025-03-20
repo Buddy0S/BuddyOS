@@ -18,5 +18,6 @@ int init_alloc(void);
 void *kmalloc(uint32_t);
 int kfree(void*);
 void kmemset32(uint32_t, uint32_t, uint32_t);
+int kmemcpy(void*, void*, uint32_t);
 
 #endif
