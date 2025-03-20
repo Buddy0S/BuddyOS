@@ -14,6 +14,7 @@ void initTimer() {
     /* Ti 20.1.3.6 */
     /* Configure the Timer Load Register (TLDR) for desired interrupt frequency */
     WRITE32(DMTIMER0_BASE + DMTIMER0_TLDR, 0xFFFF8000);
+    /* 0xFFFF8000 = 1s period, 0xFFFFFEBF = 10 ms? */
 
     /* Wait for the write to complete 
      * TWPS ensures register update is done

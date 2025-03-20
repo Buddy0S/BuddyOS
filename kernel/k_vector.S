@@ -38,13 +38,11 @@ not_used:
 irq_interrupt:
     
     @ save registers to stack
+    sub sp, sp, #4 @ stack hole just in case
     stmfd sp!, {r0-r3, r11, lr}
  
     @ save the saved program status register
     mrs r11, spsr
-
-    @ jump to interrupt handler 
-    bl interrupt_handler
 
     @ TI manual 6.6.1.6
     @ acknowledge interrupt to interrupt controller
@@ -52,8 +50,12 @@ irq_interrupt:
     mov r1, #0x1 @ gonna set bit one to enable new irq generation
     str r1, [r0, #0x48] @ write the bit to INTC_CONTROL register
 
+    @ jump to interrupt handler 
+    bl interrupt_handler
+
     msr spsr, r11 @ restore saved program status register
     ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
+    add sp, sp, #4
 
     subs pc, lr, #4 @ restore execution
 
