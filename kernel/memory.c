@@ -153,7 +153,7 @@ uint32_t find_size(uint32_t addr) {
 }
 
 /* simple memset */
-void kmemset32(uint32_t addr, uint32_t value, uint32_t size) {
+void kmemset32(void *addr, uint32_t value, uint32_t size) {
     uint32_t *ptr = (uint32_t *)addr;
     for (uint32_t i = 0; i < size / sizeof(uint32_t); i++) {
         ptr[i] = value;
@@ -192,7 +192,7 @@ void *kmalloc(uint32_t size) {
 
     addr = alloc_block->addr;
 
-    kmemset32(addr, 0, block_size);
+    kmemset32((void *)addr, 0, block_size);
     //uart0_puts("kmalloc reached return\n");
     order_arr[order]->num_free--;
     return (void *)addr;
