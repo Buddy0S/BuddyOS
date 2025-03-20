@@ -27,6 +27,7 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     // a pointer to the bottom of the process stack that performed the syscall
     current_process->r_args = args;
     current_process->syscall_num = svc_num;
+    current_process->trap_reason = SYSCALL;
     switch_to_dispatch(current_process, kernel_process);
 }
 

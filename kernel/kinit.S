@@ -137,8 +137,8 @@ switch_to_start:
     stmdb r2!, {r4-r11, lr}         /* Save registers and LR on current stack */
     str sp, [r0, #28]               /* Store current SP into *old_sp */
 
-    cpsie if
-    /* switch into system mode */
+    cpsie if                        /* enable interrupts for user process */
+    /* switch into user mode */
     mrs r0, cpsr
     bic r0, #0x1F
     orr r0, #0x10
