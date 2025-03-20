@@ -9,6 +9,7 @@
 #define MAX_PROCS   3
 #define STACK_SIZE  256
 #define KERNEL_STACK_SIZE 256
+#define PROC_QUANTUM 1000
 
 /* Process states */
 enum ProcessState {

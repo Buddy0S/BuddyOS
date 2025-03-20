@@ -12,8 +12,8 @@ uint32_t test_syscall(int a, int b) {
     return a + b;
 }
 
-void testprint(void) {
-    uart0_printf("hi guys\n");
+void testprint(int a, int b) {
+    uart0_printf("hi guys %x %x\n", a, b);
 }
 
 /* called by supervisor vector in idt when svc interrupt is raised.
@@ -38,7 +38,8 @@ void isr_switch(uint32_t isr_num) {
     current_process->status = isr_num;
     current_process->trap_reason = INTERRUPT;
     switch_to_dispatch(current_process, kernel_process);
-    testprint();
+    register uint32_t lr asm("lr");
+    uart0_printf("current irq lr %x\n", lr);
 }
 
 int ledmode = 0;
