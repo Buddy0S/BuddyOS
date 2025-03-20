@@ -75,6 +75,9 @@ $(BUILD_DIR)k_intr.o : kernel/k_intr.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | 
 $(BUILD_DIR)dispatcher.o: kernel/dispatcher.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/dispatcher.c -o $@
 
+$(BUILD_DIR)srr_ipc.o: kernel/srr_ipc.c
+	$(PREFIX)gcc $(KCFLAGS) kernel/srr_ipc.c -o $@
+
 $(BUILD_DIR)memory.o: kernel/memory.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/memory.c -o $@
 
@@ -89,7 +92,7 @@ $(BUILD_DIR)kernel.o: kernel/main.c
 $(BUILD_DIR)net.o: drivers/net.c
 	$(PREFIX)gcc $(CFLAGS) drivers/net.c -o $@
 
-kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)net.o $(BUILD_DIR)dispatcher.o
+kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)net.o $(BUILD_DIR)dispatcher.o $(BUILD_DIR)srr_ipc.o
 
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
