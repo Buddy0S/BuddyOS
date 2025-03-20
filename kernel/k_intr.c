@@ -30,7 +30,6 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     current_process->r_args = args;
     current_process->status = svc_num;
     current_process->trap_reason = SYSCALL;
-    uart0_printf("current %d\n", current_process->pid);
     switch_to_dispatch(current_process, kernel_process);
 }
 
@@ -38,8 +37,6 @@ void isr_switch(uint32_t isr_num) {
     current_process->status = isr_num;
     current_process->trap_reason = INTERRUPT;
     switch_to_dispatch(current_process, kernel_process);
-    register uint32_t lr asm("lr");
-    uart0_printf("current irq lr %x\n", lr);
 }
 
 int ledmode = 0;
@@ -88,8 +85,6 @@ void interrupt_handler(){
     /* get interrupt number */
     volatile uint32_t irqnum = *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_IRQ) & 0x7F; 
 
-    current_process->trap_reason = INTERRUPT;
-
     static uint32_t seconds = 0;
 
     if (irqnum != 66) uart0_printf("IRQ number %d\n", (int) irqnum);
@@ -117,7 +112,7 @@ void interrupt_handler(){
         current_process->cpu_time -= 1;
         if (current_process->cpu_time <= 0) {
             uart0_printf("time to switch\n");
-            /* here is where it would jump back to the dispatcher */
+            /* jump back to the dispatcher */
             isr_switch(irqnum);
         }
 
