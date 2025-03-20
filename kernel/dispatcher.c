@@ -75,7 +75,7 @@ void dispatcher(void) {
                 uart0_printf("time to die\n");
                 break;
             default:
-uart0_printf("unknown\n");
+                uart0_printf("unknown\n");
                 break;
         }
 
