@@ -15,6 +15,9 @@ struct KList ready_queue;
 /* Initialize the ready queue */
 void init_ready_queue(void) {
     list_init(&ready_queue);
+    for (int i = 0; i < MAX_PROCS; i++) {
+        PROC_TABLE[i].state = DEAD;
+    }
 }
 
 /* Simple delay routine */
@@ -73,4 +76,3 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, Pro
     /* Add this process to the ready queue */
     list_add_tail(&ready_queue, &p->sched_node);
 }
-
