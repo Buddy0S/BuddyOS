@@ -96,8 +96,6 @@ supervisor_call:
     ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
     add sp, sp, #128
 
-    bl testprint
-
     subs pc, lr, #0 @ restore execution
 
 

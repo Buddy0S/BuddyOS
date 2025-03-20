@@ -38,6 +38,9 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     uart0_printf("r1: %d\n", args[1]);
     uart0_printf("r2: %d\n", args[2]);
     uart0_printf("r3: %d\n", args[3]);
+    uart0_printf("r11: %x\n", args[4]);
+    uart0_printf("lr: %x\n", args[5]);
+    uart0_printf("mystery: %x\n", args[6]);
 
 
     uart0_printf("kernel sp: %x\n", kernel_process->stack_ptr);
@@ -48,7 +51,16 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
 
     switch_to_dispatch(current_process, kernel_process);
     uart0_printf("returned monkey\n");
+    uart0_printf("syscall num: %d\n", svc_num);
+    uart0_printf("r0: %d\n", args[0]);
+    uart0_printf("r1: %d\n", args[1]);
+    uart0_printf("r2: %d\n", args[2]);
+    uart0_printf("r3: %d\n", args[3]);
+    uart0_printf("r11: %x\n", args[4]);
+    uart0_printf("lr: %x\n", args[5]);
+    uart0_printf("mystery: %x\n", args[6]);
     register uint32_t r0 asm("r0");
+    register uint32_t r11 asm("r11");
     uart0_printf("current sp: %x\n", sp);
         asm volatile("  \n\t    \
                 mov r0, lr     \n\t    \
@@ -56,10 +68,7 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
 
     uart0_printf("current lr: %x\n", r0);
 
-        asm volatile("  \n\t    \
-                mrs r0, spsr     \n\t    \
-       " : : : "r0");
-    uart0_printf("current spsr: %x\n", r0);
+    uart0_printf("current spsr: %x\n", r11);
 }
 
 

@@ -85,7 +85,8 @@ switch_to_dispatch:
     /*                         */
     cpsid if
 
-    str sp, [r0, #72]               /* store user process sp */
+    str sp, [r0, #68]               /* store user process sp */
+    str lr, [r0, #72]               /* store user process lr */
 
     ldr sp, [r1, #28]               /* Load new SP from *new_sp */
     add r3, r1, #32                 /* Gets pointer to context */
@@ -107,7 +108,8 @@ switch_to_svc:
     stmdb r2!, {r4-r11, lr}         /* Save registers and LR on current stack */
     str sp, [r0, #28]               /* Store current SP into *old_sp */
 
-    ldr sp, [r1, #72]               /* grab user process sp */
+    ldr sp, [r1, #68]               /* grab user process sp */
+    ldr lr, [r1, #72]               /* grab user process sp */
 
     /* switch into svc mode */
     mrs r0, cpsr

@@ -66,16 +66,6 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
 
     }
 
-    /* Initialize saved SPSR (with interrupts enabled) into stored SPSR.
-       This ensures that when the process context is restored, it resumes with the proper CPSR */
-    asm volatile("  \n\t    \
-       mrs r0, spsr     \n\t    \
-       bic r0, r0, #0x1F\n\t    \
-       orr r0, r0, #0x10\n\t    \
-            ");
-    register uint32_t r0 asm("r0");
-    p->cpsr = r0;
-
     /* Set the saved LR to the address of the process function;
        when the context is restored, execution will jump to func */
     p->context.lr = (int32_t)func;
@@ -95,7 +85,7 @@ void process1(void) {
     while (1) {
         uart0_printf("Process 1\n");
         delay();
-        uart0_printf("Process 1: %d\n", syscalltest(1));
+        uart0_printf("Process 1 received %d\n", syscalltest(1));
     }
 }
 
@@ -103,7 +93,7 @@ void process2(void) {
     while (1) {
         uart0_printf("Process 2\n");
         delay();
-        uart0_printf("Process 2: %d\n", syscalltest(2));
+        uart0_printf("Process 2 received %d\n", syscalltest(2));
     }
 }
 
