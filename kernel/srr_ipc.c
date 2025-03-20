@@ -1,8 +1,9 @@
-#include <asm-generic/errno.h>
 #include <srr_ipc.h>
 #include <stdint.h>
 #include <syserr.h>
 #include <proc.h>
+#include <memory.h>
+#include <memcpy.h>
 
 int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     struct SRRMailbox *r_box, *c_box;
@@ -46,12 +47,12 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     }
 
     bmemcpy(data, msg, len);
-    new_mail->mail.msg = data;
-    new_mail->mail.len = len;
+    new_mail->data.msg = data;
+    new_mail->data.len = len;
     new_mail->author = current_process->pid;
 
     list_add_tail(&r_box->mail, &new_mail->node);
-    rbox->count++;
+    r_box->count++;
 
     c_box->sent_to = pid;
 
@@ -65,7 +66,7 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     bmemcpy(reply, c_box->reply.msg, usable_len);
     *rlen = usable_len;
 
-    kree(c_box->reply.msg);
+    kfree(c_box->reply.msg);
     c_box->reply.msg = NULL;
     c_box->sent_to = 0;
     
@@ -88,7 +89,7 @@ int receive(int* author, void* msg, uint32_t* len) {
     }
 
 
-    mb = current_process->mailbox;
+    mb = &current_process->mailbox;
 
     if (mb->count == 0) {
         /* will be woken once there is a message waiting*/
@@ -101,7 +102,7 @@ int receive(int* author, void* msg, uint32_t* len) {
     usable_len = entry->data.len > *len ? *len : entry->data.len;
     bmemcpy(msg, entry->data.msg, usable_len);
     *len = usable_len;
-    *author = entry->node;
+    *author = entry->author;
 
     kfree(entry->data.msg);
     kfree(entry);
@@ -144,7 +145,7 @@ int reply(int pid, void* msg, uint32_t len) {
     s_box->reply.msg = reply;
     s_box->reply.len = len;
 
-    wake_proccess(pid);
+    wake_proc(pid);
 
     return 0;
 }
