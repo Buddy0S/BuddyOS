@@ -1101,11 +1101,7 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
     cpdma_hdp* tx_desc = eth_interface.txch.head;
     uint32_t len = size / sizeof(uint32_t);
 
-    for (int i = 0; i < len; i++){
-        //packet[i] = htonl(packet[i]);
-    }
-
-    hex_dump(packet,size);
+    //hex_dump(packet,size);
 
     tx_desc->next_descriptor = 0;
     tx_desc->buffer_pointer = packet;
@@ -1113,28 +1109,14 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
     tx_desc->flags = TX_INIT_FLAGS;
     tx_desc->flags |= (size & 0xFFF);
 
-    uart0_printf("tx flags %x\n",tx_desc->flags);
-
-    uart0_printf("DMASTATUS %x\n",REG(DMASTATUS));
-
     REG(TX0_HDP) = (uint32_t) tx_desc;
 
     uart0_printf("Transmiting Packet\n");
 
-    uart0_printf("DMASTATUS %x\n",REG(DMASTATUS));
-
-    uart0_printf("TX CP %x | TX CURR %x \n",REG(TX0_CP), tx_desc);
-
     // TX INT STAT RAW
     while (!REG(CPDMA_BASE + 0x80)){}
 
-    uart0_printf("Packet Transmited\n");
-
-    uart0_printf("TX CP %x | TX CURR %x \n",REG(TX0_CP), tx_desc);
-
-    uart0_printf("tx flags %x\n",tx_desc->flags);
-
-    uart0_printf("DMASTATUS %x\n",REG(DMASTATUS));
+    uart0_printf("Packet Transmited\n"); 
 
     REG(CPDMA_BASE + 0x8C) = CPDMA_CHANNEL_INT;
 
@@ -1143,8 +1125,6 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
     REG(CPDMA_EOI_VECTOR) = EOI_TX;
 
     REG(TX_INTMASK_SET) = CPDMA_CHANNEL_INT;
-
-    uart0_printf("INT STATUS %x\n",REG(CPDMA_BASE + 0x80));
 
     kfree(packet);
 
@@ -1509,12 +1489,17 @@ void eth_recv(uint32_t* frame, int size){
  * */
 void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint8_t* src, uint16_t type){
 
+    uart0_printf("Crafting Ethernet Frame\n");	
+ 
     frame[0] = dest[0];
     frame[1] = dest[1];
     frame[2] = dest[2];
     frame[3] = dest[3];
     frame[4] = dest[4];
     frame[5] = dest[5];
+
+    uart0_printf("Destination MAC\n");
+    print_mac(dest);
 
     frame[6] = src[0];
     frame[7] = src[1];
@@ -1523,8 +1508,13 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint8_t* src, uint16_
     frame[10] = src[4];
     frame[11] = src[5];
 
+    uart0_printf("Source MAC\n");
+    print_mac(src);
+
     frame[12] = (type & 0xFF00) >> 8;
     frame[13] = type & 0xFF;
+
+    uart0_printf("Frame Type %x\n", type);
 
     cpsw_transmit((uint32_t*)frame,size);
 }
@@ -1546,6 +1536,8 @@ void init_network_stack(){
 
     buddy();
 
+    cpsw_recv();
+
     //REG(C0_RX_EN) = 0;
     //REG(C0_TX_EN) = 0;
 
@@ -1557,7 +1549,7 @@ void init_network_stack(){
     //REG(C0_TX_EN) = CPDMA_CHANNEL_INT;
 
     while(1){
-       cpsw_recv();
+       //cpsw_recv();
        buddy();
        uint8_t* packet = (uint8_t*) kmalloc(128);
        packet[14] = 0;
