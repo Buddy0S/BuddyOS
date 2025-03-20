@@ -48,26 +48,21 @@ void timer_isr(){
 
         LEDon(LED3);
 
-	ledmode = 1;
+        ledmode = 1;
 	
     }
 
     else if (ledmode == 1){
         LEDoff(LED0);
 
-    int32_t r11;
         LEDoff(LED1);
 
         LEDoff(LED2);
 
         LEDoff(LED3);
 
-	ledmode = 0;
+        ledmode = 0;
     }
-
-   
-
-    
 
 }
 
@@ -89,6 +84,10 @@ void interrupt_handler(){
     /* TIMER 0 interrrupt*/
     if (irqnum == 66){
 
+        /* need to have some quantum variable inside current_process that gets 
+         * checked so that we know if we should go to dispatcher and reschedule
+         * because i dont want to waste a lot of time on context switching
+         * on timer interrupts that arent even going to make us re schedule */
 
         *(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_IRQ_STATUS) = 0x2;
 
@@ -128,7 +127,6 @@ void enable_interrupts(void){
  * IRQ and FIQ disable bits in cpsr
  * */
 void disable_interrupts(void){
-
     asm(" mrs r1, cpsr   \n\t"
             " orr r1, #0xC0  \n\t"
             " msr cpsr, r1 \n\t");
@@ -182,6 +180,7 @@ void kexception_handler(uint32_t exception) {
             break;
     }
 
+    /* can figure out some graceful exit method probably */
     uart0_printf("HALTING\n");
 
     while (1); 

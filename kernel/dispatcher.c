@@ -39,10 +39,15 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
 
 void dispatcher(void) {
     // run first process
+    uart0_printf("\nstart of dispatcher\n");
     while (1) {
-        uart0_printf("\nstart of dispatcher\n");
-        uart0_printf("returned to dispatcher from process #%d\n", current_process->pid);
-
+        if (current_process->started) {
+            switch_to_svc(kernel_process, current_process);    
+        } else {
+            current_process->started = true;
+            switch_to_start(kernel_process, current_process);    
+        }
+        uart0_printf("\nreturned to dispatcher from process #%d\n", current_process->pid);
 
         uart0_printf("trap reason: ");
         switch (current_process->trap_reason) {
@@ -67,16 +72,9 @@ void dispatcher(void) {
          * probably just get killed */
         current_process->trap_reason = HANDLED;
 
-
         /* after dealing with last process, schedule next process to run */
         schedule();
         uart0_printf("jumping to %x for process #%d\n", current_process->context.lr, current_process->pid);
-        if (current_process->started) {
-            switch_to_svc(kernel_process, current_process);    
-        } else {
-            current_process->started = true;
-            switch_to_start(kernel_process, current_process);    
-        }
 
     }
 }
