@@ -19,56 +19,15 @@ void testprint(int a, int b) {
  * supervisor vector in vector_table.S passes syscall number and function
  * arguments to this handler.
  *
- * marked as void return but may place a return value into r0 which will
- * then be returned to the caller by the supervisor vector. */
+ * DO NOT ADD ANY LOCAL VARIABLES TO THIS FUNCTION BECAUSE IT WILL OBLITERATE
+ * THE SVC STACK
+ * */
 void svc_handler(uint32_t svc_num, uint32_t args[]) {
     // arguments will be put into the args array, but technically its just
     // a pointer to the bottom of the process stack that performed the syscall
-    uart0_printf("you just called a syscall my good buddy\n");
-
-    PCB *process = current_process; /* our current process */
-
-    process->r_args = args;
-    process->syscall_num = svc_num;
-
-    register uint32_t sp asm("sp");
-    uart0_printf("current sp: %x\n", sp);
-    uart0_printf("syscall num: %d\n", svc_num);
-    uart0_printf("r0: %d\n", args[0]);
-    uart0_printf("r1: %d\n", args[1]);
-    uart0_printf("r2: %d\n", args[2]);
-    uart0_printf("r3: %d\n", args[3]);
-    uart0_printf("r11: %x\n", args[4]);
-    uart0_printf("lr: %x\n", args[5]);
-    uart0_printf("mystery: %x\n", args[6]);
-
-
-    uart0_printf("kernel sp: %x\n", kernel_process->stack_ptr);
-    uart0_printf("kernel return addr: %x\n", kernel_process->context.lr);
-
-
-    uart0_printf("current sp: %x\n", sp);
-
+    current_process->r_args = args;
+    current_process->syscall_num = svc_num;
     switch_to_dispatch(current_process, kernel_process);
-    uart0_printf("returned monkey\n");
-    uart0_printf("syscall num: %d\n", svc_num);
-    uart0_printf("r0: %d\n", args[0]);
-    uart0_printf("r1: %d\n", args[1]);
-    uart0_printf("r2: %d\n", args[2]);
-    uart0_printf("r3: %d\n", args[3]);
-    uart0_printf("r11: %x\n", args[4]);
-    uart0_printf("lr: %x\n", args[5]);
-    uart0_printf("mystery: %x\n", args[6]);
-    register uint32_t r0 asm("r0");
-    register uint32_t r11 asm("r11");
-    uart0_printf("current sp: %x\n", sp);
-        asm volatile("  \n\t    \
-                mov r0, lr     \n\t    \
-       " : : : "r0");
-
-    uart0_printf("current lr: %x\n", r0);
-
-    uart0_printf("current spsr: %x\n", r11);
 }
 
 
