@@ -154,5 +154,22 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 }
 
 uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
-	return 0;
+	
+	int mountpoint_id;
+	mountpoint mnt;
+	int bytesRead = 0;
+
+	if (vfs_openFiles[fd] != NULL) {
+		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
+		mnt = vfs_mountpoints[mountpoint_id];
+
+		bytesRead = mnt.operations.write(fd, write_buffer, bytes);
+
+		return bytesRead;
+
+	}
+	else {
+		return -1; /* File not open */
+	}
+
 }
