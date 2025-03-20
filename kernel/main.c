@@ -3,15 +3,20 @@
 #include "reg.h"
 #include "uart.h"
 #include "memory.h"
+#include "list.h"
 #include "proc.h"
+#include "net.h"
+#include "led.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
 uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
-uint32_t KERNEL_STACKS[MAX_PROCS][KERNEL_STACK_SIZE];
 
-/* Global variables for current process and the ready queue */
+/* Global variables for current process, kernel process, and the ready queue */
 PCB *current_process;
+PCB kernel_p;
+PCB *kernel_process = &kernel_p;
+
 struct KList ready_queue;
 
 /* Initialize the ready queue */
@@ -29,30 +34,10 @@ void delay(void) {
     for (volatile unsigned int i = 0; i < 1000000; i++);
 }
 
-/* Round-robin yield: switches context to the next process */
-void yield(void) {
-    
-    delay();
-
-    PCB *current = current_process;
-    
-    /* Remove the head node and add it to the tail */
-    struct KList *node = list_pop(&ready_queue);
-    list_add_tail(&ready_queue, node);
-    
-    /* The new head of the ready queue is the next process */
-    PCB *next = knode_data(list_first(&ready_queue), PCB, sched_node);
-    current_process = next;
-    
-    /* Switch context from current process to the next process */
-    switch_context((unsigned int **)&current->stack_ptr,
-                   (unsigned int **)&next->stack_ptr);
-}
-
 /* Initialize a process's PCB so that when its context is restored, execution begins at func */
-void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, ProcessPriority prio) {
+void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio) {
     /* Set basic PCB values */
-    p->pid = pid;
+    p->pid = p - PROC_TABLE;
     p->state = READY;
     p->prio = prio;
     p->exitStatus = 0;
@@ -61,83 +46,107 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int pid, Pro
     /* Initialize the list of this proc's children */
     list_init(&p->children);
 
-    /* Set the stack pointer to the top of the process's stack */
-    uint32_t *stack_top = stack_base + STACK_SIZE;
-
-    /* Reserve space for registers r4–r11 and LR (9 words) */
-    stack_top -= 9;
-
-    /* Initialize registers r4–r11 with 0 */
-    for (int i = 0; i < 8; i++) {
-        stack_top[i] = 0;
-    }
-
-    /* Initialize saved CPSR (with interrupts enabled) into register slot r11 (stack_top[7])
-       This ensures that when the process context is restored, it resumes with the proper CPSR */
-    asm volatile("  \n\t    \
-       mrs r0, cpsr     \n\t    \
-       bic r0, r0, #0x1F\n\t    \
-       orr r0, r0, #0x1F\n\t    \
-            ");
-    register uint32_t r0 asm("r0");
-    stack_top[7] = r0;
-
     /* Set the saved LR to the address of the process function;
        when the context is restored, execution will jump to func */
-    stack_top[8] = (uint32_t) func;
-    p->stack_ptr = stack_top;
+    p->context.lr = (int32_t)func;
+
+    /* Set the stack pointer to the top of the process's stack */
+    p->stack_ptr = stack_base + STACK_SIZE;
+
+    /* Make sure started is false, so the dispatch switches into proc properly */
+    p->started = false;
+
+    /* This way if it returns to the dispatcher on its own without syscalling
+     * or being interrupted then we just know that the process is done */
+    p->trap_reason = HANDLED;
+
+    /* start all processes with a 100 ms quantum for now */
+    p->cpu_time = PROC_QUANTUM;
 
     /* Add this process to the ready queue */
     list_add_tail(&ready_queue, &p->sched_node);
 }
 
-// these syscalls 1-3 do not have return values, so they will print the
-// value that was in r0 when they were called
+/* test function that calls a syscall that takes 2 arguments */
+int __syscalltest(int a, int b) {
+    return SYSCALL(1);
+}
+
+void __yield(void) {
+    SYSCALL(0);
+}
+
+void process0(void) {
+    uart0_printf("Process 0\n");
+    while (1) {
+        uart0_printf("\nProcess 0 received 5 + 10 = %d\n", __syscalltest(5, 10));
+        delay();
+    }
+}
 
 void process1(void) {
+    uart0_printf("Process 1\n");
     while (1) {
-        uart0_printf("Process 1\n");
-        register uint32_t sp asm("sp");
-        uart0_printf("current sp: %x\n", sp);
+        uart0_printf("\nProcess 1 is going to sleep\n");
         delay();
-        SYSCALL(1);
+        WFI();
+        uart0_printf("\nProcess 1 has been resurrected\n");
     }
 }
 
-void process2(void) {
+void null_proc(void) {
     while (1) {
-        uart0_printf("Process 2\n");
-        register uint32_t sp asm("sp");
-        uart0_printf("current sp: %x\n", sp);
-        delay();
-        SYSCALL(1);
+        uart0_printf("null proc going to sleep... zzzzzzz\n");
+        WFI();
     }
 }
 
-void process3(void) {
-    while (1) {
-        uart0_printf("Process 3\n");
-        register uint32_t sp asm("sp");
-        uart0_printf("current sp: %x\n", sp);
-        delay();
-        SYSCALL(1);
-    }
-}
-
-/* test function that calls a syscall that takes 2 arguments */
-int test_syscall_sum(int a, int b) {
-    return SYSCALL(0);
-}
-
-unsigned int *kernel_sp;
 extern void supervisor_call(void);
+extern void dispatcher(void);
+
+void buddy(void) {
+
+    volatile int i;
+    volatile int T = 500000;
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED1);
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED2);
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED3);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED0);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED1);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED2);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED3);
+
+    for (i = 0; i < T; i++);
+
+}
+
 
 int main(){
 
     uart0_printf("Entering Kernel\n");
     register uint32_t sp asm("sp");
     uart0_printf("current sp: %x\n", sp);
-    uart0_printf("return result of %d + %d is %d\n", 10, 34, test_syscall_sum(10, 34));
 
 
     /* Initialize buddyOS memory allocator */
@@ -146,28 +155,24 @@ int main(){
     } else {
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
-    
 
+    
     /* Initialize the ready queue */
     init_ready_queue();
-    
+
     /* Initialize three processes (using only the first three slots) with MEDIUM priority */
-    init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], 0, MEDIUM);
-    init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], 1, MEDIUM);
-    init_process(&PROC_TABLE[2], process3, PROC_STACKS[2], 2, MEDIUM);
+    init_process(&PROC_TABLE[0], process0, PROC_STACKS[0], MEDIUM);
+    init_process(&PROC_TABLE[1], process1, PROC_STACKS[1], MEDIUM);
+
+    uart0_printf("process gonan jump to %x\n", process1);
 
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
 
-    /* Save the kernel stack pointer inside the PCB for the current process.
-       Each process gets its own kernel stack stored in KERNEL_STACKS[] */
-    current_process->kernel_sp = KERNEL_STACKS[current_process->pid] + KERNEL_STACK_SIZE;
+    /* Call dispatcher */
+    dispatcher();
 
-    /* Switch context from the kernel to the first process.
-       The kernel stack pointer and the process stack pointer are passed to switch_context() */
-    switch_context((unsigned int **)&current_process->kernel_sp, 
-                   (unsigned int **)&current_process->stack_ptr);    
-    while (1){}	
+    while (1) {}	
 
     return 0;
 }

@@ -2,12 +2,18 @@
 #include "interrupts.h"
 #include "led.h"
 #include "timer.h"
-#include "syscall.h"
+#include "reg.h"
 #include "uart.h"
 #include <stdint.h>
 
+uint32_t timer_counter = 1000;
+
 uint32_t test_syscall(int a, int b) {
     return a + b;
+}
+
+void testprint(int a, int b) {
+    uart0_printf("hi guys %x %x\n", a, b);
 }
 
 /* called by supervisor vector in idt when svc interrupt is raised.
@@ -15,81 +21,22 @@ uint32_t test_syscall(int a, int b) {
  * supervisor vector in vector_table.S passes syscall number and function
  * arguments to this handler.
  *
- * marked as void return but may place a return value into r0 which will
- * then be returned to the caller by the supervisor vector. */
+ * DO NOT ADD ANY LOCAL VARIABLES TO THIS FUNCTION BECAUSE IT WILL OBLITERATE
+ * THE SVC STACK
+ * */
 void svc_handler(uint32_t svc_num, uint32_t args[]) {
     // arguments will be put into the args array, but technically its just
     // a pointer to the bottom of the process stack that performed the syscall
-    uart0_printf("you just called a syscall my good buddy\n");
-    register uint32_t sp asm("sp");
-    uart0_printf("current sp: %x\n", sp);
-    uart0_printf("syscall num: %d\n", svc_num);
-    uart0_printf("r0: %d\n", args[0]);
-    uart0_printf("r1: %d\n", args[1]);
-    uart0_printf("r2: %d\n", args[2]);
-    uart0_printf("r3: %d\n", args[3]);
-    // to give a return value for the system call, put it into args[0]
-    switch (svc_num) {
-        case SYSCALL_TEST_2_ARGS_NR: // can definitely replace this number later
-            // takes two arguments from r0 and r1 and returns their sum
-            args[0] = test_syscall(args[0], args[1]);
-            break;
-        case SYSCALL_YIELD_NR:
-            yield();
-            break;
-        default:
-            uart0_printf("invalid or unimplemented syscall\n");
-            break;
-
-    }
-    return;
+    current_process->r_args = args;
+    current_process->status = svc_num;
+    current_process->trap_reason = SYSCALL;
+    switch_to_dispatch(current_process, kernel_process);
 }
 
-
-
-
-/*TI manual 6.2.1
- * Skiping Steps 1 and 2
- * Step 3
- * 	default all interrupts are IRQ and highest prioirity
- * 	we can change it to FRQ if we want using this step
- * 	for now we will keep all as default
- *
- * Step 4
- * 	by default all interrupts are masked
- * 	write to INTC_MIR_CLEARn to unmask
- * 	for now we will unmask all and send all to 
- * 	the default interrupt handler, which will
- * 	proccess request based on interrupt number
- * */
-void init_interrupts(void){
-
-    /* soft reset INTC*/
-    *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_SYSCONFIG) |= 0x2;
-
-    /* spin until reset finished */
-    while (!((*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_SYSSTATUS)) & 0x1)){}
-
-   
-    /* Unmasking interrupts that we need */
-
-    //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR0) = 0xFFFFFFFF;
-
-    //*(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR1) = 0xFFFFFFFF;
-
-
-    /* timer0 interrupt*/
-   *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = (0x1 << 2);
-
-    /* mmc interrupts*/
-   *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = (0x1);
-
-    /* UART0 interrupt */
-   *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = (0x1 << 8);
-
-   // *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR2) = 0xFFFFFFFF;
-
-   // *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_MIR_CLEAR3) = 0xFFFFFFFF;
+void isr_switch(uint32_t isr_num) {
+    current_process->status = isr_num;
+    current_process->trap_reason = INTERRUPT;
+    switch_to_dispatch(current_process, kernel_process);
 }
 
 int ledmode = 0;
@@ -108,7 +55,7 @@ void timer_isr(){
 
         LEDon(LED3);
 
-	ledmode = 1;
+        ledmode = 1;
 	
     }
 
@@ -121,12 +68,8 @@ void timer_isr(){
 
         LEDoff(LED3);
 
-	ledmode = 0;
+        ledmode = 0;
     }
-
-   
-
-    
 
 }
 
@@ -137,38 +80,61 @@ void UART0_isr(){
     uart0_putch(rec);
 }
 
-void interrupt_handler(){
+/* this function somehow doesnt break irq stack frame, should probably cut
+ * it down, but if i move the whole thing into the dispatcher, the timer
+ * irq goes off 1000 times per second and obliterates everything with like 5
+ * different context switches per timer interrupt */
+void interrupt_handler() {
 
     /* get interrupt number */
     volatile uint32_t irqnum = *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_IRQ) & 0x7F; 
 
+    static uint32_t seconds = 0;
 
-    //uart0_printf("IRQ number %d\n", (int) irqnum);
+    //if (irqnum != 66) uart0_printf("IRQ number %d\n", (int) irqnum);
 
     /* TIMER 0 interrrupt*/
-    if (irqnum == 66){
-   
-	    
+    if (irqnum == 66) {
+
+        /* need to have some quantum variable inside current_process that gets 
+         * checked so that we know if we should go to dispatcher and reschedule
+         * because i dont want to waste a lot of time on context switching
+         * on timer interrupts that arent even going to make us re schedule */
+        timer_counter -= 1;
+
+
         *(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_IRQ_STATUS) = 0x2;
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 2);	
 
-        timer_isr();
+        if (timer_counter <= 0) {
+            timer_isr();
+            //uart0_printf("%d seconds passed\n", ++seconds);
+            timer_counter = 1000;
+        }
+
+        current_process->cpu_time -= 1;
+        if (current_process->cpu_time <= 0) {
+            //uart0_printf("time to switch\n");
+            /* jump back to the dispatcher */
+            current_process->quantum_elapsed = true;
+            isr_switch(irqnum);
+        }
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
-
-    
     }
 
     /* UART 0 interrupt*/
     if (irqnum == 72){
-    
-       *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 8); 
 
-       UART0_isr();       
+        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 8); 
 
-       *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
-	
+        // when processes start blocking on stdin, gonna need to make this 
+        // jump to dispatcher just like timer does above
+        UART0_isr();       
+
+        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
+
     }
 
 }
@@ -177,20 +143,19 @@ void interrupt_handler(){
  * IRQ and FIQ disable bits in cpsr
  * */
 void enable_interrupts(void){
-  asm(" mrs r1, cpsr   \n\t"
-      " bic r1, #0xC0  \n\t"
-      " msr cpsr, r1 \n\t");
-    
+    asm(" mrs r1, cpsr   \n\t"
+            " bic r1, #0xC0  \n\t"
+            " msr cpsr, r1 \n\t");
+
 }
 
 /* disables interrupts by seting the
  * IRQ and FIQ disable bits in cpsr
  * */
 void disable_interrupts(void){
-
     asm(" mrs r1, cpsr   \n\t"
-        " orr r1, #0xC0  \n\t"
-        " msr cpsr, r1 \n\t");
+            " orr r1, #0xC0  \n\t"
+            " msr cpsr, r1 \n\t");
 
 }
 
@@ -202,9 +167,9 @@ void kexception_handler(uint32_t exception) {
             uart0_printf("Supervisor Call Exception\n");
             break;
         case 2:  
-	    {
-		uint32_t addr; 
-	        uint32_t status;
+            {
+                uint32_t addr; 
+                uint32_t status;
                 uint32_t reason;
 
                 uart0_printf("Data Abort Exception\n");
@@ -212,26 +177,24 @@ void kexception_handler(uint32_t exception) {
                 // this whole function is causing some embbeded bs
 
 
-		asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
-
-		asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
-
-		uart0_printf("Addr: %x \n", addr);
-		uart0_printf("Status: %x \n", status);
+                asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
+                asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
+                uart0_printf("Addr: %x \n", addr);
+                uart0_printf("Status: %x \n", status);
 
                 reason = status & 0xF;
 
-		switch(reason){
-		    case 0x0: uart0_printf("Alignment Fault\n"); break;
+                switch(reason){
+                    case 0x0: uart0_printf("Alignment Fault\n"); break;
                     case 0x4: uart0_printf("Translation Fault (Section)\n"); break;
                     case 0x5: uart0_printf("Translation Fault (Page)\n"); break;
                     case 0x8: uart0_printf("Permission Fault (Section)\n"); break;
                     case 0x9: uart0_printf("Permission Fault (Page)\n"); break;
                     default: uart0_printf("Unknown Fault\n"); break;
-		}
+                }
 
                 break;
-	    }
+            }
         case 3:  
             uart0_printf("Undefined Instruction Exception\n");
             break;
@@ -243,9 +206,28 @@ void kexception_handler(uint32_t exception) {
             break;
     }
 
+    /* can figure out some graceful exit method probably */
     uart0_printf("HALTING\n");
 
     while (1); 
 }
 
+/* change the timer interval to be 10 ms */
+void new_timer_init(void) {
+    WRITE32(DMTIMER0_BASE + DMTIMER0_TLDR, 0xFFFFFFD9);
+    /* 0xFFFF8000 = 1s period, 0xFFFFFEB8 = 10 ms? */
+    /* whatever the hell this number is is 1 ms ??? */
+
+    /* Wait for the write to complete 
+     * TWPS ensures register update is done
+     */
+    while (READ32(DMTIMER0_BASE + DMTIMER0_TWPS) & (0x4)) {}
+
+    /* Set Timer Trigger Register (TTGR) to force a reload of TLDR 
+     */
+    WRITE32(DMTIMER0_BASE + DMTIMER0_TTGR, 0x1);
+
+    /* Wait for write completion */
+    while (READ32(DMTIMER0_BASE + DMTIMER0_TWPS) & (0x8)) {}
+}
 
