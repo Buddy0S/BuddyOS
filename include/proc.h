@@ -18,6 +18,11 @@ enum ProcessState {
     DEAD
 };
 
+enum TrapReason {
+    SYSCALL,
+    INTERRUPT,
+};
+
 
 /* Process priorities */
 enum ProcessPriority {
@@ -38,9 +43,8 @@ typedef struct context {
     int32_t r9;
     int32_t r10;
     int32_t r11;
-    
-    int32_t lr; /* link register */
 
+    int32_t lr; /* link register */
 } context;
 
 
@@ -60,7 +64,7 @@ typedef struct PCB {
     uint32_t saved_lr;            /* Pointer to the suspended process' lr (when in svc mode) */
 
     uint32_t *r_args;
-
+    int32_t trap_reason;
     bool started;
 
     struct KList children;          /* A list of this proc's children */
