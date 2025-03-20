@@ -16,7 +16,7 @@ enum ProcessState {
     READY,
     RUNNING,
     BLOCKED,
-    DEAD
+    DEAD,
 };
 
 enum TrapReason {
