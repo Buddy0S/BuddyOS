@@ -75,7 +75,7 @@ void dispatcher(void) {
                 uart0_printf("time to die\n");
                 break;
             default:
-                uart0_printf("unknown\n");
+uart0_printf("unknown\n");
                 break;
         }
 
@@ -89,3 +89,29 @@ void dispatcher(void) {
 
     }
 }
+
+
+PCB* get_PCB(int pid) {
+    if (pid >= 0 && pid < MAX_PROCS) {
+        return &PROC_TABLE[pid];
+    }
+
+    return NULL;
+}
+
+void wake_proc(int pid) {
+    PCB* pcb;
+    pcb = get_PCB(pid);
+    if (pcb == NULL) {
+        return;
+    }
+
+    pcb->state = READY;
+    list_add_tail(&ready_queue, &pcb->sched_node);
+}
+
+void block() {
+    current_process->state = BLOCKED;
+    schedule();
+}
+
