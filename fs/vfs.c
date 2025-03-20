@@ -8,7 +8,7 @@
 
 /* Global Variables */
 mountpoint vfs_mountpoints[MAX_MOUNTPOINTS];
-file_descriptor* vfs_openFiles[MAX_OPENED_FILES];
+file_descriptor* vfs_openFiles[MAX_OPENED_FILES] = {NULL};
 int mountedCount = 0;
 int openCount = 0;
 
@@ -21,6 +21,7 @@ mountpoint *get_mountpoint(char* path) {
 	int mntPntLen = 0;
 
 	for (int i = 0; i < mountedCount; i++) {
+
 		mntPntLen = strlen(vfs_mountpoints[i].fs_mountpoint);
 
 		if (strncmp(path, vfs_mountpoints[i].fs_mountpoint, mntPntLen) == 0) {
@@ -64,6 +65,10 @@ int vfs_open(char* path, int flags) {
 	char relPath[VFS_PATH_LEN];
 	file_descriptor* fdOpen = NULL;
 
+	if (openCount == MAX_OPENED_FILES) {
+		return -3; /* max files open */
+	}
+
 	if (mnt != NULL) {
 		
 		fdOpen = mnt->operations.open(path + strlen(mnt->fs_mountpoint) + 1,
@@ -71,24 +76,62 @@ int vfs_open(char* path, int flags) {
 
 		if (fdOpen != NULL) {
 
-			vfs_openFiles[openCount] = fdOpen;
-			openCount++;
-			
+			for (int i = 0; i < MAX_OPENED_FILES; i++) {
+				if (vfs_openFiles[i] == NULL) {
+					vfs_openFiles[i] = fdOpen;
+					openCount++;
+					return i;
+				}
+			}
 		}
-
-
+		else {
+			return -2; /* File not found */
+		}
 	}
-
-	return 0;
-
+	else {
+		return -1; /* Mount point not found */
+	}
 }
 
 int vfs_close(int fd) {
-	return 0;
+	
+	mountpoint mnt;
+	int mountpoint_id; 
+	int result = 0;
+
+	if (vfs_openFiles[fd] != NULL) {
+
+		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
+		mnt = vfs_mountpoints[mountpoint_id];
+
+		result = mnt.close(vfs_openFiles[fd]);
+
+		if (result) {
+			vfs_openFiles[fd] = NULL;
+			openCount--;
+		}
+		else {
+			return -2; /* Could not close */
+		}
+
+	}
+	else {
+		return -1; /* File not open */
+	}
+
 }
 
 uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
-	return 0;
+
+	int mountpoint_id;
+	mountpoint mnt;
+
+	if (vfs_openFiles[fd] != NULL) {
+		mountpoint_id = vfs_openFiles
+	}
+	else {
+		return -1; /* File not open */
+	}
 }
 
 uint32_t vfs_write(int fd, char* write_buffer, int bytes) {

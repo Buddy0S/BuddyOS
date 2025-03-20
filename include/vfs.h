@@ -25,6 +25,7 @@ typedef struct {
 } fs_ops;
 
 typedef struct {
+	int mountpoint_id;
 	int type;
 	char fs_mountpoint[VFS_PATH_LEN];
 	fs_ops operations;
