@@ -19,6 +19,7 @@ enum ProcessState {
 };
 
 enum TrapReason {
+    HANDLED,
     SYSCALL,
     INTERRUPT,
 };

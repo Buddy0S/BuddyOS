@@ -25,12 +25,14 @@ init:
    ldr r0, =vector_table
    mcr p15, #0, r0, c12, c0, #0
 
-   @ set stack pointer for SVC mode and dsiable interrupts
+   @ switch into system mode
    mrs r0, cpsr
    bic r0, r0, #0x1F @ clear mode bits
    orr r0, r0, #0x1F @ set System mode
    msr cpsr, r0
 
+   @ set stack pointer for system mode and dsiable interrupts
+   cpsid if
    ldr sp, =#0x8F000000 @ end of reserved
 
    @ jump to main

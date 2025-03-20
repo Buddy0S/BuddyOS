@@ -54,10 +54,18 @@ void dispatcher(void) {
             case INTERRUPT:
                 uart0_printf("interrupt\n");
                 break;
+            case HANDLED:
+                uart0_printf("time to die\n");
+                break;
             default:
                 uart0_printf("unknown\n");
                 break;
         }
+        /* if the process then returns to the dispatcher without 
+         * going through a syscall or an interrupt then that means it just
+         * returned from the function it started at which means it should 
+         * probably just get killed */
+        current_process->trap_reason = HANDLED;
 
 
         /* after dealing with last process, schedule next process to run */

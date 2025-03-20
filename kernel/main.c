@@ -56,6 +56,10 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
     /* Make sure started is false, so the dispatch switches into proc properly */
     p->started = false;
 
+    /* This way if it returns to the dispatcher on its own without syscalling
+     * or being interrupted then we just know that the process is done */
+    p->trap_reason = HANDLED;
+
     /* Add this process to the ready queue */
     list_add_tail(&ready_queue, &p->sched_node);
 }
@@ -72,7 +76,7 @@ void __yield(void) {
 void process0(void) {
     uart0_printf("Process 0\n");
     while (1) {
-        uart0_printf("\nProcess 0 received %d\n", __syscalltest(5, 10));
+        uart0_printf("\nProcess 0 received 5 + 10 = %d\n", __syscalltest(5, 10));
         delay();
     }
 }
