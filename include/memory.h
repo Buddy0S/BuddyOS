@@ -15,8 +15,8 @@
 #define ALLOC_END           0x8FFFFFFF
 
 int init_alloc(void);
-void *kmalloc(uint32_t size);
-int kfree(void *ptr);
-
+void *kmalloc(uint32_t);
+int kfree(void*);
+void kmemset32(uint32_t, uint32_t, uint32_t);
 
 #endif

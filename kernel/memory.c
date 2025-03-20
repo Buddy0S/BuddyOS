@@ -153,7 +153,7 @@ uint32_t find_size(uint32_t addr) {
 }
 
 /* simple memset */
-void memset32(uint32_t addr, uint32_t value, uint32_t size) {
+void kmemset32(uint32_t addr, uint32_t value, uint32_t size) {
     uint32_t *ptr = (uint32_t *)addr;
     for (uint32_t i = 0; i < size / sizeof(uint32_t); i++) {
         ptr[i] = value;
@@ -192,8 +192,8 @@ void *kmalloc(uint32_t size) {
 
     addr = alloc_block->addr;
 
-    memset32(addr, 0, block_size);
-    uart0_puts("kmalloc reached return\n");
+    kmemset32(addr, 0, block_size);
+    //uart0_puts("kmalloc reached return\n");
     order_arr[order]->num_free--;
     return (void *)addr;
 }
@@ -219,7 +219,7 @@ int kfree(void *ptr) {
         order_arr[order]->tail->next = free_block;
         order_arr[order]->tail = free_block;
     }
-    uart0_puts("kfree reached return\n");
+    //uart0_puts("kfree reached return\n");
     order_arr[order]->num_free++;
     return 0;
 

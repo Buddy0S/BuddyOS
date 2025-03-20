@@ -5,6 +5,8 @@
 #include "memory.h"
 #include "list.h"
 #include "proc.h"
+#include "net.h"
+#include "led.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
@@ -96,6 +98,44 @@ void null_proc(void) {
 extern void supervisor_call(void);
 extern void dispatcher(void);
 
+void buddy(void) {
+
+    volatile int i;
+    volatile int T = 500000;
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED1);
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED2);
+
+    for (i = 0; i < T; i++);
+
+    LEDon(LED3);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED0);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED1);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED2);
+
+    for (i = 0; i < T; i++);
+
+    LEDoff(LED3);
+
+    for (i = 0; i < T; i++);
+
+}
+
+
 int main(){
 
     uart0_printf("Entering Kernel\n");
@@ -111,6 +151,10 @@ int main(){
     }
 
 
+    //cpsw_init();
+
+    //phy_init(); 
+    
     /* Initialize the ready queue */
     init_ready_queue();
 
