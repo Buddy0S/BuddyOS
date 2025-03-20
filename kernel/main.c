@@ -89,37 +89,21 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
     list_add_tail(&ready_queue, &p->sched_node);
 }
 
-// these syscalls 1-3 do not have return values, so they will print the
-// value that was in r0 when they were called
+int syscalltest(int a);
 
 void process1(void) {
     while (1) {
         uart0_printf("Process 1\n");
-        register uint32_t sp asm("sp");
-        uart0_printf("current sp: %x\n", sp);
-        register uint32_t r0 asm("r0");
-        asm volatile("  \n\t    \
-                mrs r0, cpsr     \n\t    \
-                "::: "r0");
-        uart0_printf("current cpsr: %x\n", r0);
         delay();
-        SYSCALL(1);
+        uart0_printf("Process 1: %d\n", syscalltest(1));
     }
 }
 
 void process2(void) {
     while (1) {
         uart0_printf("Process 2\n");
-        register uint32_t sp asm("sp");
-        uart0_printf("current sp: %x\n", sp);
-        register uint32_t r0 asm("r0");
-        asm volatile("  \n\t    \
-                mrs r0, cpsr     \n\t    \
-                "::: "r0");
-        uart0_printf("current cpsr: %x\n", r0);
-
         delay();
-        SYSCALL(1);
+        uart0_printf("Process 2: %d\n", syscalltest(2));
     }
 }
 
@@ -134,8 +118,8 @@ void process3(void) {
 }
 
 /* test function that calls a syscall that takes 2 arguments */
-int test_syscall_sum(int a, int b) {
-    return SYSCALL(0);
+int syscalltest(int a) {
+    return SYSCALL(1);
 }
 
 extern void supervisor_call(void);
@@ -215,6 +199,7 @@ int main(){
 
     /* Initialize three processes (using only the first three slots) with MEDIUM priority */
     init_process(&PROC_TABLE[0], process1, PROC_STACKS[0], MEDIUM);
+    init_process(&PROC_TABLE[1], process2, PROC_STACKS[1], MEDIUM);
 
     uart0_printf("process gonan jump to %x\n", process2);
 

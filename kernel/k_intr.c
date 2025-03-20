@@ -10,6 +10,10 @@ uint32_t test_syscall(int a, int b) {
     return a + b;
 }
 
+void testprint(int a, int b) {
+    uart0_printf("r0: %x, r1: %x\n", a, b);
+}
+
 /* called by supervisor vector in idt when svc interrupt is raised.
  *
  * supervisor vector in vector_table.S passes syscall number and function
@@ -44,19 +48,18 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
 
     switch_to_dispatch(current_process, kernel_process);
     uart0_printf("returned monkey\n");
-    /*
+    register uint32_t r0 asm("r0");
     uart0_printf("current sp: %x\n", sp);
         asm volatile("  \n\t    \
-                mov r11, lr     \n\t    \
-       " : : : "r11");
+                mov r0, lr     \n\t    \
+       " : : : "r0");
 
-    uart0_printf("current lr: %x\n", r11);
+    uart0_printf("current lr: %x\n", r0);
 
         asm volatile("  \n\t    \
-                mrs r11, spsr     \n\t    \
-       " : : : "r11");
-    uart0_printf("current spsr: %x\n", r11);
-    */
+                mrs r0, spsr     \n\t    \
+       " : : : "r0");
+    uart0_printf("current spsr: %x\n", r0);
 }
 
 
@@ -116,8 +119,8 @@ void interrupt_handler(){
 
     /* TIMER 0 interrrupt*/
     if (irqnum == 66){
-   
-	    
+
+
         *(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_IRQ_STATUS) = 0x2;
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 2);	
@@ -126,18 +129,18 @@ void interrupt_handler(){
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
 
-    
+
     }
 
     /* UART 0 interrupt*/
     if (irqnum == 72){
-    
-       *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 8); 
 
-       UART0_isr();       
+        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 8); 
 
-       *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
-	
+        UART0_isr();       
+
+        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
+
     }
 
 }
@@ -146,10 +149,10 @@ void interrupt_handler(){
  * IRQ and FIQ disable bits in cpsr
  * */
 void enable_interrupts(void){
-  asm(" mrs r1, cpsr   \n\t"
-      " bic r1, #0xC0  \n\t"
-      " msr cpsr, r1 \n\t");
-    
+    asm(" mrs r1, cpsr   \n\t"
+            " bic r1, #0xC0  \n\t"
+            " msr cpsr, r1 \n\t");
+
 }
 
 /* disables interrupts by seting the
@@ -158,8 +161,8 @@ void enable_interrupts(void){
 void disable_interrupts(void){
 
     asm(" mrs r1, cpsr   \n\t"
-        " orr r1, #0xC0  \n\t"
-        " msr cpsr, r1 \n\t");
+            " orr r1, #0xC0  \n\t"
+            " msr cpsr, r1 \n\t");
 
 }
 
@@ -171,9 +174,9 @@ void kexception_handler(uint32_t exception) {
             uart0_printf("Supervisor Call Exception\n");
             break;
         case 2:  
-	    {
-		uint32_t addr; 
-	        uint32_t status;
+            {
+                uint32_t addr; 
+                uint32_t status;
                 uint32_t reason;
 
                 uart0_printf("Data Abort Exception\n");
@@ -181,26 +184,24 @@ void kexception_handler(uint32_t exception) {
                 // this whole function is causing some embbeded bs
 
 
-		asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
-
-		asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
-
-		uart0_printf("Addr: %x \n", addr);
-		uart0_printf("Status: %x \n", status);
+                asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
+                asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
+                uart0_printf("Addr: %x \n", addr);
+                uart0_printf("Status: %x \n", status);
 
                 reason = status & 0xF;
 
-		switch(reason){
-		    case 0x0: uart0_printf("Alignment Fault\n"); break;
+                switch(reason){
+                    case 0x0: uart0_printf("Alignment Fault\n"); break;
                     case 0x4: uart0_printf("Translation Fault (Section)\n"); break;
                     case 0x5: uart0_printf("Translation Fault (Page)\n"); break;
                     case 0x8: uart0_printf("Permission Fault (Section)\n"); break;
                     case 0x9: uart0_printf("Permission Fault (Page)\n"); break;
                     default: uart0_printf("Unknown Fault\n"); break;
-		}
+                }
 
                 break;
-	    }
+            }
         case 3:  
             uart0_printf("Undefined Instruction Exception\n");
             break;

@@ -1,5 +1,6 @@
 PREFIX = arm-none-eabi-
 CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include
+KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include
 
 BUILD_DIR = build/
 BIN_DIR = bin/
@@ -69,7 +70,7 @@ $(BUILD_DIR)k_vector.o : kernel/k_vector.S | $(BUILD_DIR)
 	$(PREFIX)as kernel/k_vector.S -o $@
 
 $(BUILD_DIR)k_intr.o : kernel/k_intr.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) kernel/k_intr.c -o $@
+	$(PREFIX)gcc $(KCFLAGS) kernel/k_intr.c -o $@
 
 $(BUILD_DIR)fs.o: fs/fs.c
 	$(PREFIX)gcc $(CFLAGS) fs/fs.c -o $@
@@ -77,20 +78,23 @@ $(BUILD_DIR)fs.o: fs/fs.c
 $(BUILD_DIR)vfs.o: $(BUILD_DIR)fs.o fs/vfs.c 
 	$(PREFIX)gcc $(CFLAGS) fs/vfs.c -o $@
 
-$(BUILD_DIR)kernel.o: kernel/main.c
-	$(PREFIX)gcc $(CFLAGS) kernel/main.c -o $@
-
 $(BUILD_DIR)dispatcher.o: kernel/dispatcher.c
-	$(PREFIX)gcc $(CFLAGS) kernel/dispatcher.c -o $@
+	$(PREFIX)gcc $(KCFLAGS) kernel/dispatcher.c -o $@
 
 $(BUILD_DIR)memory.o: kernel/memory.c
-	$(PREFIX)gcc $(CFLAGS) kernel/memory.c -o $@
+	$(PREFIX)gcc $(KCFLAGS) kernel/memory.c -o $@
 
 $(BUILD_DIR)string.o: misc/string.c
 	$(PREFIX)gcc $(CFLAGS) misc/string.c -o $@
 
 $(BUILD_DIR)net.o: drivers/net.c
 	$(PREFIX)gcc $(CFLAGS) drivers/net.c -o $@
+
+$(BUILD_DIR)cpsw.o: drivers/cpsw.c
+	$(PREFIX)gcc $(KCFLAGS) drivers/cpsw.c -o $@
+
+$(BUILD_DIR)kernel.o: kernel/main.c
+	$(PREFIX)gcc $(KCFLAGS) kernel/main.c -o $@
 
 kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o\
 $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o\

@@ -57,7 +57,7 @@ typedef struct PCB {
     uint32_t *stack_ptr;            /* Pointer to the saved context (stack pointer) */
     context context;                /* registers that need to be saved on context switch */
     uint32_t cpsr;                  /* cpsr at the time the process was context switched from */
-    uint32_t *svc_sp;            /* Pointer to the saved context (stack pointer) */
+    uint32_t *saved_sp;            /* Pointer to the saved context (stack pointer) */
 
     uint32_t *r_args;
 
