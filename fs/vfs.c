@@ -122,6 +122,7 @@ int vfs_close(int fd) {
 
 }
 
+/* add checks for file open flags */
 uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 
 	int mountpoint_id;

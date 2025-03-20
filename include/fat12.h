@@ -62,9 +62,9 @@ typedef struct {
 
 
 void fat12_init(unsigned int startSector, volatile uint32_t* buffer); 
-int fat12_find(volatile char* filename, volatile uint32_t* buffer,
+int fat12_find(char* filename, uint32_t* buffer,
     uint32_t* entryIndex); 
-uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer);
+uint32_t fat12_read_file(char* filename, uint32_t* buffer, uint32_t* tempBuffer);
 uint32_t fat12_create_dir_entry(volatile char* filename,
 	uint16_t parent_dir_sector, uint8_t attributes, volatile uint32_t* buffer); 
 uint32_t fat12_write_file(volatile char* filename, volatile char* data,

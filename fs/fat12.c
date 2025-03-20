@@ -139,8 +139,7 @@ void fat12_init(unsigned int startSector, volatile uint32_t* buffer) {
 }
 
 /* Return Dir Sector that file is in */
-int fat12_find(volatile char* filename, volatile uint32_t* buffer,
-    uint32_t* entryIndex) {
+int fat12_find(char* filename, uint32_t* buffer, uint32_t* entryIndex) {
 
     uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
@@ -323,7 +322,7 @@ uint16_t fat12_find_free_cluster() {
 }
 
 /* //wiki.osdev.org/FAT#FAT_12 */
-uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
+uint32_t fat12_read_file(char* filename, uint32_t* buffer, uint32_t* tempBuffer) {
 	uart0_printf("Entered read file\n");
 	uint32_t sectorRead; /* sector to start reading from */
 	uint32_t rootSectorStart = bootSector.reservedSectorCount +
@@ -331,11 +330,11 @@ uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 	uint32_t entryIndex;
 	DirEntry dirEntry;
 
-	if (fat12_find(filename, buffer, &entryIndex) == 0) {
+	if (fat12_find(filename, tempBuffer, &entryIndex) == 0) {
 		return -1;
 	}
 
-	dirEntry = ((DirEntry*)buffer)[entryIndex];
+	dirEntry = ((DirEntry*)tempBuffer)[entryIndex];
 
    	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
 	uint32_t bytesRead = 0;
