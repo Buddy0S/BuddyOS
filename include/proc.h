@@ -69,6 +69,7 @@ typedef struct PCB {
     int32_t trap_reason;
     int32_t cpu_time;
     bool started;
+    bool quantum_elapsed;
 
     struct KList children;          /* A list of this proc's children */
     struct KList sched_node;        /* Node for the scheduler's ready queue */

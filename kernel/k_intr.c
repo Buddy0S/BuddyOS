@@ -80,17 +80,21 @@ void UART0_isr(){
     uart0_putch(rec);
 }
 
-void interrupt_handler(){
+/* this function somehow doesnt break irq stack frame, should probably cut
+ * it down, but if i move the whole thing into the dispatcher, the timer
+ * irq goes off 1000 times per second and obliterates everything with like 5
+ * different context switches per timer interrupt */
+void interrupt_handler() {
 
     /* get interrupt number */
     volatile uint32_t irqnum = *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_IRQ) & 0x7F; 
 
     static uint32_t seconds = 0;
 
-    if (irqnum != 66) uart0_printf("IRQ number %d\n", (int) irqnum);
+    //if (irqnum != 66) uart0_printf("IRQ number %d\n", (int) irqnum);
 
     /* TIMER 0 interrrupt*/
-    if (irqnum == 66){
+    if (irqnum == 66) {
 
         /* need to have some quantum variable inside current_process that gets 
          * checked so that we know if we should go to dispatcher and reschedule
@@ -105,14 +109,15 @@ void interrupt_handler(){
 
         if (timer_counter <= 0) {
             timer_isr();
-            uart0_printf("%d seconds passed\n", ++seconds);
+            //uart0_printf("%d seconds passed\n", ++seconds);
             timer_counter = 1000;
         }
 
         current_process->cpu_time -= 1;
         if (current_process->cpu_time <= 0) {
-            uart0_printf("time to switch\n");
+            //uart0_printf("time to switch\n");
             /* jump back to the dispatcher */
+            current_process->quantum_elapsed = true;
             isr_switch(irqnum);
         }
 
@@ -124,6 +129,8 @@ void interrupt_handler(){
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 8); 
 
+        // when processes start blocking on stdin, gonna need to make this 
+        // jump to dispatcher just like timer does above
         UART0_isr();       
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;

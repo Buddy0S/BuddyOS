@@ -82,6 +82,7 @@ void dispatcher(void) {
         /* after dealing with last process, schedule next process to run */
         if (current_process->status == 66) {
             current_process->cpu_time = PROC_QUANTUM;
+            current_process->quantum_elapsed = false;
             schedule();
         }
         uart0_printf("jumping to %x for process #%d through ", current_process->context.lr, current_process->pid);
