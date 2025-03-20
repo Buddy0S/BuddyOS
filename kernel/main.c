@@ -60,8 +60,17 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
      * or being interrupted then we just know that the process is done */
     p->trap_reason = HANDLED;
 
+    /* start all processes with a 10 ms quantum */
+    p->cpu_time = 1000;
+
     /* Add this process to the ready queue */
     list_add_tail(&ready_queue, &p->sched_node);
+}
+
+__attribute__((naked)) void wfi(void) {
+        asm volatile("  \n\t \
+                wfi     \n\t \
+                ");
 }
 
 /* test function that calls a syscall that takes 2 arguments */
@@ -84,18 +93,17 @@ void process0(void) {
 void process1(void) {
     uart0_printf("Process 1\n");
     while (1) {
-        __yield();
-        uart0_printf("\nProcess 1 yielded\n");
+        uart0_printf("\nProcess 1 is going to sleep\n");
         delay();
+        wfi();
+        uart0_printf("\nProcess 1 has been resurrected\n");
     }
 }
 
 void null_proc(void) {
     while (1) {
         uart0_printf("null proc going to sleep... zzzzzzz\n");
-        asm volatile("  \n\t \
-                wfi     \n\t \
-                ");
+        wfi();
     }
 }
 

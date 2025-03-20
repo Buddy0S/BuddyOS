@@ -2,16 +2,18 @@
 #include "interrupts.h"
 #include "led.h"
 #include "timer.h"
-#include "syscall.h"
+#include "reg.h"
 #include "uart.h"
 #include <stdint.h>
+
+uint32_t timer_counter = 1000;
 
 uint32_t test_syscall(int a, int b) {
     return a + b;
 }
 
-void testprint(int a, int b) {
-    uart0_printf("r0: %x, r1: %x\n", a, b);
+void testprint(void) {
+    uart0_printf("hi guys\n");
 }
 
 /* called by supervisor vector in idt when svc interrupt is raised.
@@ -26,11 +28,18 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     // arguments will be put into the args array, but technically its just
     // a pointer to the bottom of the process stack that performed the syscall
     current_process->r_args = args;
-    current_process->syscall_num = svc_num;
+    current_process->status = svc_num;
     current_process->trap_reason = SYSCALL;
+    uart0_printf("current %d\n", current_process->pid);
     switch_to_dispatch(current_process, kernel_process);
 }
 
+void isr_switch(uint32_t isr_num) {
+    current_process->status = isr_num;
+    current_process->trap_reason = INTERRUPT;
+    switch_to_dispatch(current_process, kernel_process);
+    testprint();
+}
 
 int ledmode = 0;
 
@@ -78,6 +87,9 @@ void interrupt_handler(){
     /* get interrupt number */
     volatile uint32_t irqnum = *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_IRQ) & 0x7F; 
 
+    current_process->trap_reason = INTERRUPT;
+
+    static uint32_t seconds = 0;
 
     if (irqnum != 66) uart0_printf("IRQ number %d\n", (int) irqnum);
 
@@ -88,16 +100,27 @@ void interrupt_handler(){
          * checked so that we know if we should go to dispatcher and reschedule
          * because i dont want to waste a lot of time on context switching
          * on timer interrupts that arent even going to make us re schedule */
+        timer_counter -= 1;
+
 
         *(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_IRQ_STATUS) = 0x2;
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 2);	
 
-        //timer_isr();
+        if (timer_counter <= 0) {
+            timer_isr();
+            uart0_printf("%d seconds passed\n", ++seconds);
+            timer_counter = 1000;
+        }
+
+        current_process->cpu_time -= 1;
+        if (current_process->cpu_time <= 0) {
+            uart0_printf("time to switch\n");
+            /* here is where it would jump back to the dispatcher */
+            isr_switch(irqnum);
+        }
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
-
-
     }
 
     /* UART 0 interrupt*/
@@ -186,4 +209,22 @@ void kexception_handler(uint32_t exception) {
     while (1); 
 }
 
+/* change the timer interval to be 10 ms */
+void new_timer_init(void) {
+    WRITE32(DMTIMER0_BASE + DMTIMER0_TLDR, 0xFFFFFFD9);
+    /* 0xFFFF8000 = 1s period, 0xFFFFFEB8 = 10 ms? */
+    /* whatever the hell this number is is 1 ms ??? */
+
+    /* Wait for the write to complete 
+     * TWPS ensures register update is done
+     */
+    while (READ32(DMTIMER0_BASE + DMTIMER0_TWPS) & (0x4)) {}
+
+    /* Set Timer Trigger Register (TTGR) to force a reload of TLDR 
+     */
+    WRITE32(DMTIMER0_BASE + DMTIMER0_TTGR, 0x1);
+
+    /* Wait for write completion */
+    while (READ32(DMTIMER0_BASE + DMTIMER0_TWPS) & (0x8)) {}
+}
 
