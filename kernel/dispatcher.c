@@ -26,7 +26,3 @@ void dispatcher(void) {
 
     }
 }
-
-void testprint(int32_t test) {
-    uart0_printf("%x\n", test);
-}

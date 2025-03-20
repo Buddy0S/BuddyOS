@@ -75,14 +75,17 @@ switch_to_dispatch:
     
     add r2, r0, #68                 /* Get pointer to context */
     stmdb r2!, {r4-r11, lr}         /* Save registers and LR on current stack */
-    str sp, [r0, #72]               /* Store current SP into *old_sp */
+    str sp, [r0, #28]               /* Store current SP into *old_sp */
 
     /* switch into system mode */
-    mrs r0, cpsr
-    bic r0, #0x1F
-    orr r0, #0x1F
-    msr cpsr, r0
+    mrs r2, cpsr
+    bic r2, #0x1F
+    orr r2, #0x1F
+    msr cpsr, r2
     /*                         */
+    cpsid if
+
+    str sp, [r0, #72]               /* store user process sp */
 
     ldr sp, [r1, #28]               /* Load new SP from *new_sp */
     add r3, r1, #32                 /* Gets pointer to context */
@@ -104,6 +107,8 @@ switch_to_svc:
     stmdb r2!, {r4-r11, lr}         /* Save registers and LR on current stack */
     str sp, [r0, #28]               /* Store current SP into *old_sp */
 
+    ldr sp, [r1, #72]               /* grab user process sp */
+
     /* switch into svc mode */
     mrs r0, cpsr
     bic r0, #0x1F
@@ -111,7 +116,7 @@ switch_to_svc:
     msr cpsr, r0
     /*                         */
 
-    ldr sp, [r1, #72]               /* Load new SP from *new_sp */
+    ldr sp, [r1, #28]               /* Load new SP from *new_sp */
     add r3, r1, #32                 /* Gets pointer to context */
     ldmia r3!, {r4-r11, lr}         /* Restore registers and LR from new process stack */
 
@@ -130,6 +135,7 @@ switch_to_start:
     stmdb r2!, {r4-r11, lr}         /* Save registers and LR on current stack */
     str sp, [r0, #28]               /* Store current SP into *old_sp */
 
+    cpsie if
     /* switch into system mode */
     mrs r0, cpsr
     bic r0, #0x1F
