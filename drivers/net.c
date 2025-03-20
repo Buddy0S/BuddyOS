@@ -429,6 +429,14 @@ typedef struct cpsw_interface {
 
 ethernet_interface eth_interface;
 
+typedef struct eth_header {
+
+    uint8_t destination_mac[MAC_ADDR_LEN];
+    uint8_t source_mac[MAC_ADDR_LEN];
+    uint16_t type;
+
+} __attribute__((packed)) ethernet_header;
+
 /* --------------------------CPSW CODE----------------------------- */
 
 /*
@@ -607,7 +615,7 @@ void cpsw_set_ports_state(){
 
     REG(PORTCTL0) |= PORT_FORWARD;
     REG(PORTCTL1) |= PORT_FORWARD;
-    REG(PORTCTL2) |= PORT_FORWARD;
+    //REG(PORTCTL2) |= PORT_FORWARD;
 }
 
 /*
@@ -915,6 +923,8 @@ void cpsw_config_interrupts(){
 
     REG(INTC_MIR_CLEAR1) = CPSW_INTMASK_CLEAR;
 
+    REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
+
     REG(TX_INTMASK_SET) = CPDMA_CHANNEL_INT;
     REG(RX_INTMASK_SET) = CPDMA_CHANNEL_INT;
 
@@ -922,7 +932,7 @@ void cpsw_config_interrupts(){
     REG(C0_TX_EN) = CPDMA_CHANNEL_INT;
 
     /* Ack Interrupts */
-    REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
+    //REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
 
 }
 
@@ -945,7 +955,7 @@ void cpsw_start_recieption(){
 void print_mac(uint8_t* mac_addr){
 
     get_mac();
-    uart0_printf("MAC ADDR ID 0: %x:%x:%x:%x:%x:%x\n",
+    uart0_printf("MAC ADDR: %x:%x:%x:%x:%x:%x\n",
 		    mac_addr[0],
 		    mac_addr[1],
 		    mac_addr[2],
@@ -975,82 +985,6 @@ void cpsw_set_transfer(uint32_t transfer){
 void cpsw_enable_gmii(){
   
     REG(PORT1_MACCONTROL) |= GMII_ENABLE | OH_MBPS;
-
-}
-
-int cpsw_transmit(uint32_t* packet, uint32_t size){
-
-    cpdma_hdp* tx_desc = eth_interface.txch.head;
-
-    tx_desc->buffer_pointer = packet;
-    tx_desc->buffer_length = size;
-    tx_desc->flags = TX_INIT_FLAGS;
-
-    REG(TX0_HDP) = (uint32_t) tx_desc;
-
-    uart0_printf("Transmiting Packet\n");
-
-    // TX INT STAT RAW
-    while (!REG(CPDMA_BASE + 0x80)){}
-
-    uart0_printf("Packet Transmited\n");
-
-    REG(TX0_CP) = (uint32_t) tx_desc;
-
-    REG(CPDMA_EOI_VECTOR) = EOI_TX;
-
-    kfree(packet);
-
-    return REG(CPDMA_BASE + 0x80);
-
-}
-
-int cpsw_recv(){
-
-    volatile cpdma_hdp* start = eth_interface.rxch.free;
-    volatile cpdma_hdp* end = (cpdma_hdp* )REG(RX0_CP);
-
-    int eoq = 0;
-
-    // int status raw need to replace this with macro
-    uint32_t status = REG(CPDMA_BASE + 0xA0);
-
-    if (!status){
-        uart0_printf("No Packets\n");
-	return -1;
-    }
-
-    uart0_printf("Starting Packet Processing\n");
-
-    while (!(start->flags & BIT(29))){
-    
-        uart0_printf("Packet Recieved\n");
-
-	start->flags = RX_INIT_FLAGS;
-	start->buffer_length = MAX_PACKET_SIZE;
-	
-        REG(RX0_CP) = (uint32_t) start;
-
-	start = start->next_descriptor;
-
-	// End of queue
-	if (start == 0){   
-	    eoq = 1;
-            uart0_printf("End of queue reached\n");
-            cpsw_start_recieption();	    
-	    break;
-	}
-
-
-    }
-
-    if (eoq) eth_interface.rxch.free = eth_interface.rxch.head;
-    else eth_interface.rxch.free = (volatile cpdma_hdp*)  start;
-
-    REG(CPDMA_EOI_VECTOR) = EOI_RX;
-
-    return 0;
-
 
 }
 
@@ -1114,6 +1048,170 @@ void cpsw_init(){
     cpsw_start_recieption();
     uart0_printf("CPSW Packet Reception Started\n");
   
+}
+
+/*
+ * ntohl()
+ *  - returns input network word to host word
+ *
+ * */
+uint32_t ntohl(uint32_t net) {
+    return ((net & 0x000000FF) << 24) |
+           ((net & 0x0000FF00) << 8)  |
+           ((net & 0x00FF0000) >> 8)  |
+           ((net & 0xFF000000) >> 24);
+}
+
+/*
+ * htonl()
+ *  - returns input host word to network word
+ *
+ * */
+uint32_t htonl(uint32_t host) {
+    return ((host & 0x000000FF) << 24) |
+           ((host & 0x0000FF00) << 8)  |
+           ((host & 0x00FF0000) >> 8)  |
+           ((host & 0xFF000000) >> 24);
+}
+
+/*
+ * dumps the hex of a buffer
+ *  - used to dump packet data
+ *
+ * */
+void hex_dump(uint32_t* data, int len){
+
+    len = len / sizeof(uint32_t);
+
+    uart0_printf("HEX DUMP\n");	
+    for (int i = 0; i < len; i++){
+    
+        uart0_printf("%x\n",ntohl(data[i])); 
+    }
+}
+
+/*
+ * cpsw_transmit()
+ *  - transmits a packet given the buffer containg the packet
+ *  - lowkey packets need to be aligned to 4 bytes
+ *
+ * */
+int cpsw_transmit(uint32_t* packet, uint32_t size){
+
+    cpdma_hdp* tx_desc = eth_interface.txch.head;
+    uint32_t len = size / sizeof(uint32_t);
+
+    //hex_dump(packet,size);
+
+    tx_desc->next_descriptor = 0;
+    tx_desc->buffer_pointer = packet;
+    tx_desc->buffer_length = size;
+    tx_desc->flags = TX_INIT_FLAGS;
+    tx_desc->flags |= (size & 0xFFF);
+
+    REG(TX0_HDP) = (uint32_t) tx_desc;
+
+    uart0_printf("Transmiting Packet\n");
+
+    // TX INT STAT RAW
+    while (!REG(CPDMA_BASE + 0x80)){}
+
+    uart0_printf("Packet Transmited\n"); 
+
+    REG(CPDMA_BASE + 0x8C) = CPDMA_CHANNEL_INT;
+
+    REG(TX0_CP) = (uint32_t) tx_desc;
+
+    REG(CPDMA_EOI_VECTOR) = EOI_TX;
+
+    REG(TX_INTMASK_SET) = CPDMA_CHANNEL_INT;
+
+    kfree(packet);
+
+    // HARD WARE BUG TRYING TO FIX THIS 
+    
+    //software_reset(CPDMA_SOFT_RESET);
+    //cpsw_init_cpdma_descriptors();
+    //cpsw_setup_cpdma_descriptors();
+    //cpsw_enable_cpdma_controller();
+    //cpsw_config_interrupts();
+    //cpsw_start_recieption();
+
+    return REG(CPDMA_BASE + 0x80);
+
+}
+
+void eth_recv(uint32_t* frame, int size);
+
+/*
+ *
+ * */
+void process_packet(uint8_t* packet, int size){
+
+     uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
+
+     //hex_dump((uint32_t*)packet,size);
+
+     if(size) eth_recv((uint32_t*)packet,size);
+
+
+}
+
+/*
+ * cpsw_recv()
+ *  - checks DMA RX channel for any packets
+ *  - Processes Packets
+ *
+ * */
+int cpsw_recv(){
+
+    cpdma_hdp* start = eth_interface.rxch.free;
+    cpdma_hdp* end = (cpdma_hdp* )REG(RX0_CP);
+
+    int eoq = 0;
+
+    // int status raw need to replace this with macro
+    uint32_t status = REG(CPDMA_BASE + 0xA0);
+
+    uart0_printf("Starting Packet Processing\n");
+
+    if (!status){
+        uart0_printf("No Packets\n");
+	return -1;
+    }
+
+    while (!(start->flags & BIT(29))){
+    
+        uart0_printf("Packet Recieved\n");
+
+	process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
+
+	start->flags = RX_INIT_FLAGS;
+	start->buffer_length = MAX_PACKET_SIZE;
+	
+        REG(RX0_CP) = (uint32_t) start;
+
+	start = start->next_descriptor;
+
+	// End of queue
+	if (start == 0){   
+	    eoq = 1;
+            uart0_printf("End of queue reached\n");
+            cpsw_start_recieption();	    
+	    break;
+	}
+
+
+    }
+
+    if (eoq) eth_interface.rxch.free = eth_interface.rxch.head;
+    else eth_interface.rxch.free = start;
+
+    REG(CPDMA_EOI_VECTOR) = EOI_RX;
+
+    return 0;
+
+
 }
 
 /* --------------------------PHY CODE----------------------------- */
@@ -1329,14 +1427,135 @@ int phy_init(){
     }
 
     cpsw_enable_gmii();
-    uart0_printf("Enabling Frame Sending and Recieving\n");
-
-    while(1){
-       cpsw_recv();
-       buddy();
-       uint32_t* packet = (uint32_t*) kmalloc(MAX_PACKET_SIZE);
-       cpsw_transmit(packet,MAX_PACKET_SIZE);
-    } 
+    uart0_printf("Enabling Frame Sending and Recieving\n"); 
 
     return 0;
 }
+
+/* --------------------------ETHERNET----------------------------- */
+
+/*
+ * eth_recv()
+ *  - takes raw frame and extracts ethernet header
+ *  
+ * */
+void eth_recv(uint32_t* frame, int size){
+    
+    ethernet_header frame_header;
+
+    uint32_t word1 = 0;
+    uint32_t word2 = 0;
+    uint32_t word3 = 0;
+    uint32_t word4 = 0;
+
+    uart0_printf("Processing Frame\n");
+
+    word1 = ntohl(frame[0]);
+    word2 = ntohl(frame[1]);
+    word3 = ntohl(frame[2]);
+    word4 = ntohl(frame[3]);
+
+    frame_header.destination_mac[0] = BYTE3(word1);
+    frame_header.destination_mac[1] = BYTE2(word1);
+    frame_header.destination_mac[2] = BYTE1(word1);
+    frame_header.destination_mac[3] = BYTE0(word1);
+    frame_header.destination_mac[4] = BYTE3(word2);
+    frame_header.destination_mac[5] = BYTE2(word2);
+
+    uart0_printf("Destination MAC: \n");
+    print_mac(frame_header.destination_mac);
+
+    frame_header.source_mac[0] = BYTE1(word2);
+    frame_header.source_mac[1] = BYTE0(word2);
+    frame_header.source_mac[2] = BYTE3(word3);
+    frame_header.source_mac[3] = BYTE2(word3);
+    frame_header.source_mac[4] = BYTE1(word3);
+    frame_header.source_mac[5] = BYTE0(word3);
+
+    uart0_printf("Source MAC: \n");
+    print_mac(frame_header.source_mac);
+
+    frame_header.type = (BYTE3(word4) << 8) | (BYTE2(word4));
+
+    uart0_printf("Frame Type: %x \n",frame_header.type);
+
+}
+
+/*
+ * eth_transmit()
+ *  - takes in packet and adds ethernet frame header
+ *  - first 14 bytes of buffer must be free for header to be added
+ *
+ * */
+void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint8_t* src, uint16_t type){
+
+    uart0_printf("Crafting Ethernet Frame\n");	
+ 
+    frame[0] = dest[0];
+    frame[1] = dest[1];
+    frame[2] = dest[2];
+    frame[3] = dest[3];
+    frame[4] = dest[4];
+    frame[5] = dest[5];
+
+    uart0_printf("Destination MAC\n");
+    print_mac(dest);
+
+    frame[6] = src[0];
+    frame[7] = src[1];
+    frame[8] = src[2];
+    frame[9] = src[3];
+    frame[10] = src[4];
+    frame[11] = src[5];
+
+    uart0_printf("Source MAC\n");
+    print_mac(src);
+
+    frame[12] = (type & 0xFF00) >> 8;
+    frame[13] = type & 0xFF;
+
+    uart0_printf("Frame Type %x\n", type);
+
+    cpsw_transmit((uint32_t*)frame,size);
+}
+
+/* --------------------------INIT----------------------------- */
+
+/*
+ *
+ * */
+void init_network_stack(){
+
+    cpsw_init();
+
+    phy_init();
+
+    uint8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
+
+    uint16_t type = 0x1234;
+
+    buddy();
+
+    cpsw_recv();
+
+    //REG(C0_RX_EN) = 0;
+    //REG(C0_TX_EN) = 0;
+
+    //REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
+
+    //cpsw_recv();
+
+    //REG(C0_RX_EN) = CPDMA_CHANNEL_INT;
+    //REG(C0_TX_EN) = CPDMA_CHANNEL_INT;
+
+    while(1){
+       //cpsw_recv();
+       buddy();
+       uint8_t* packet = (uint8_t*) kmalloc(128);
+       packet[14] = 0;
+       packet[15] = 0;
+       eth_transmit(packet,128, multicast, eth_interface.mac_addr, type);
+    }
+
+}
+
