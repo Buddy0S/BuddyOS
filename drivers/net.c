@@ -1743,6 +1743,26 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
     cpsw_transmit((uint32_t*)frame,size);
 }
 
+void arp_anounce(){
+
+    uint8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
+
+    uint8_t anoun[6] = { 0, 0 , 0, 0, 0, 0};
+
+    uint8_t* packet = (uint8_t*) kmalloc(128);
+
+    arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
+}
+
+void arp_grap(){
+
+    int8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
+
+    uint8_t* packet = (uint8_t*) kmalloc(128);
+
+    arp_transmit(packet,128, multicast, multicast, eth_interface.ip_addr, ARP_REQUEST);
+}
+
 /* --------------------------INIT----------------------------- */
 
 /*
