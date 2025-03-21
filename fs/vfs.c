@@ -138,17 +138,6 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 
 		bytesRead = mnt.operations.read(vfs_openFiles[fd], read_buffer, bytes);
 
-		/* Maybe move to fs.c 
-		if (vfs_openFiles[fd]->read_offset + bytes <
-			vfs_openFiles[fd]->file_size) {
-				
-			vfs_openFiles[fd]->read_offset += bytes;	
-		}
-		else {
-			vfs_openFiles[fd]->read_offset = vfs_openFiles[fd]->file_size;	
-		}
-		**********************/
-
 		return bytesRead;
 
 	}

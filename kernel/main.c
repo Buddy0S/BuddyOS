@@ -169,9 +169,9 @@ int main(){
 	bytes = vfs_write(fd, "I ain't reading all that", sizeof("I ain't reading all that"));
 	vfs_close(fd);
 
-	fd = vfs_open("/home/TEST.TXT", 2);
-	bytes = vfs_read(fd, buf, 50);
-	uart0_printf("%s (%d bytes)\n", buf, bytes);
+	fd = vfs_open("/home/HELLO.TXT", 2);
+	bytes = vfs_write(fd, "Hello World!", sizeof("Hello World!"));
+	uart0_printf("Wrote %d bytes\n", bytes);
 	vfs_close(fd);
 
 

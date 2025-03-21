@@ -57,11 +57,28 @@ file_descriptor* fat12_open(const char* path, int flags) {
 
 		uart0_printf("File Contents = %s\n", fdOpen->file_buffer);
 		
-		return fdOpen;
 	}
 	else {
-		return NULL; /* Create file */
+		/* Create file */
+		fat12_write_file(path, "", 0, tempBuffer);
+
+		/* Initialize fd fields */
+		strcpy(fdOpen->file_name, path);
+		fdOpen->fs_file_id = 5;
+		fdOpen->flags = flags;
+		fdOpen->read_offset = 0;
+		fdOpen->write_offset = 0;
+		fdOpen->file_size = 0;
+		fdOpen->file_buffer = (char*)kmalloc(sizeof(char));
+
+		if (fdOpen->file_buffer == NULL) {
+			kfree(fdOpen);
+			return NULL;
+		}
+
 	}
+
+	return fdOpen;
 }
 
 int fat12_close(file_descriptor* fd) {
@@ -83,7 +100,7 @@ int fat12_close(file_descriptor* fd) {
 
 uint32_t fat12_read(file_descriptor* fd, char* read_buffer, int bytes) {
 	
-	int bytesRead;
+	int bytesRead = 0;
 
 	uart0_printf("Reading from %s\n", fd->file_name);
 
@@ -111,12 +128,29 @@ uint32_t fat12_read(file_descriptor* fd, char* read_buffer, int bytes) {
 
 uint32_t fat12_write(file_descriptor* fd, char* write_buffer, int bytes) {
 	
-	int bytesWritten;
+	char *oldBuffer, *newBuffer;
 
 	uart0_printf("Writing to %s\n", fd->file_name);
 
-	if (strncpy(fd->file_buffer + fd->write_offset, write_buffer, bytes)) {
-		fd->write_offset += bytesWritten;
+	if (fd->write_offset + bytes > fd->file_size) {
+		
+		newBuffer = (char*)kmalloc(sizeof(char) * fd->write_offset + bytes);
+		oldBuffer = fd->file_buffer;
+
+		fd->file_buffer = newBuffer;
+
+		strncpy(fd->file_buffer, oldBuffer, fd->file_size);
+
+		kfree(oldBuffer);
+	}
+
+	strncpy(fd->file_buffer + fd->write_offset, write_buffer, bytes);
+	
+	fd->write_offset += bytes;
+
+	if (fd->write_offset > fd->file_size) {
+		fd->file_size = fd->write_offset;
+		uart0_printf("%s: size = %d\n", fd->file_buffer, fd->file_size);
 	}
 
 	return bytes;
