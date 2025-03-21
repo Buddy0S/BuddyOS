@@ -3,7 +3,6 @@
 #include <syserr.h>
 #include <proc.h>
 #include <memory.h>
-#include <memcpy.h>
 
 int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     struct SRRMailbox *r_box, *c_box;
@@ -46,7 +45,7 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
         return -ENOMEM;
     }
 
-    bmemcpy(data, msg, len);
+    kmemcpy(data, msg, len);
     new_mail->data.msg = data;
     new_mail->data.len = len;
     new_mail->author = current_process->pid;
@@ -63,7 +62,7 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     /* By now the reply has been put in */
 
     usable_len = c_box->reply.len > *rlen ? *rlen : c_box->reply.len;
-    bmemcpy(reply, c_box->reply.msg, usable_len);
+    kmemcpy(reply, c_box->reply.msg, usable_len);
     *rlen = usable_len;
 
     kfree(c_box->reply.msg);
@@ -100,7 +99,7 @@ int receive(int* author, void* msg, uint32_t* len) {
     entry = knode_data(mail_node, struct MailEntry, node);
 
     usable_len = entry->data.len > *len ? *len : entry->data.len;
-    bmemcpy(msg, entry->data.msg, usable_len);
+    kmemcpy(msg, entry->data.msg, usable_len);
     *len = usable_len;
     *author = entry->author;
 
@@ -141,7 +140,7 @@ int reply(int pid, void* msg, uint32_t len) {
         return -ENOMEM;
     }
 
-    bmemcpy(reply, msg, len);
+    kmemcpy(reply, msg, len);
     s_box->reply.msg = reply;
     s_box->reply.len = len;
 
