@@ -8,6 +8,7 @@
 #define FAT12 12
 
 typedef struct {
+  char file_name[16];
 	uint32_t fs_file_id;
 	int mountpoint_id;
 	int flags;
@@ -20,8 +21,8 @@ typedef struct {
 typedef struct {
 	file_descriptor* (*open)(const char* path, int flags);
 	int (*close)(file_descriptor* fd);
-	uint32_t (*read)(int fd, char* read_buffer, int bytes);
-	uint32_t (*write)(int fd, char* write_buffer, int bytes);
+	uint32_t (*read)(file_descriptor* fd, char* read_buffer, int bytes);
+	uint32_t (*write)(file_descriptor* fd, char* write_buffer, int bytes);
 } fs_ops;
 
 typedef struct {

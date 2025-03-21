@@ -136,9 +136,9 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
 		mnt = vfs_mountpoints[mountpoint_id];
 
-		bytesRead = mnt.operations.read(fd, read_buffer, bytes);
+		bytesRead = mnt.operations.read(vfs_openFiles[fd], read_buffer, bytes);
 
-		/* Maybe move to fs.c */
+		/* Maybe move to fs.c 
 		if (vfs_openFiles[fd]->read_offset + bytes <
 			vfs_openFiles[fd]->file_size) {
 				
@@ -147,7 +147,7 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 		else {
 			vfs_openFiles[fd]->read_offset = vfs_openFiles[fd]->file_size;	
 		}
-		/**********************/
+		**********************/
 
 		return bytesRead;
 
@@ -167,7 +167,7 @@ uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
 		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
 		mnt = vfs_mountpoints[mountpoint_id];
 
-		bytesRead = mnt.operations.write(fd, write_buffer, bytes);
+		bytesRead = mnt.operations.write(vfs_openFiles[fd], write_buffer, bytes);
 
 		return bytesRead;
 

@@ -161,7 +161,19 @@ int main(){
 	vfs_mount("/", FAT12);
 	vfs_mount("/home", FAT12);
 
-	vfs_open("/home/TEST.TXT", 2);
+	char buf[1024];
+
+	int fd = vfs_open("/home/TEST.TXT", 2);
+	int bytes = vfs_read(fd, buf, 1024);
+	uart0_printf("%s (%d bytes)\n", buf, bytes);
+	bytes = vfs_write(fd, "I ain't reading all that", sizeof("I ain't reading all that"));
+	vfs_close(fd);
+
+	fd = vfs_open("/home/TEST.TXT", 2);
+	bytes = vfs_read(fd, buf, 50);
+	uart0_printf("%s (%d bytes)\n", buf, bytes);
+	vfs_close(fd);
+
 
 	//uart0_printf("FS TEST = %s(%d)\n", mnt->fs_mountpoint, mnt->type);
 

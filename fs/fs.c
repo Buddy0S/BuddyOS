@@ -3,18 +3,20 @@
 #include "uart.h"
 #include "fat12.h"
 #include "memory.h"
+#include "string.h"
 
 #define NULL (void*)0
 
 file_descriptor* fat12_open(const char* path, int flags);
-uint32_t fat12_read(int fd, char* read_buffer, int bytes);
-uint32_t fat12_write(int fd, char* write_buffer, int bytes);
-int fat12_close(int fd);
+uint32_t fat12_read(file_descriptor* fd, char* read_buffer, int bytes);
+uint32_t fat12_write(file_descriptor* fd, char* write_buffer, int bytes);
+int fat12_close(file_descriptor* fd);
 
 fs_ops fat12_ops = {
     .open = fat12_open,
     .read = fat12_read,
     .write = fat12_write,
+	.close = fat12_close
 };
 
 extern file_descriptor vfs_openFiles[MAX_OPENED_FILES]; 
@@ -37,6 +39,7 @@ file_descriptor* fat12_open(const char* path, int flags) {
 		dir = ((DirEntry*)tempBuffer)[entryIndex];
 
 		/* Initialize fd fields */
+		strcpy(fdOpen->file_name, path);
 		fdOpen->fs_file_id = dir.firstClusterLow;
 		fdOpen->flags = flags;
 		fdOpen->read_offset = 0;
@@ -61,15 +64,62 @@ file_descriptor* fat12_open(const char* path, int flags) {
 	}
 }
 
-int fat12_close(int fd) {
-	return 0;
+int fat12_close(file_descriptor* fd) {
+	uint32_t tempBuffer[128];
+	int bytes;
+
+	uart0_printf("Closing %s\n", fd->file_name);
+	
+	bytes = fat12_write_file(fd->file_name, fd->file_buffer, fd->file_size, tempBuffer);
+
+	if (bytes >= fd->file_size) {
+		kfree(fd->file_buffer);
+		kfree(fd);
+	}
+
+	return 1;
+
 }
 
-uint32_t fat12_read(int fd, char* read_buffer, int bytes) {
-	return 0;
+uint32_t fat12_read(file_descriptor* fd, char* read_buffer, int bytes) {
+	
+	int bytesRead;
+
+	uart0_printf("Reading from %s\n", fd->file_name);
+
+	if (fd->read_offset >= fd->file_size) {
+		return 0;
+	}
+	else {
+		
+		if (strncpy(read_buffer, fd->file_buffer + fd->read_offset, bytes)) {
+			if (fd->read_offset + bytes < fd->file_size) {
+				bytesRead = bytes;
+			}
+			else {
+				bytesRead = fd->file_size - fd->read_offset;
+			}
+
+			fd->read_offset += bytesRead;
+		}
+
+		return bytesRead;
+
+	}
+
 }
 
-uint32_t fat12_write(int fd, char* write_buffer, int bytes) {
-	return 0;
+uint32_t fat12_write(file_descriptor* fd, char* write_buffer, int bytes) {
+	
+	int bytesWritten;
+
+	uart0_printf("Writing to %s\n", fd->file_name);
+
+	if (strncpy(fd->file_buffer + fd->write_offset, write_buffer, bytes)) {
+		fd->write_offset += bytesWritten;
+	}
+
+	return bytes;
+
 }
 
