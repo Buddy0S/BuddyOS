@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include "uart.h"
 #include "proc.h"
+#include <syscall.h>
+#include <srr_ipc.h>
 
 /* Round-robin yield: switches context to the next process */
 void schedule(void) {
@@ -28,6 +30,24 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
         case 1:
             uart0_printf("add two numbers together tye shi\n");
             args[0] = add_two_numbers(args[0], args[1]);
+            break;
+        case SYSCALL_SEND_NR:
+            uart0_printf("IPC SEND\n");
+            args[0] = send((int)args[0], (void*)args[1], (uint32_t)args[2],
+                    (void*)args[3], (uint32_t*)args[4]);
+            break;
+        case SYSCALL_RECEIVE_NR:
+            uart0_printf("IPC RECV\n");
+            args[0] = receive((int*)args[0],
+                    (void*)args[1], (uint32_t*)args[2]);
+            break;
+        case SYSCALL_REPLY_NR:
+            uart0_printf("IPC REPLY\n");
+            args[0] = reply((int)args[0], (void*)args[1], (uint32_t)args[2]);
+            break;
+        case SYSCALL_MSG_WAITING_NR:
+            uart0_printf("IPC MSGWAITS\n");
+            args[0] = msg_waiting();
             break;
         default:
             uart0_printf("unknown\n");
