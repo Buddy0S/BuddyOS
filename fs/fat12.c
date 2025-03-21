@@ -8,7 +8,7 @@
 fat_bs_t bootSector;
 fat12_ebs_t extendedBootRecord;
 
-int compareFileNames(DirEntry *entry, volatile char* fileName) {
+int compareFileNames(DirEntry *entry, const char* fileName) {
     
     int i, j;
 
@@ -32,7 +32,7 @@ int compareFileNames(DirEntry *entry, volatile char* fileName) {
 
 }
 
-void splitFilename(volatile char* input, char* filename, char* extension) {
+void splitFilename(const char* input, char* filename, char* extension) {
 	
 	int i = 0;
 	int dotLoc = -1;
@@ -86,7 +86,7 @@ void splitFilename(volatile char* input, char* filename, char* extension) {
 
 }
 
-void fat12_init(unsigned int startSector, volatile uint32_t* buffer) {
+void fat12_init(unsigned int startSector, uint32_t* buffer) {
 	MMCreadblock(startSector, buffer);
 
 	unsigned char* buf = (unsigned char*) buffer;
@@ -139,7 +139,7 @@ void fat12_init(unsigned int startSector, volatile uint32_t* buffer) {
 }
 
 /* Return Dir Sector that file is in */
-int fat12_find(char* filename, uint32_t* buffer, uint32_t* entryIndex) {
+int fat12_find(const char* filename, uint32_t* buffer, uint32_t* entryIndex) {
 
     uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
@@ -319,7 +319,7 @@ uint16_t fat12_find_free_cluster() {
 }
 
 /* //wiki.osdev.org/FAT#FAT_12 */
-uint32_t fat12_read_file(char* filename, uint32_t* buffer, uint32_t* tempBuffer) {
+uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempBuffer) {
 	uart0_printf("Entered read file\n");
 	uint32_t sectorRead; /* sector to start reading from */
 	uint32_t rootSectorStart = bootSector.reservedSectorCount +
@@ -371,8 +371,8 @@ uint32_t fat12_read_file(char* filename, uint32_t* buffer, uint32_t* tempBuffer)
 
 }
 
-uint32_t fat12_create_dir_entry(volatile char* filename,
-	uint16_t parent_dir_sector, uint8_t attributes, volatile uint32_t* buffer) {
+uint32_t fat12_create_dir_entry(const char* filename,
+	uint16_t parent_dir_sector, uint8_t attributes, uint32_t* buffer) {
 
 	char* buf = (char*)buffer; /* CHANGE TO MALLOC'D ARRAY WHEN POSSIBLE */
 
@@ -410,8 +410,8 @@ uint32_t fat12_create_dir_entry(volatile char* filename,
 
 }
 
-uint32_t fat12_write_file(volatile char* filename, volatile char* data,
-	uint32_t size, volatile uint32_t* tempBuffer) {
+uint32_t fat12_write_file(const char* filename, char* data, uint32_t size, 
+	uint32_t* tempBuffer) {
 
 	uart0_printf("GOT TO WRITE FILE\n");
 

@@ -47,7 +47,7 @@ file_descriptor* fat12_open(const char* path, int flags) {
 		}
 
 		/* Maybe add some kinda check later */
-		fat12_read_file(path, fdOpen->file_buffer, tempBuffer);
+		fat12_read_file(path, (uint32_t*)fdOpen->file_buffer, tempBuffer);
 		
 		return fdOpen;
 	}

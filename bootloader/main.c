@@ -123,7 +123,7 @@ int main(void) {
 
     mmc.init();
     
-    volatile uint32_t __attribute__((aligned(4))) buffer[256];
+     uint32_t __attribute__((aligned(4))) buffer[256];
 
     uart0_printf("Attempting to init fat12......\n");
     fat12_init(0, buffer);
@@ -136,7 +136,7 @@ int main(void) {
 
 	uart0_printf("Read from TEST.TXT - %s", buffer);
 
-	fat12_read_file("KERNEL.BIN", (volatile uint32_t *)0x80000000, buffer);
+	fat12_read_file("KERNEL.BIN", (uint32_t *)0x80000000, buffer);
 
     /*jump to kernel*/
     uint32_t* kernel = (uint32_t*)0x80000000;
