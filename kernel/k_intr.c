@@ -21,8 +21,8 @@ void testprint(int a, int b) {
  * supervisor vector in vector_table.S passes syscall number and function
  * arguments to this handler.
  *
- * DO NOT ADD ANY LOCAL VARIABLES TO THIS FUNCTION BECAUSE IT WILL OBLITERATE
- * THE SVC STACK
+ * DO NOT ADD ANY LOCAL VARIABLES TO THIS FUNCTION BECAUSE IT WILL PROBABLY 
+ * OBLITERATE THE SVC STACK
  * */
 void svc_handler(uint32_t svc_num, uint32_t args[]) {
     /* arguments will be put into the args array, but technically its just
@@ -33,8 +33,9 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     switch_to_dispatch(current_process, kernel_process);
 }
 
-void isr_switch(uint32_t isr_num) {
-    current_process->status = isr_num;
+/* stores irq num into process context before switching to dispatcher */
+void isr_switch(uint32_t irq_num) {
+    current_process->status = irq_num;
     current_process->trap_reason = INTERRUPT;
     switch_to_dispatch(current_process, kernel_process);
 }
@@ -94,17 +95,11 @@ void interrupt_handler() {
     /* TIMER 0 interrrupt*/
     if (irqnum == 66) {
 
-        /* need to have some quantum variable inside current_process that gets 
-         * checked so that we know if we should go to dispatcher and reschedule
-         * because i dont want to waste a lot of time on context switching
-         * on timer interrupts that arent even going to make us re schedule */
-        timer_counter -= 1;
-
-
         *(volatile uint32_t*)((volatile char*)DMTIMER0_BASE + DMTIMER0_IRQ_STATUS) = 0x2;
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 2);	
 
+        timer_counter -= 1;
         if (timer_counter <= 0) {
             timer_isr();
             timer_counter = 1000;
@@ -206,7 +201,7 @@ void kexception_handler(uint32_t exception) {
     while (1); 
 }
 
-/* change the timer interval to be 10 ms */
+/* change the timer interval to be 1 ms */
 void new_timer_init(void) {
     WRITE32(DMTIMER0_BASE + DMTIMER0_TLDR, 0xFFFFFFD9);
     /* 0xFFFF8000 = 1s period, 0xFFFFFEB8 = 10 ms? */

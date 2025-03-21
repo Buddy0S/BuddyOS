@@ -72,8 +72,8 @@ int __syscalltest(int a, int b) {
     return SYSCALL(SYSCALL_TEST_2_ARGS_NR);
 }
 
-void __yield(void) {
-    SYSCALL(SYSCALL_YIELD_NR);
+int __yield(void) {
+    return SYSCALL(SYSCALL_YIELD_NR);
 }
 
 void process0(void) {

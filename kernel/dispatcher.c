@@ -26,6 +26,8 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
     switch (svc_num) {
         case SYSCALL_YIELD_NR:
             uart0_printf("yield\n");
+            schedule();
+            args[0] = 0;
             break;
         case SYSCALL_TEST_2_ARGS_NR:
             uart0_printf("add two numbers together tye shi\n");
