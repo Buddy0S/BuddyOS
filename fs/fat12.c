@@ -372,39 +372,46 @@ uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempB
 }
 
 uint32_t fat12_create_dir_entry(const char* filename,
-	uint16_t parent_dir_sector, uint8_t attributes, uint32_t* buffer) {
+  uint8_t attributes, uint32_t* buffer) {
+  
+  uint32_t rootSectorStart = bootSector.reservedSectorCount +
+                (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
+
+  uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
 
 	char* buf = (char*)buffer; /* CHANGE TO MALLOC'D ARRAY WHEN POSSIBLE */
 
-    DirEntry *dirEntry;
-
-	MMCreadblock(parent_dir_sector, (uint32_t*)buf);
-
-	/* In FAT12, each sector has 16 directory entries */
-	for (int j = 0; j < 16; j++) {
-
-		/* Each directory entry in FAT 12 is 32 bytes long */
-		/* See DirEntry struct for fields in directory entry */
-		dirEntry = (DirEntry*) &buf[j * 32];
-
-		/* Check for directory end */
-		if (dirEntry->name[0] == 0x00 || dirEntry->name[0] == 0xE5) {
-			
-			splitFilename(filename, dirEntry->name, dirEntry->ext);			
-			dirEntry->firstClusterLow = fat12_find_free_cluster();
-			fat12_set_next_cluster(dirEntry->firstClusterLow, FAT12_EOF_MAX);
-			dirEntry->attrib = attributes;
-			dirEntry->fileSize = 0;
-
-			uart0_printf("%s.%s - %x - %d (%d)\n", dirEntry->name, dirEntry->ext,
-			dirEntry->attrib, dirEntry->firstClusterLow,
-			fat12_get_next_cluster(dirEntry->firstClusterLow));
-
-			MMCwriteblock(parent_dir_sector, (uint32_t*)buf);
-			return dirEntry->firstClusterLow;
-		}
-
-	}
+  DirEntry *dirEntry;
+  
+  for (uint32_t i = rootSectorStart; i < rootSectorStart + numRootSectors;
+        i++) {
+    MMCreadblock(i, (uint32_t*)buf);
+    
+    /* In FAT12, each sector has 16 directory entries */
+    for (int j = 0; j < 16; j++) {
+    
+    	/* Each directory entry in FAT 12 is 32 bytes long */
+    	/* See DirEntry struct for fields in directory entry */
+    	dirEntry = (DirEntry*) &buf[j * 32];
+    
+    	/* Check for directory end */
+    	if (dirEntry->name[0] == 0x00 || dirEntry->name[0] == 0xE5) {
+    		
+    		splitFilename(filename, dirEntry->name, dirEntry->ext);			
+    		dirEntry->firstClusterLow = fat12_find_free_cluster();
+    		fat12_set_next_cluster(dirEntry->firstClusterLow, FAT12_EOF_MAX);
+    		dirEntry->attrib = attributes;
+    		dirEntry->fileSize = 0;
+    
+    		uart0_printf("%s.%s - %x - %d (%d)\n", dirEntry->name, dirEntry->ext,
+    		dirEntry->attrib, dirEntry->firstClusterLow,
+    		fat12_get_next_cluster(dirEntry->firstClusterLow));
+    
+    		MMCwriteblock(i, (uint32_t*)buf);
+    		return dirEntry->firstClusterLow;
+    	}
+    }
+  }
 
 	return -1;
 
@@ -423,12 +430,16 @@ uint32_t fat12_write_file(const char* filename, char* data, uint32_t size,
 	uint32_t firstDataSector = bootSector.reservedSectorCount +
 		(bootSector.FATTableCount * bootSector.sectorsPerFATTable) +
 		((bootSector.rootEntryCount * 32) / bootSector.bytesPerSector);
+  uint32_t rootSectorStart = bootSector.reservedSectorCount +
+                (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
 
 	char temp[32];
 
 	/* File not found */
 	if (dirSector == 0) {
-		return -1;
+    uart0_printf("Not found - Creating new \n");
+    fat12_create_dir_entry(filename, 0x20, tempBuffer);
+    return -1;
 	}
 
 	MMCreadblock(dirSector, tempBuffer);

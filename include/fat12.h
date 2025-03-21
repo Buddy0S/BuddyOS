@@ -65,7 +65,7 @@ void fat12_init(unsigned int startSector, uint32_t* buffer);
 int fat12_find(const char* filename, uint32_t* buffer,
     uint32_t* entryIndex); 
 uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempBuffer);
-uint32_t fat12_create_dir_entry(const char* filename,	uint16_t parent_dir_sector,
+uint32_t fat12_create_dir_entry(const char* filename,
 	uint8_t attributes, uint32_t* buffer); 
 uint32_t fat12_write_file(const char* filename, char* data, uint32_t size, 
 	uint32_t* tempBuffer); 
