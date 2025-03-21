@@ -153,11 +153,15 @@ int main(){
     }
 
 	/* ********* Test File system ********* */
-	
+
+	uint32_t* buffer = (uint32_t*)kmalloc(128 * sizeof(uint32_t));
+	fat12_init(0, buffer);
+	kfree(buffer);
+
 	vfs_mount("/", FAT12);
 	vfs_mount("/home", FAT12);
 
-	vfs_open("/home/user/folder/file", 2);
+	vfs_open("/home/TEST.TXT", 2);
 
 	//uart0_printf("FS TEST = %s(%d)\n", mnt->fs_mountpoint, mnt->type);
 

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "vfs.h"
+#include "uart.h"
 #include "fat12.h"
 #include "memory.h"
 
@@ -23,6 +24,8 @@ file_descriptor* fat12_open(const char* path, int flags) {
 	file_descriptor* fdOpen;
 	uint32_t entryIndex;
 	DirEntry dir;
+
+	uart0_printf("Got to fat12_open() - %s, %d\n", path, flags);
 
 	fdOpen = (file_descriptor*) kmalloc(sizeof(file_descriptor));
 	if (fdOpen == NULL) {
@@ -48,11 +51,13 @@ file_descriptor* fat12_open(const char* path, int flags) {
 
 		/* Maybe add some kinda check later */
 		fat12_read_file(path, (uint32_t*)fdOpen->file_buffer, tempBuffer);
+
+		uart0_printf("File Contents = %s\n", fdOpen->file_buffer);
 		
 		return fdOpen;
 	}
 	else {
-		return NULL;
+		return NULL; /* Create file */
 	}
 }
 

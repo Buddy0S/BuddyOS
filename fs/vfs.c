@@ -59,14 +59,18 @@ int vfs_mount(char* target, int type) {
 }
 
 int vfs_open(char* path, int flags) {
-	
+
 	mountpoint *mnt = get_mountpoint(path);
 	char relPath[VFS_PATH_LEN];
 	file_descriptor* fdOpen = NULL;
 
+	uart0_printf("Got to vfs_open(), %s, %d\n", path, flags);
+
 	if (openCount == MAX_OPENED_FILES) {
 		return -3; /* max files open */
 	}
+
+	uart0_printf("Mnt pnt = %s\n", mnt->fs_mountpoint);
 
 	if (mnt != NULL) {
 		
