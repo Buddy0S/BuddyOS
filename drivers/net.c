@@ -459,7 +459,7 @@ typedef struct eth_header {
     uint8_t source_mac[MAC_ADDR_LEN];
     uint16_t type;
 
-} __attribute__((packed)) ethernet_header;
+} ethernet_header;
 
 typedef struct arp {
 
@@ -473,7 +473,7 @@ typedef struct arp {
     uint8_t dest_mac[MAC_ADDR_LEN];
     uint32_t dest_ip;
 
-} __attribute__((packed)) arp_header;
+} arp_header;
 
 /* --------------------------CPSW CODE----------------------------- */
 
@@ -802,12 +802,12 @@ void unicast_ale_entry(uint32_t portmask, uint8_t* mac_addr){
  * */
 void get_mac(){
 
-    eth_interface.mac_addr[0] = BYTE1(REG(MAC_ID0_LO));
-    eth_interface.mac_addr[1] = BYTE0(REG(MAC_ID0_LO));
-    eth_interface.mac_addr[2] = BYTE3(REG(MAC_ID0_HI));
-    eth_interface.mac_addr[3] = BYTE2(REG(MAC_ID0_HI));
-    eth_interface.mac_addr[4] = BYTE1(REG(MAC_ID0_HI));
-    eth_interface.mac_addr[5] = BYTE0(REG(MAC_ID0_HI));
+    eth_interface.mac_addr[5] = BYTE1(REG(MAC_ID0_LO));
+    eth_interface.mac_addr[4] = BYTE0(REG(MAC_ID0_LO));
+    eth_interface.mac_addr[3] = BYTE3(REG(MAC_ID0_HI));
+    eth_interface.mac_addr[2] = BYTE2(REG(MAC_ID0_HI));
+    eth_interface.mac_addr[1] = BYTE1(REG(MAC_ID0_HI));
+    eth_interface.mac_addr[0] = BYTE0(REG(MAC_ID0_HI));
 
 }
 
@@ -1484,7 +1484,7 @@ void print_ip(uint32_t ip){
     uint8_t ip3 = BYTE1(ip);
     uint8_t ip4 = BYTE0(ip);
 
-    uart0_printf("IP: %d.%d.%d.%d", ip1,ip2,ip3,ip4);
+    uart0_printf("IP: %d.%d.%d.%d/n", ip1,ip2,ip3,ip4);
 
 }
 
@@ -1511,10 +1511,10 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
     word2 = ntohl(frame[1]);
     word3 = ntohl(frame[2]);
     word4 = ntohl(frame[3]);
-    word1 = ntohl(frame[4]);
-    word2 = ntohl(frame[5]);
-    word3 = ntohl(frame[6]);
-    word4 = ntohl(frame[7]);
+    word5 = ntohl(frame[4]);
+    word6 = ntohl(frame[5]);
+    word7 = ntohl(frame[6]);
+    word8 = ntohl(frame[7]);
 
     frame_arp.hardware_type = word1 & 0x0000FFFF;
 
@@ -1661,7 +1661,7 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type);
 /*
  *
  * */
-void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint32_t dest_ip, uint16_t opcode){
+void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint8_t* dether_mac, uint32_t dest_ip, uint16_t opcode){
 
     frame[14] = (HARDWARE_TYPE & 0xFF00) >> 8;
     frame[15] = HARDWARE_TYPE & 0x00FF;
@@ -1699,7 +1699,7 @@ void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint32_t dest_ip,
     frame[40] = BYTE1(dest_ip);
     frame[41] = BYTE0(dest_ip);
 
-    eth_transmit(frame,size,dest_mac,ARP);
+    eth_transmit(frame,size,dether_mac,ARP);
 
 }
 
@@ -1758,6 +1758,8 @@ void init_network_stack(){
 
     uint8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
 
+    uint8_t anoun[6] = { 0, 0 , 0, 0, 0, 0};
+
     uint16_t type = 0x1234;
 
     buddy();
@@ -1780,7 +1782,7 @@ void init_network_stack(){
        uint8_t* packet = (uint8_t*) kmalloc(128);
        
        // GARP
-       arp_transmit(packet,128, multicast, eth_interface.ip_addr, ARP_REQUEST);
+       arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
     }
 
 }
