@@ -239,6 +239,11 @@ extern void buddy();
 
 #define CPDMA_EOI_VECTOR (CPDMA_BASE + 0x94)
 
+#define RX_INT_STATUS_RAW (CPDMA_BASE + 0xA0)
+#define TX_INT_STATUS_RAW (CPDMA_BASE + 0x80)
+
+#define TX_INTMASK_CLEAR (CPDMA_BASE + 0x8C)
+
 //*******************************************************************
 // GPIO REGISTERS
 //*******************************************************************
@@ -343,6 +348,7 @@ extern void buddy();
 
 #define MAC_ADDR_LEN 6
 #define MAX_PACKET_SIZE 1520
+#define STATIC_IP 0xC0A80702
 
 //*******************************************************************
 // CPPI
@@ -396,6 +402,13 @@ extern void buddy();
 #define IN_BAND BIT(18)
 #define CLEAR_TRANSFER (BIT(7) | BIT(0))
 
+//*******************************************************************
+// ETHERTYPES
+//*******************************************************************
+
+#define IPV4 0x0800
+#define ARP 0x0806
+
 /* ----------------------------STRUCTS----------------------------- */
 
 /* CPDMA header discriptors */
@@ -436,6 +449,20 @@ typedef struct eth_header {
     uint16_t type;
 
 } __attribute__((packed)) ethernet_header;
+
+typedef struct arp {
+
+    uint16_t hardware_type;
+    uint16_t protocol_type;
+    uint8_t hardware_length;
+    uint8_t protocol_length;
+    uint16_t operation;
+    uint8_t src_mac[MAC_ADDR_LEN];
+    uint32_t src_ip;
+    uint8_t dest_mac[MAC_ADDR_LEN];
+    uint32_t dest_ip;
+
+} __attribute__((packed)) arp_header;
 
 /* --------------------------CPSW CODE----------------------------- */
 
@@ -1050,6 +1077,25 @@ void cpsw_init(){
   
 }
 
+/* --------------------------HELPER----------------------------- */
+
+void debug(){
+
+    buddy();
+    uart0_printf("RXCH head %x\n",eth_interface.rxch.head);
+    uart0_printf("RXCH head flags %x\n",eth_interface.rxch.head->flags);
+    uart0_printf("DMASTATUS %x\n",REG(DMASTATUS));
+    uart0_printf("DMA INT RAW STATUS %x\n",REG(CPDMA_BASE + 0xA0));
+    uart0_printf("DMA INT MASKED STATUS %x\n",REG(CPDMA_BASE + 0xA4));
+    uart0_printf("RX CP %x\n",REG(RX0_CP));
+    uart0_printf("RX CP flags %x\n",((cpdma_hdp*)REG(RX0_CP))->flags);
+    uart0_printf("RX CP next %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor);
+    //uart0_printf("RX CP next flags %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor->flags);
+    uart0_printf("RXCH tail %x\n",eth_interface.rxch.tail);
+    uart0_printf("RXCH tail flags %x\n",eth_interface.rxch.tail->flags);
+
+}
+
 /*
  * ntohl()
  *  - returns input network word to host word
@@ -1090,6 +1136,8 @@ void hex_dump(uint32_t* data, int len){
     }
 }
 
+/* --------------------------PACKETS----------------------------- */
+
 /*
  * cpsw_transmit()
  *  - transmits a packet given the buffer containg the packet
@@ -1114,11 +1162,11 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
     uart0_printf("Transmiting Packet\n");
 
     // TX INT STAT RAW
-    while (!REG(CPDMA_BASE + 0x80)){}
+    while (!REG(TX_INT_STATUS_RAW)){}
 
     uart0_printf("Packet Transmited\n"); 
 
-    REG(CPDMA_BASE + 0x8C) = CPDMA_CHANNEL_INT;
+    REG(TX_INTMASK_CLEAR) = CPDMA_CHANNEL_INT;
 
     REG(TX0_CP) = (uint32_t) tx_desc;
 
@@ -1137,7 +1185,7 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
     //cpsw_config_interrupts();
     //cpsw_start_recieption();
 
-    return REG(CPDMA_BASE + 0x80);
+    return REG(TX_INT_STATUS_RAW);
 
 }
 
@@ -1150,7 +1198,7 @@ void process_packet(uint8_t* packet, int size){
 
      uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
 
-     //hex_dump((uint32_t*)packet,size);
+     hex_dump((uint32_t*)packet,size);
 
      if(size) eth_recv((uint32_t*)packet,size);
 
@@ -1171,7 +1219,7 @@ int cpsw_recv(){
     int eoq = 0;
 
     // int status raw need to replace this with macro
-    uint32_t status = REG(CPDMA_BASE + 0xA0);
+    uint32_t status = REG(RX_INT_STATUS_RAW);
 
     uart0_printf("Starting Packet Processing\n");
 
@@ -1384,23 +1432,6 @@ int phy_link(){
     return REG(MDIOLINK);
 }
 
-void debug(){
-
-    buddy();
-    uart0_printf("RXCH head %x\n",eth_interface.rxch.head);
-    uart0_printf("RXCH head flags %x\n",eth_interface.rxch.head->flags);
-    uart0_printf("DMASTATUS %x\n",REG(DMASTATUS));
-    uart0_printf("DMA INT RAW STATUS %x\n",REG(CPDMA_BASE + 0xA0));
-    uart0_printf("DMA INT MASKED STATUS %x\n",REG(CPDMA_BASE + 0xA4));
-    uart0_printf("RX CP %x\n",REG(RX0_CP));
-    uart0_printf("RX CP flags %x\n",((cpdma_hdp*)REG(RX0_CP))->flags);
-    uart0_printf("RX CP next %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor);
-    //uart0_printf("RX CP next flags %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor->flags);
-    uart0_printf("RXCH tail %x\n",eth_interface.rxch.tail);
-    uart0_printf("RXCH tail flags %x\n",eth_interface.rxch.tail->flags);
-
-}
-
 /*
  * phy_init()
  *  - initializes the Ethernet PHY 
@@ -1433,6 +1464,93 @@ int phy_init(){
 }
 
 /* --------------------------ETHERNET----------------------------- */
+
+void print_ip(uint32_t ip){
+
+
+    uint8_t ip1 = BYTE3(ip);
+    uint8_t ip2 = BYTE2(ip);
+    uint8_t ip3 = BYTE1(ip);
+    uint8_t ip4 = BYTE0(ip);
+
+    uart0_printf("IP: %d.%d.%d.%d", ip1,ip2,ip3,ip4);
+
+}
+
+/*
+ * arp_recv
+ *  - pass in frame with ethernet header removed + 2 bytes for align
+ * */
+void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
+
+    arp_header frame_arp;
+
+    uint32_t word1 = 0;
+    uint32_t word2 = 0;
+    uint32_t word3 = 0;
+    uint32_t word4 = 0;
+    uint32_t word5 = 0;
+    uint32_t word6 = 0;
+    uint32_t word7 = 0;
+    uint32_t word8 = 0;
+
+    uart0_printf("Handling ARP Request\n");
+
+    word1 = ntohl(frame[0]);
+    word2 = ntohl(frame[1]);
+    word3 = ntohl(frame[2]);
+    word4 = ntohl(frame[3]);
+    word1 = ntohl(frame[4]);
+    word2 = ntohl(frame[5]);
+    word3 = ntohl(frame[6]);
+    word4 = ntohl(frame[7]);
+
+    frame_arp.hardware_type = word1 & 0x0000FFFF;
+
+    uart0_printf("Hardware Type %x\n",frame_arp.hardware_type);
+
+    frame_arp.protocol_type = word2 & 0xFFFF0000;
+
+    uart0_printf("Protocol Type %x\n",frame_arp.protocol_type);
+
+    frame_arp.hardware_length = word2 & 0x0000FF00;
+
+    frame_arp.protocol_length = word2 & 0x000000FF;
+
+    frame_arp.operation = word3 & 0xFFFF0000;
+
+    frame_arp.src_mac[0] = word3 & 0x0000FF00;
+    frame_arp.src_mac[1] = word3 & 0x000000FF;
+    frame_arp.src_mac[2] = word4 & 0xFF000000;
+    frame_arp.src_mac[3] = word4 & 0x00FF0000;
+    frame_arp.src_mac[4] = word4 & 0x0000FF00;
+    frame_arp.src_mac[5] = word4 & 0x000000FF;
+
+    uart0_printf("Source MAC\n");
+    print_mac(frame_arp.src_mac);
+
+    frame_arp.src_ip = word5;
+
+    uart0_printf("Source IP\n");
+    print_ip(frame_arp.src_ip);
+
+    frame_arp.dest_mac[0] = word6 & 0xFF000000;
+    frame_arp.dest_mac[1] = word6 & 0x00FF0000;
+    frame_arp.dest_mac[2] = word6 & 0x0000FF00;
+    frame_arp.dest_mac[3] = word6 & 0x000000FF;
+    frame_arp.dest_mac[4] = word7 & 0xFF000000;
+    frame_arp.dest_mac[5] = word7 & 0x00FF0000;
+
+    uart0_printf("Destination MAC\n");
+    print_mac(frame_arp.dest_mac);
+
+    frame_arp.dest_ip = (word7 & 0x0000FFFF) | (word8 & 0xFFFF0000);
+
+    uart0_printf("Destination IP\n");
+    print_ip(frame_arp.dest_ip);
+
+
+}
 
 /*
  * eth_recv()
@@ -1478,6 +1596,37 @@ void eth_recv(uint32_t* frame, int size){
     frame_header.type = (BYTE3(word4) << 8) | (BYTE2(word4));
 
     uart0_printf("Frame Type: %x \n",frame_header.type);
+
+    switch (frame_header.type) {
+    
+        case ARP:
+	    {
+	        uart0_printf("Packet Type ARP\n");
+
+                // skip frame header but include ether type for alignment
+		
+		frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t));
+
+                size = size - 3*sizeof(uint32_t);
+
+		arp_recv(frame_header,frame,size);
+	    }
+	    break;
+
+	case IPV4:
+	    {
+		uart0_printf("Packet Type IPV4\n");
+	    }
+	    break;
+
+	default:
+	    {
+	        uart0_printf("Unsupported Packet Type\n");
+	    }
+    }
+}
+
+void arp_gratuitous(){
 
 }
 
@@ -1536,7 +1685,7 @@ void init_network_stack(){
 
     buddy();
 
-    cpsw_recv();
+    //cpsw_recv();
 
     //REG(C0_RX_EN) = 0;
     //REG(C0_TX_EN) = 0;
@@ -1549,7 +1698,7 @@ void init_network_stack(){
     //REG(C0_TX_EN) = CPDMA_CHANNEL_INT;
 
     while(1){
-       //cpsw_recv();
+       cpsw_recv();
        buddy();
        uint8_t* packet = (uint8_t*) kmalloc(128);
        packet[14] = 0;
