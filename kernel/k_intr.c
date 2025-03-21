@@ -159,7 +159,7 @@ void disable_interrupts(void){
 
 }
 
-void kexception_handler(uint32_t exception) {
+void kexception_handler(uint32_t exception, uint32_t pc) {
     uart0_printf("Exception Occurred: ");
 
     switch (exception) {
@@ -181,11 +181,12 @@ void kexception_handler(uint32_t exception) {
                 asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
                 uart0_printf("Addr: %x \n", addr);
                 uart0_printf("Status: %x \n", status);
+                uart0_printf("Exception PC: %x \n", pc);
 
                 reason = status & 0xF;
 
                 switch(reason){
-                    case 0x0: uart0_printf("Alignment Fault\n"); break;
+                    case 0x1: uart0_printf("Alignment Fault\n"); break;
                     case 0x4: uart0_printf("Translation Fault (Section)\n"); break;
                     case 0x5: uart0_printf("Translation Fault (Page)\n"); break;
                     case 0x8: uart0_printf("Permission Fault (Section)\n"); break;

@@ -39,7 +39,7 @@ void exception_handler(uint32_t exception) {
                 reason = status & 0xF;
 
 		switch(reason){
-		    case 0x0: uart0_printf("Alignment Fault\n"); break;
+		    case 0x1: uart0_printf("Alignment Fault\n"); break;
                     case 0x4: uart0_printf("Translation Fault (Section)\n"); break;
                     case 0x5: uart0_printf("Translation Fault (Page)\n"); break;
                     case 0x8: uart0_printf("Permission Fault (Section)\n"); break;

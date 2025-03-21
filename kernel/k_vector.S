@@ -21,14 +21,17 @@ vector_table:
 
 undefined_instruction:
     ldr r0, =3
+    mov r1, lr
     b loop
 
 prefetch_abort:
     ldr r0, =4
+    mov r1, lr
     b loop
 
 data_abort:
     ldr r0, =2
+    mov r1, lr
     b loop
 
 not_used:

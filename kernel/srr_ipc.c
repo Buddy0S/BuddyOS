@@ -93,6 +93,7 @@ int receive(int* author, void* msg, uint32_t* len) {
     if (mb->count == 0) {
         /* will be woken once there is a message waiting*/
         block();
+        /* bro THIS BLOCK CALL DOESNT DO SHIT */
     }
 
     mail_node = list_pop(&mb->mail);

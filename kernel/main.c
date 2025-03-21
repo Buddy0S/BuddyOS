@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "srr_ipc.h"
 #include "syscall.h"
 #include "reg.h"
 #include "uart.h"
@@ -62,6 +63,8 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
 
     /* start all processes with a 100 ms quantum for now */
     p->cpu_time = PROC_QUANTUM;
+
+    srr_init_mailbox(&p->mailbox);
 
     /* Add this process to the ready queue */
     list_add_tail(&ready_queue, &p->sched_node);
