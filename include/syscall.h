@@ -19,5 +19,9 @@
 #define SYSCALL_FORK_NR         3
 #define SYSCALL_KILL_NR         4
 #define SYSCALL_GETPID_NR       5
+#define SYSCALL_SEND_NR         6
+#define SYSCALL_RECEIVE_NR      7
+#define SYSCALL_REPLY_NR        8
+#define SYSCALL_MSG_WAITING_NR  9
 
 #endif
