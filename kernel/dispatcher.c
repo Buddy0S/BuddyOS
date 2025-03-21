@@ -60,7 +60,7 @@ void dispatcher(void) {
                 current_process->trap_reason = HANDLED;
                 switch_to_irq(kernel_process, current_process);
             }
-            /* check for handled */
+            /* check for handled and kill process */
         } else {
             current_process->started = true;
             switch_to_start(kernel_process, current_process);    
