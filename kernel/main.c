@@ -76,21 +76,63 @@ void __yield(void) {
     SYSCALL(0);
 }
 
+int __send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
+    return SYSCALL(SYSCALL_SEND_NR);
+}
+
+int __receive(int* author, void* msg, uint32_t* len) {
+    return SYSCALL(SYSCALL_RECEIVE_NR);
+}
+
+int __reply(int pid, void* msg, uint32_t len) {
+    return SYSCALL(SYSCALL_REPLY_NR);
+}
+
+int __msg_waiting() {
+    return SYSCALL(SYSCALL_MSG_WAITING_NR);
+}
+
+
 void process0(void) {
+    int author;
+    char msg[20];
+    uint32_t len;
+
+    len = 20;
+
     uart0_printf("Process 0\n");
     while (1) {
         uart0_printf("\nProcess 0 received 5 + 10 = %d\n", __syscalltest(5, 10));
         delay();
+        if (__msg_waiting()) {
+            uart0_printf("Proc 0: Theres a message from my buddy!\n");
+        } else {
+            uart0_printf("Proc 0: Theres no message from my buddy yet but thats fine ill wait\n");
+        }
+
+        __receive(&author, msg, &len);
+        uart0_printf("Proc 0: I got my buddy's message!\n");
+        uart0_printf("Proc 0: msg received:\n\t%s\n", msg);
+        __reply(author, msg, 19);
+
+        uart0_printf("Proc 0: sent my buddy a reply\n");
     }
 }
 
 void process1(void) {
+    char message[20] = "Hey buddy";
+    char response[20];
+    uint32_t rsp_len;
     uart0_printf("Process 1\n");
     while (1) {
         uart0_printf("\nProcess 1 is going to sleep\n");
         delay();
         WFI();
         uart0_printf("\nProcess 1 has been resurrected\n");
+        uart0_printf("Proc1: Sending a message to my buddy :)\n");
+        rsp_len = 20;
+        __send(0, message, 20, response, &rsp_len);
+        uart0_printf("PROC1: My buddy received my message!!\n");
     }
 }
 
