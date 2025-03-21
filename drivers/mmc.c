@@ -702,7 +702,7 @@ void MMCwriteblock(uint32_t block, volatile uint32_t* buf){
 
     int i;
 
-    uart0_printf(""); // again random print fixes the bug
+    uart0_printf(""); /* again random print fixes the bug */
 
     /* set block size to 512*/
     WRITE32(SD_BLK, 0x200);
@@ -713,7 +713,7 @@ void MMCwriteblock(uint32_t block, volatile uint32_t* buf){
     mmcCMD(CMD24);
 
     /* Wait for write to complete */
-    uart0_printf(""); // dont remove this it will break something
+    uart0_printf(""); /* dont remove this it will break something */
 
     while(1){
     

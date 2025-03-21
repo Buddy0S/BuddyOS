@@ -93,17 +93,17 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
 
     DirEntry dirEntry;
 
-    //uart0_printf("Args = %s %d %d\n", filename, *startCluster, *fileSize);
+    /* uart0_printf("Args = %s %d %d\n", filename, *startCluster, *fileSize); */
 
-    //uart0_printf("start = %d, numSectors = %d\n", rootSectorStart,
-    //numRootSectors);
+    /* uart0_printf("start = %d, numSectors = %d\n", rootSectorStart,
+     * numRootSectors); */
 
     /* Iterate through each sector */
     for (uint32_t i = rootSectorStart; i < rootSectorStart + numRootSectors;
         i++) {
 
         MMCreadblock(i, buffer);
-        //uart0_printf("Reading Sector %d ...\n", i);
+        /* uart0_printf("Reading Sector %d ...\n", i); */
 
         char *buf = (char*)buffer;
 
@@ -126,7 +126,7 @@ int fat12_find(volatile char* filename, volatile uint32_t* buffer,
             
             /* File found - set passed pointers to appropriate values*/
             if (compareFileNames(&dirEntry, filename)) {
-                *startCluster = dirEntry.firstClusterLow;// do we needd  this 2/20 9:21 pm Noah | (dirEntry.firstClusterHigh << 8);
+                *startCluster = dirEntry.firstClusterLow; /* do we needd  this 2/20 9:21 pm Noah | (dirEntry.firstClusterHigh << 8); */
                 *fileSize = dirEntry.fileSize;
                 uart0_printf("fat12_find - RETURNING 1\n");
                 return 1;
@@ -188,12 +188,12 @@ uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer) {
 	/* read until EOF marker */
 	while (loopCluster < FAT12_EOF_MIN) {
 		/* reads from first data sector available */
-		//uart0_printf("Entered loopCluster loop\n");
+		/*uart0_printf("Entered loopCluster loop\n"); */
 		sectorRead = rootSectorStart + numRootSectors + ((loopCluster-2) * bootSector.sectorsPerCluster);
-		//uart0_printf("rootSectorStart = %d\n", rootSectorStart);
-		//uart0_printf("numRootSectors = %d\n", numRootSectors);
+		/*uart0_printf("rootSectorStart = %d\n", rootSectorStart); */
+		/*uart0_printf("numRootSectors = %d\n", numRootSectors); */
 		uart0_printf("loopCluster = %d\n", loopCluster);
-		//uart0_printf("sectorsPerCluster = %d\n", bootSector.sectorsPerCluster);
+		/*uart0_printf("sectorsPerCluster = %d\n", bootSector.sectorsPerCluster); */
 		uart0_printf("Calculated sectorRead = %d\n", sectorRead);
 
 		/* need to divide bytesRead/4 to convert to pointer index */

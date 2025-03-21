@@ -1,10 +1,13 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
 
+/* lets us pass a macro to SYSCALL(x) */
+#define STR(x) #x
+
 #define SYSCALL(x)                          \
 ({                                          \
-    register int return_val asm("r0");      \
-    asm volatile (" svc #" #x "  \n\t");    \
+    register int32_t return_val asm("r0");  \
+    asm volatile ("svc #" STR(x) "  \n\t"); \
     return_val;                             \
 })                                          \
 

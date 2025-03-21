@@ -25,8 +25,8 @@ void testprint(int a, int b) {
  * THE SVC STACK
  * */
 void svc_handler(uint32_t svc_num, uint32_t args[]) {
-    // arguments will be put into the args array, but technically its just
-    // a pointer to the bottom of the process stack that performed the syscall
+    /* arguments will be put into the args array, but technically its just
+     * a pointer to the bottom of the process stack that performed the syscall */
     current_process->r_args = args;
     current_process->status = svc_num;
     current_process->trap_reason = SYSCALL;
@@ -91,8 +91,6 @@ void interrupt_handler() {
 
     static uint32_t seconds = 0;
 
-    //if (irqnum != 66) uart0_printf("IRQ number %d\n", (int) irqnum);
-
     /* TIMER 0 interrrupt*/
     if (irqnum == 66) {
 
@@ -109,13 +107,11 @@ void interrupt_handler() {
 
         if (timer_counter <= 0) {
             timer_isr();
-            //uart0_printf("%d seconds passed\n", ++seconds);
             timer_counter = 1000;
         }
 
         current_process->cpu_time -= 1;
         if (current_process->cpu_time <= 0) {
-            //uart0_printf("time to switch\n");
             /* jump back to the dispatcher */
             current_process->quantum_elapsed = true;
             isr_switch(irqnum);
@@ -129,8 +125,8 @@ void interrupt_handler() {
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 8); 
 
-        // when processes start blocking on stdin, gonna need to make this 
-        // jump to dispatcher just like timer does above
+        /* when processes start blocking on stdin, gonna need to make this 
+         * jump to dispatcher just like timer does above */
         UART0_isr();       
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
@@ -173,8 +169,6 @@ void kexception_handler(uint32_t exception) {
                 uint32_t reason;
 
                 uart0_printf("Data Abort Exception\n");
-
-                // this whole function is causing some embbeded bs
 
 
                 asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));

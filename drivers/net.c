@@ -19,32 +19,32 @@ extern void buddy();
 
 /* ----------------------DATA ACCESS MACROS----------------------- */
 
-//*******************************************************************
-// Register Access Macro
-//*******************************************************************
+/********************************************************************
+* Register Access Macro
+********************************************************************/
 
 #define REG(x) (*((volatile uint32_t *)(x)))
 
-//*******************************************************************
-// Byte Extraction Macros
-//*******************************************************************
+/********************************************************************
+* Byte Extraction Macros
+********************************************************************/
 
 #define BYTE0(x) (((x) & 0xFF))
 #define BYTE1(x) ((((x) & 0xFF00)) >> 8)
 #define BYTE2(x) ((((x) & 0xFF0000)) >> 16)
 #define BYTE3(x) ((((x) & 0xFF000000)) >> 24)
 
-//******************************************************************* 
-// Bit Macro      
-//*******************************************************************
+/******************************************************************** 
+* Bit Macro      
+********************************************************************/
 
 #define BIT(x) (1 << (x))
 
 /* ---------------------------REGISTERS--------------------------- */
 
-//*******************************************************************
-// CONTROL_MODULE REGISTERS
-//*******************************************************************
+/********************************************************************
+* CONTROL_MODULE REGISTERS
+********************************************************************/
 
 #define CM_BASE 0x44E10000
 
@@ -73,9 +73,9 @@ extern void buddy();
 #define CONF_MDIO (CM_BASE + 0x948)
 #define CONF_MDC (CM_BASE + 0x94C)
 
-//*******************************************************************
-// CLOCK_MODULE REGISTERS
-//*******************************************************************
+/********************************************************************
+* CLOCK_MODULE REGISTERS
+********************************************************************/
 
 #define CM_PER_BASE 0x44E00000
 
@@ -83,9 +83,9 @@ extern void buddy();
 #define CM_PER_CPGMAC0_CLKCTRL (CM_PER_BASE + 0x14)
 #define CM_PER_CPSW_CLKSTCTRL (CM_PER_BASE + 0x144)
 
-//*******************************************************************
-// CPDMA REGISTERS
-//*******************************************************************
+/********************************************************************
+* CPDMA REGISTERS
+********************************************************************/
 
 #define CPDMA_BASE 0x4A100800
 
@@ -96,9 +96,9 @@ extern void buddy();
 
 #define DMASTATUS (CPDMA_BASE + 0x24)
 
-//*******************************************************************
-// CPSW_SL REGISTERS
-//*******************************************************************
+/********************************************************************
+* CPSW_SL REGISTERS
+********************************************************************/
 
 #define PORT1_BASE 0x4A100D80
 #define PORT2_BASE 0x4A100DC0
@@ -108,26 +108,26 @@ extern void buddy();
 
 #define PORT1_MACCONTROL (PORT1_BASE + 0x4)
 
-//*******************************************************************
-// CPSW_SS REGISTERS
-//*******************************************************************
+/********************************************************************
+* CPSW_SS REGISTERS
+********************************************************************/
 
 #define CPSW_SS_BASE 0x4A100000
 
 #define CPSW_SS_SOFT_RESET (CPSW_SS_BASE + 0x8)
 #define STAT_PORT_EN (CPSW_SS_BASE + 0xC)
 
-//*******************************************************************
-// CPSW_WR REGISTERS
-//*******************************************************************
+/********************************************************************
+* CPSW_WR REGISTERS
+********************************************************************/
 
 #define CPSW_WR_BASE 0x4A101200
 
 #define CPSW_WR_SOFT_RESET (CPSW_WR_BASE + 0x4)
 
-//*******************************************************************
-// CPDMA_STATERAM REGISTERS
-//*******************************************************************
+/********************************************************************
+* CPDMA_STATERAM REGISTERS
+********************************************************************/
 
 #define CPDMA_STATERAM_BASE 0x4A100A00
 
@@ -171,9 +171,9 @@ extern void buddy();
 #define RX6_CP (CPDMA_STATERAM_BASE + 0x78)
 #define RX7_CP (CPDMA_STATERAM_BASE + 0x7C)
 
-//*******************************************************************
-// MDIO REGISTERS
-//*******************************************************************
+/********************************************************************
+* MDIO REGISTERS
+********************************************************************/
 
 #define MDIO_BASE 0x4A101000
 
@@ -183,18 +183,18 @@ extern void buddy();
 
 #define MDIOUSERACCESS0 (MDIO_BASE + 0x80)
 
-//*******************************************************************
-// PHY REGISTERS
-//*******************************************************************
+/********************************************************************
+* PHY REGISTERS
+********************************************************************/
 
 #define PHY_BCR 0
 #define PHY_BSR 1
 #define PHY_AUTONEG_ADV 4
 #define PHY_PARTNER_CAP 5
 
-//*******************************************************************
-// CPSW_ALE REGISTERS
-//*******************************************************************
+/********************************************************************
+* CPSW_ALE REGISTERS
+********************************************************************/
 
 #define CPSW_ALE_BASE 0x4A100D00
 
@@ -208,9 +208,9 @@ extern void buddy();
 #define PORTCTL1 (CPSW_ALE_BASE + 0x44)
 #define PORTCTL2 (CPSW_ALE_BASE + 0x48)
 
-//*******************************************************************
-// CPSW_PORT REGISTERS
-//*******************************************************************
+/********************************************************************
+* CPSW_PORT REGISTERS
+********************************************************************/
 
 #define CPSW_PORT_BASE 0x4A100100
 
@@ -224,9 +224,9 @@ extern void buddy();
 #define P2_SA_LO (CPSW_PORT_BASE + 0x220)
 #define P2_SA_HI (CPSW_PORT_BASE + 0x224)
 
-//*******************************************************************
-// INTERRUPT REGISTERS
-//*******************************************************************
+/********************************************************************
+* INTERRUPT REGISTERS
+********************************************************************/
 
 #define INTERRUPTC_BASE 0x48200000
 #define INTC_MIR_CLEAR1 (INTERRUPTC_BASE + 0xA8)
@@ -239,9 +239,9 @@ extern void buddy();
 
 #define CPDMA_EOI_VECTOR (CPDMA_BASE + 0x94)
 
-//*******************************************************************
-// GPIO REGISTERS
-//*******************************************************************
+/********************************************************************
+* GPIO REGISTERS
+********************************************************************/
 
 #define GPIO1_BASE      0x4804C000
 #define GPIO_OE         (GPIO1_BASE + 0x134)
@@ -249,25 +249,25 @@ extern void buddy();
 
 /* ------------------------REGISTER VALUES------------------------- */
 
-//*******************************************************************
-// Interface Selection
-//*******************************************************************
+/********************************************************************
+* Interface Selection
+********************************************************************/
 
 #define GMII_MII_SELECT 0x0
 #define GMII_ENABLE BIT(5)
 #define OH_MBPS (BIT(16) | BIT(15))
 
-//*******************************************************************
-// Pin Muxing 
-//*******************************************************************
+/********************************************************************
+* Pin Muxing 
+********************************************************************/
 
 #define DEFAULT_PIN 0x0
 #define RECEIVE_ENABLE BIT(5)
 #define PULLUP_ENABLE BIT(4)
 
-//*******************************************************************
-// Clocks                                                        
-//*******************************************************************
+/********************************************************************
+* Clocks                                                        
+********************************************************************/
 
 #define CPGMAC0_ENABLE BIT(1)
 #define CPGMAC0_NOTREADY (BIT(16) | BIT(17))
@@ -275,16 +275,16 @@ extern void buddy();
 #define CPSWCLK_ENABLE BIT(1)
 #define CPSWCLK_READY BIT(4)
 
-//*******************************************************************
-// Software Reset                                                     
-//*******************************************************************
+/********************************************************************
+* Software Reset                                                     
+********************************************************************/
 
 #define START_RESET BIT(0)
 #define RESET_NOTDONE BIT(0)
 
-//*******************************************************************
-// DMA                                                            
-//*******************************************************************
+/********************************************************************
+* DMA                                                            
+********************************************************************/
 
 #define DESCRIPTOR_NULL 0x00000000
 
@@ -293,9 +293,9 @@ extern void buddy();
 
 #define CPDMA_ENABLE BIT(0)
 
-//*******************************************************************
-// ALE                                                               
-//*******************************************************************
+/********************************************************************
+* ALE                                                               
+********************************************************************/
 
 #define MAX_ALE_ENTRIES 1024
 #define ALE_ENTRY_WORDS 3
@@ -315,9 +315,9 @@ extern void buddy();
 
 #define TBLCTL_WRITE_READ BIT(31)
 
-//*******************************************************************
-// MDIO                                                               
-//*******************************************************************
+/********************************************************************
+* MDIO                                                               
+********************************************************************/
 
 #define MDIO_ENABLE BIT(30)
 #define MDIO_CLKDIV 124
@@ -325,37 +325,37 @@ extern void buddy();
 #define MDIO_FAULTENB BIT(18)
 #define MDIO_CLKDIV_MASK 0xFFFF
 
-//*******************************************************************
-// STATS                                                              
-//*******************************************************************
+/********************************************************************
+* STATS                                                              
+********************************************************************/
 
 #define STATS_DISABLE 0x00000000
 
-//*******************************************************************
-// Ports                                                             
-//*******************************************************************
+/********************************************************************
+* Ports                                                             
+********************************************************************/
 
 #define PORT_FORWARD (BIT(0) | BIT(1))
 
-//*******************************************************************
-// ETH                                                             
-//*******************************************************************
+/********************************************************************
+* ETH                                                             
+********************************************************************/
 
 #define MAC_ADDR_LEN 6
 #define MAX_PACKET_SIZE 1520
 
-//*******************************************************************
-// CPPI
-//*******************************************************************
+/********************************************************************
+* CPPI
+********************************************************************/
 
 #define CPPI_RAM 0x4A102000
 #define CPPI_SIZE 0x2000
 
 #define NUM_DESCRIPTORS 50
 
-//*******************************************************************
-// INTERRUPTS
-//*******************************************************************
+/********************************************************************
+* INTERRUPTS
+********************************************************************/
 
 #define CPSW_INTMASK_CLEAR (BIT(10) | BIT(9))
 
@@ -364,9 +364,9 @@ extern void buddy();
 #define EOI_TX BIT(1)
 #define EOI_RX BIT(0)
 
-//*******************************************************************
-// PHY
-//*******************************************************************
+/********************************************************************
+* PHY
+********************************************************************/
 
 #define GO_BIT BIT(31)
 #define PHY_READ 0x00000000
@@ -579,7 +579,7 @@ void cpsw_init_cpdma_descriptors(){
  * */
 void cpsw_config_ale(){
     
-    //REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE | BIT(4) | BIT(8);
+    /*REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE | BIT(4) | BIT(8);*/
     REG(CPSW_ALE_CONTROL) = ENABLE_ALE | CLEAR_ALE;
 }
 
@@ -615,7 +615,7 @@ void cpsw_set_ports_state(){
 
     REG(PORTCTL0) |= PORT_FORWARD;
     REG(PORTCTL1) |= PORT_FORWARD;
-    //REG(PORTCTL2) |= PORT_FORWARD;
+    /*REG(PORTCTL2) |= PORT_FORWARD;*/
 }
 
 /*
@@ -633,7 +633,7 @@ void get_ale_entry(uint32_t index, uint32_t* entrybuffer){
 	
     REG(TBLCTL) = index;
 
-    //REG(TBLCTL) &= ~TBLCTL_WRITE_READ;
+    /*REG(TBLCTL) &= ~TBLCTL_WRITE_READ;*/
 
     entrybuffer[0] = REG(TBLW0);
     entrybuffer[1] = REG(TBLW1);
@@ -852,11 +852,11 @@ void cpsw_setup_cpdma_descriptors(){
         /* TX */
 
 	/* Set Next Descriptor */    
-        //tx_cur = (cpdma_hdp*)((uint32_t) tx_start + (i * sizeof(cpdma_hdp)));
-	//tx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) tx_cur + sizeof(cpdma_hdp));
+        /*tx_cur = (cpdma_hdp*)((uint32_t) tx_start + (i * sizeof(cpdma_hdp)));*/
+	/*tx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) tx_cur + sizeof(cpdma_hdp));*/
 
         /* Set Flags */
-        //tx_cur->flags = TX_INIT_FLAGS;
+        /*tx_cur->flags = TX_INIT_FLAGS;*/
 
         /* RX */
 
@@ -871,9 +871,9 @@ void cpsw_setup_cpdma_descriptors(){
 	rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
 	rx_cur->buffer_length = MAX_PACKET_SIZE;
 
-	//uart0_printf("RX_CUR  %x -> next %x\n",rx_cur,rx_cur->next_descriptor);
-	//uart0_printf("RX_CUR flags %x\n", rx_cur->flags);
-	//uart0_printf("index %d\n",i);
+	/*uart0_printf("RX_CUR  %x -> next %x\n",rx_cur,rx_cur->next_descriptor);*/
+	/*uart0_printf("RX_CUR flags %x\n", rx_cur->flags);*/
+	/*uart0_printf("index %d\n",i);*/
 
     }
 
@@ -884,11 +884,11 @@ void cpsw_setup_cpdma_descriptors(){
     eth_interface.txch.num_descriptors = 1;
 
     
-    //eth_interface.txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));
-    //eth_interface.txch.tail->next_descriptor = 0;
-    //eth_interface.txch.tail->flags = TX_INIT_FLAGS;
+    /*eth_interface.txch.tail = (cpdma_hdp*)((uint32_t) tx_start + (num_descriptors - 1) * sizeof(cpdma_hdp));*/
+    /*eth_interface.txch.tail->next_descriptor = 0;*/
+    /*eth_interface.txch.tail->flags = TX_INIT_FLAGS;*/
 
-    //eth_interface.txch.free = eth_interface.txch.head;
+    /*eth_interface.txch.free = eth_interface.txch.head;*/
 
     eth_interface.rxch.head = rx_start;
     eth_interface.rxch.num_descriptors = num_descriptors;
@@ -932,7 +932,7 @@ void cpsw_config_interrupts(){
     REG(C0_TX_EN) = CPDMA_CHANNEL_INT;
 
     /* Ack Interrupts */
-    //REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
+    /*REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;*/
 
 }
 
@@ -1101,7 +1101,7 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
     cpdma_hdp* tx_desc = eth_interface.txch.head;
     uint32_t len = size / sizeof(uint32_t);
 
-    //hex_dump(packet,size);
+    /*hex_dump(packet,size);*/
 
     tx_desc->next_descriptor = 0;
     tx_desc->buffer_pointer = packet;
@@ -1113,7 +1113,7 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
     uart0_printf("Transmiting Packet\n");
 
-    // TX INT STAT RAW
+    /* TX INT STAT RAW*/
     while (!REG(CPDMA_BASE + 0x80)){}
 
     uart0_printf("Packet Transmited\n"); 
@@ -1128,14 +1128,14 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
     kfree(packet);
 
-    // HARD WARE BUG TRYING TO FIX THIS 
+    /* HARD WARE BUG TRYING TO FIX THIS */
     
-    //software_reset(CPDMA_SOFT_RESET);
-    //cpsw_init_cpdma_descriptors();
-    //cpsw_setup_cpdma_descriptors();
-    //cpsw_enable_cpdma_controller();
-    //cpsw_config_interrupts();
-    //cpsw_start_recieption();
+    /*software_reset(CPDMA_SOFT_RESET);*/
+    /*cpsw_init_cpdma_descriptors();*/
+    /*cpsw_setup_cpdma_descriptors();*/
+    /*cpsw_enable_cpdma_controller();*/
+    /*cpsw_config_interrupts();*/
+    /*cpsw_start_recieption();*/
 
     return REG(CPDMA_BASE + 0x80);
 
@@ -1150,7 +1150,7 @@ void process_packet(uint8_t* packet, int size){
 
      uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
 
-     //hex_dump((uint32_t*)packet,size);
+     /*hex_dump((uint32_t*)packet,size);*/
 
      if(size) eth_recv((uint32_t*)packet,size);
 
@@ -1170,7 +1170,7 @@ int cpsw_recv(){
 
     int eoq = 0;
 
-    // int status raw need to replace this with macro
+    /* int status raw need to replace this with macro*/
     uint32_t status = REG(CPDMA_BASE + 0xA0);
 
     uart0_printf("Starting Packet Processing\n");
@@ -1193,7 +1193,7 @@ int cpsw_recv(){
 
 	start = start->next_descriptor;
 
-	// End of queue
+	/* End of queue*/
 	if (start == 0){   
 	    eoq = 1;
             uart0_printf("End of queue reached\n");
@@ -1229,14 +1229,14 @@ int cpsw_recv(){
  * */
 void phy_reset(void)
 {
-    // Configure GPIO1_8 as an output by clearing its bit in the OE register.
+    /* Configure GPIO1_8 as an output by clearing its bit in the OE register. */
     REG(GPIO_OE) &= ~PHY_RESET_BIT;
 
-    // Assert PHY reset 
+    /* Assert PHY reset  */
     REG(GPIO_DATAOUT) &= ~PHY_RESET_BIT;
     buddy();  
 
-    // Deassert PHY reset
+    /* Deassert PHY reset */
     REG(GPIO_DATAOUT) |= PHY_RESET_BIT;
     buddy();  
 }
@@ -1395,7 +1395,7 @@ void debug(){
     uart0_printf("RX CP %x\n",REG(RX0_CP));
     uart0_printf("RX CP flags %x\n",((cpdma_hdp*)REG(RX0_CP))->flags);
     uart0_printf("RX CP next %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor);
-    //uart0_printf("RX CP next flags %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor->flags);
+    /*uart0_printf("RX CP next flags %x\n",((cpdma_hdp*)REG(RX0_CP))->next_descriptor->flags);*/
     uart0_printf("RXCH tail %x\n",eth_interface.rxch.tail);
     uart0_printf("RXCH tail flags %x\n",eth_interface.rxch.tail->flags);
 
@@ -1538,18 +1538,18 @@ void init_network_stack(){
 
     cpsw_recv();
 
-    //REG(C0_RX_EN) = 0;
-    //REG(C0_TX_EN) = 0;
+    /*REG(C0_RX_EN) = 0; */
+    /*REG(C0_TX_EN) = 0;*/
 
-    //REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
+    /*REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX; */
 
-    //cpsw_recv();
+    /*cpsw_recv(); */
 
-    //REG(C0_RX_EN) = CPDMA_CHANNEL_INT;
-    //REG(C0_TX_EN) = CPDMA_CHANNEL_INT;
+    /*REG(C0_RX_EN) = CPDMA_CHANNEL_INT;*/
+    /*REG(C0_TX_EN) = CPDMA_CHANNEL_INT;*/
 
     while(1){
-       //cpsw_recv();
+       /*cpsw_recv(); */
        buddy();
        uint8_t* packet = (uint8_t*) kmalloc(128);
        packet[14] = 0;

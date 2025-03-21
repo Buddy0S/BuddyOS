@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include "uart.h"
 #include "proc.h"
+#include "syscall.h"
+#include "syserr.h"
 
 /* Round-robin yield: switches context to the next process */
 void schedule(void) {
@@ -22,15 +24,16 @@ int32_t add_two_numbers(int a, int b) {
 void execute_syscall(uint32_t svc_num, uint32_t* args) {
     /* might refactor this */
     switch (svc_num) {
-        case 0:
+        case SYSCALL_YIELD_NR:
             uart0_printf("yield\n");
             break;
-        case 1:
+        case SYSCALL_TEST_2_ARGS_NR:
             uart0_printf("add two numbers together tye shi\n");
             args[0] = add_two_numbers(args[0], args[1]);
             break;
         default:
-            uart0_printf("unknown\n");
+            uart0_printf("unknown/unimplemented\n");
+            args[0] = -ENOSYS;
             break;
     }
 
@@ -38,7 +41,7 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
 
 
 void dispatcher(void) {
-    // run first process
+
     uart0_printf("\nstart of dispatcher\n");
     while (1) {
         if (current_process->started) {
@@ -55,6 +58,7 @@ void dispatcher(void) {
                 current_process->trap_reason = HANDLED;
                 switch_to_irq(kernel_process, current_process);
             }
+            /* check for handled */
         } else {
             current_process->started = true;
             switch_to_start(kernel_process, current_process);    
