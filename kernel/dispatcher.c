@@ -126,8 +126,10 @@ void wake_proc(int pid) {
         return;
     }
 
-    pcb->state = READY;
-    list_add_tail(&ready_queue, &pcb->sched_node);
+    if (pcb->state != READY) {
+        pcb->state = READY;
+        list_add_tail(&ready_queue, &pcb->sched_node);
+    }
 }
 
 void block() {
