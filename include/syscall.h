@@ -13,8 +13,8 @@
     asm volatile ("wfi  \n\t");             \
 })  
 
-#define SYSCALL_YIELD_NR        0
-#define SYSCALL_TEST_2_ARGS_NR  1
+#define SYSCALL_TEST_2_ARGS_NR  0
+#define SYSCALL_YIELD_NR        1
 #define SYSCALL_MALLOC_NR       2
 #define SYSCALL_FORK_NR         3
 #define SYSCALL_KILL_NR         4
