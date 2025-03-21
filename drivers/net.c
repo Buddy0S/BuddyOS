@@ -409,6 +409,16 @@ extern void buddy();
 #define IPV4 0x0800
 #define ARP 0x0806
 
+//*******************************************************************
+// ARP
+//*******************************************************************
+
+#define ARP_REQUEST 0x0001
+#define ARP_REPLY 0x0002
+#define ARP_HARDWARE_SIZE 6
+#define ARP_PROTOCOL_SIZE 4
+#define HARDWARE_TYPE 0x0001
+
 /* ----------------------------STRUCTS----------------------------- */
 
 /* CPDMA header discriptors */
@@ -434,6 +444,7 @@ typedef struct cpdma_channel {
 /* Ethernet Interface */
 typedef struct cpsw_interface {
 
+    uint32_t ip_addr;	
     uint8_t mac_addr[MAC_ADDR_LEN];
     cpdma_ch txch;
     cpdma_ch rxch;
@@ -1198,7 +1209,7 @@ void process_packet(uint8_t* packet, int size){
 
      uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
 
-     hex_dump((uint32_t*)packet,size);
+     //hex_dump((uint32_t*)packet,size);
 
      if(size) eth_recv((uint32_t*)packet,size);
 
@@ -1509,22 +1520,22 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
 
     uart0_printf("Hardware Type %x\n",frame_arp.hardware_type);
 
-    frame_arp.protocol_type = word2 & 0xFFFF0000;
+    frame_arp.protocol_type = (word2 & 0xFFFF0000) >> 16;
 
     uart0_printf("Protocol Type %x\n",frame_arp.protocol_type);
 
-    frame_arp.hardware_length = word2 & 0x0000FF00;
+    frame_arp.hardware_length = (word2 & 0x0000FF00) >> 8;
 
     frame_arp.protocol_length = word2 & 0x000000FF;
 
-    frame_arp.operation = word3 & 0xFFFF0000;
+    frame_arp.operation = (word3 & 0xFFFF0000) >> 16;
 
-    frame_arp.src_mac[0] = word3 & 0x0000FF00;
-    frame_arp.src_mac[1] = word3 & 0x000000FF;
-    frame_arp.src_mac[2] = word4 & 0xFF000000;
-    frame_arp.src_mac[3] = word4 & 0x00FF0000;
-    frame_arp.src_mac[4] = word4 & 0x0000FF00;
-    frame_arp.src_mac[5] = word4 & 0x000000FF;
+    frame_arp.src_mac[0] = BYTE1(word3);
+    frame_arp.src_mac[1] = BYTE0(word3);
+    frame_arp.src_mac[2] = BYTE3(word4);
+    frame_arp.src_mac[3] = BYTE2(word4);
+    frame_arp.src_mac[4] = BYTE1(word4);
+    frame_arp.src_mac[5] = BYTE0(word4);
 
     uart0_printf("Source MAC\n");
     print_mac(frame_arp.src_mac);
@@ -1534,21 +1545,40 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
     uart0_printf("Source IP\n");
     print_ip(frame_arp.src_ip);
 
-    frame_arp.dest_mac[0] = word6 & 0xFF000000;
-    frame_arp.dest_mac[1] = word6 & 0x00FF0000;
-    frame_arp.dest_mac[2] = word6 & 0x0000FF00;
-    frame_arp.dest_mac[3] = word6 & 0x000000FF;
-    frame_arp.dest_mac[4] = word7 & 0xFF000000;
-    frame_arp.dest_mac[5] = word7 & 0x00FF0000;
+    frame_arp.dest_mac[0] = BYTE3(word6);
+    frame_arp.dest_mac[1] = BYTE2(word6);
+    frame_arp.dest_mac[2] = BYTE1(word6);
+    frame_arp.dest_mac[3] = BYTE0(word6);
+    frame_arp.dest_mac[4] = BYTE3(word7);
+    frame_arp.dest_mac[5] = BYTE2(word7);
 
     uart0_printf("Destination MAC\n");
     print_mac(frame_arp.dest_mac);
 
-    frame_arp.dest_ip = (word7 & 0x0000FFFF) | (word8 & 0xFFFF0000);
+    frame_arp.dest_ip = (word7 & 0x0000FFFF) << 16 | (word8 & 0xFFFF0000) >> 16;
 
     uart0_printf("Destination IP\n");
     print_ip(frame_arp.dest_ip);
 
+    switch (frame_arp.operation){
+    
+        case ARP_REQUEST:
+	    {
+	    
+	    }
+	    break;
+
+	case ARP_REPLY:
+	    {
+	    
+	    }
+	    break;
+
+	default:
+	    {
+	    
+	    }
+    }
 
 }
 
@@ -1626,7 +1656,50 @@ void eth_recv(uint32_t* frame, int size){
     }
 }
 
-void arp_gratuitous(){
+void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type);
+
+/*
+ *
+ * */
+void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint32_t dest_ip, uint16_t opcode){
+
+    frame[14] = (HARDWARE_TYPE & 0xFF00) >> 8;
+    frame[15] = HARDWARE_TYPE & 0x00FF;
+
+    frame[16] = (IPV4 & 0xFF00) >> 8;
+    frame[17] = IPV4 & 0x00FF;
+
+    frame[18] = ARP_HARDWARE_SIZE;
+    frame[19] = ARP_PROTOCOL_SIZE;
+
+    frame[20] = (opcode & 0xFF00) >> 8;
+    frame[21] = opcode & 0x00FF;
+
+    frame[22] = eth_interface.mac_addr[0];
+    frame[23] = eth_interface.mac_addr[1];
+    frame[24] = eth_interface.mac_addr[2];
+    frame[25] = eth_interface.mac_addr[3];
+    frame[26] = eth_interface.mac_addr[4];
+    frame[27] = eth_interface.mac_addr[5];
+
+    frame[28] = BYTE3(eth_interface.ip_addr);
+    frame[29] = BYTE2(eth_interface.ip_addr);
+    frame[30] = BYTE1(eth_interface.ip_addr);
+    frame[31] = BYTE0(eth_interface.ip_addr);
+
+    frame[32] = dest_mac[0];
+    frame[33] = dest_mac[1];
+    frame[34] = dest_mac[2];
+    frame[35] = dest_mac[3];
+    frame[36] = dest_mac[4];
+    frame[37] = dest_mac[5];
+
+    frame[38] = BYTE3(dest_ip);
+    frame[39] = BYTE2(dest_ip);
+    frame[40] = BYTE1(dest_ip);
+    frame[41] = BYTE0(dest_ip);
+
+    eth_transmit(frame,size,dest_mac,ARP);
 
 }
 
@@ -1636,7 +1709,9 @@ void arp_gratuitous(){
  *  - first 14 bytes of buffer must be free for header to be added
  *
  * */
-void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint8_t* src, uint16_t type){
+void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
+
+    uint8_t* src = eth_interface.mac_addr;
 
     uart0_printf("Crafting Ethernet Frame\n");	
  
@@ -1679,6 +1754,8 @@ void init_network_stack(){
 
     phy_init();
 
+    eth_interface.ip_addr = STATIC_IP;
+
     uint8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
 
     uint16_t type = 0x1234;
@@ -1701,9 +1778,9 @@ void init_network_stack(){
        cpsw_recv();
        buddy();
        uint8_t* packet = (uint8_t*) kmalloc(128);
-       packet[14] = 0;
-       packet[15] = 0;
-       eth_transmit(packet,128, multicast, eth_interface.mac_addr, type);
+       
+       // GARP
+       arp_transmit(packet,128, multicast, eth_interface.ip_addr, ARP_REQUEST);
     }
 
 }
