@@ -348,7 +348,6 @@ extern void buddy();
 
 #define MAC_ADDR_LEN 6
 #define MAX_PACKET_SIZE 1520
-#define STATIC_IP 0xC0A80114
 
 //*******************************************************************
 // CPPI
@@ -419,6 +418,13 @@ extern void buddy();
 #define ARP_PROTOCOL_SIZE 4
 #define HARDWARE_TYPE 0x0001
 
+//*******************************************************************
+// IPV4                                                               
+//*******************************************************************
+
+#define STATIC_IP 0xC0A80114
+#define IPV4_HEADER_SIZE 20
+
 /* ----------------------------STRUCTS----------------------------- */
 
 /* CPDMA header discriptors */
@@ -474,6 +480,24 @@ typedef struct arp {
     uint32_t dest_ip;
 
 } arp_header;
+
+typedef struct ipv4 {
+
+    uint8_t version;
+    uint8_t ihl;
+    uint8_t dhsp;
+    uint8_t ecn;
+    uint16_t total_length;
+    uint16_t identification;
+    uint8_t flags;
+    uint16_t fragment_offset;
+    uint8_t time_to_live;
+    uint8_t protocol;
+    uint16_t header_checksum;
+    uint32_t src_ip;
+    uint32_t dest_ip;
+
+} ipv4_header;
 
 /* --------------------------CPSW CODE----------------------------- */
 
@@ -1172,7 +1196,7 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
     REG(TX0_HDP) = (uint32_t) tx_desc;
 
-    uart0_printf("\n\nTransmiting Packet\n");
+    uart0_printf("Transmiting Packet\n");
 
     // TX INT STAT RAW
     while (!REG(TX_INT_STATUS_RAW)){}
@@ -1243,7 +1267,7 @@ int cpsw_recv(){
 
     while (!(start->flags & BIT(29))){
     
-        uart0_printf("Packet Recieved\n");
+        uart0_printf("\nPacket Recieved\n");
 
 	process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
 
@@ -1488,7 +1512,7 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
 
     uint8_t* src = eth_interface.mac_addr;
 
-    uart0_printf("Crafting Ethernet Frame\n");	
+    uart0_printf("\nCrafting Ethernet Frame\n");	
  
     frame[0] = dest[0];
     frame[1] = dest[1];
@@ -1519,6 +1543,7 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
 }
 
 void arp_recv(ethernet_header frame_header, uint32_t* frame, int size);
+void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size);
 
 /*
  * eth_recv()
@@ -1548,8 +1573,8 @@ void eth_recv(uint32_t* frame, int size){
     frame_header.destination_mac[4] = BYTE3(word2);
     frame_header.destination_mac[5] = BYTE2(word2);
 
-    uart0_printf("Destination MAC: \n");
-    print_mac(frame_header.destination_mac);
+    //uart0_printf("Destination MAC: \n");
+    //print_mac(frame_header.destination_mac);
 
     frame_header.source_mac[0] = BYTE1(word2);
     frame_header.source_mac[1] = BYTE0(word2);
@@ -1558,12 +1583,12 @@ void eth_recv(uint32_t* frame, int size){
     frame_header.source_mac[4] = BYTE1(word3);
     frame_header.source_mac[5] = BYTE0(word3);
 
-    uart0_printf("Source MAC: \n");
-    print_mac(frame_header.source_mac);
+    //uart0_printf("Source MAC: \n");
+    //print_mac(frame_header.source_mac);
 
     frame_header.type = (BYTE3(word4) << 8) | (BYTE2(word4));
 
-    uart0_printf("Frame Type: %x \n",frame_header.type);
+    //uart0_printf("Frame Type: %x \n",frame_header.type);
 
     switch (frame_header.type) {
     
@@ -1583,7 +1608,15 @@ void eth_recv(uint32_t* frame, int size){
 
 	case IPV4:
 	    {
+
 		uart0_printf("Packet Type IPV4\n");
+
+		// skip frame header but include ether type for alignment
+
+                frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t));
+                                                                                      size = size - 3*sizeof(uint32_t);
+
+		ipv4_recv(frame_header,frame,size);
 	    }
 	    break;
 
@@ -1714,11 +1747,11 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
 
     frame_arp.hardware_type = word1 & 0x0000FFFF;
 
-    uart0_printf("Hardware Type %x\n",frame_arp.hardware_type);
+    //uart0_printf("Hardware Type %x\n",frame_arp.hardware_type);
 
     frame_arp.protocol_type = (word2 & 0xFFFF0000) >> 16;
 
-    uart0_printf("Protocol Type %x\n",frame_arp.protocol_type);
+    //uart0_printf("Protocol Type %x\n",frame_arp.protocol_type);
 
     frame_arp.hardware_length = (word2 & 0x0000FF00) >> 8;
 
@@ -1733,13 +1766,13 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
     frame_arp.src_mac[4] = BYTE1(word4);
     frame_arp.src_mac[5] = BYTE0(word4);
 
-    uart0_printf("Source MAC\n");
-    print_mac(frame_arp.src_mac);
+    //uart0_printf("Source MAC\n");
+    //print_mac(frame_arp.src_mac);
 
     frame_arp.src_ip = word5;
 
-    uart0_printf("Source IP\n");
-    print_ip(frame_arp.src_ip);
+    //uart0_printf("Source IP\n");
+    //print_ip(frame_arp.src_ip);
 
     frame_arp.dest_mac[0] = BYTE3(word6);
     frame_arp.dest_mac[1] = BYTE2(word6);
@@ -1748,13 +1781,13 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
     frame_arp.dest_mac[4] = BYTE3(word7);
     frame_arp.dest_mac[5] = BYTE2(word7);
 
-    uart0_printf("Destination MAC\n");
-    print_mac(frame_arp.dest_mac);
+    //uart0_printf("Destination MAC\n");
+    //print_mac(frame_arp.dest_mac);
 
     frame_arp.dest_ip = (word7 & 0x0000FFFF) << 16 | (word8 & 0xFFFF0000) >> 16;
 
-    uart0_printf("Destination IP\n");
-    print_ip(frame_arp.dest_ip);
+    //uart0_printf("Destination IP\n");
+    //print_ip(frame_arp.dest_ip);
 
     switch (frame_arp.operation){
     
@@ -1775,6 +1808,12 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
 	    
 	    }
     }
+
+}
+
+/* --------------------------IPV4----------------------------- */
+
+void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
 
 }
 
