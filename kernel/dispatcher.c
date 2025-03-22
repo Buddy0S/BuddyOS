@@ -101,9 +101,9 @@ void dispatcher(void) {
 
         /* after dealing with last process, schedule next process to run */
         if (current_process->state == BLOCKED) {
-            current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
             current_process->cpu_time = PROC_QUANTUM;
             current_process->quantum_elapsed = false;
+            current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
         }
         else if (current_process->status == 66) {
             current_process->cpu_time = PROC_QUANTUM;
