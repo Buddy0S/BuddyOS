@@ -61,7 +61,7 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             break;
 	case SYSCALL_FORK_NR:
     	    uart0_printf("fork syscall\n");
-    	    args[0] = do_fork();
+    	    args[0] = fork();
     	    break;
         default:
             uart0_printf("unknown\n");
@@ -156,7 +156,7 @@ void block() {
     list_pop(&ready_queue); /* clears the current process out of the queue */
 }
 
-int32_t do_fork(void) {
+int32_t fork(void) {
     // Find a free PCB (state == DEAD)
     int child_pid = -1;
     for (int i = 0; i < MAX_PROCS; i++) {

@@ -123,8 +123,26 @@ int __msg_waiting() {
     return SYSCALL(SYSCALL_MSG_WAITING_NR);
 }
 
+int __fork() {
+	return SYSCALL(SYSCALL_FORK_NR);
+}	
 
 void process0(void) {
+    
+    // Call fork and capture its return value.
+    int fork_result = fork();
+
+    // Check the result
+    if (fork_result == -1) {
+        uart0_printf("Process 0: fork failed!\n");
+    } else if (fork_result == 0) {
+        // This branch is executed in the child
+        uart0_printf("Process 0 (child): My PID is %d\n", current_process->pid);
+    } else {
+        // This branch is executed in the paren
+        uart0_printf("Process 0 (parent): fork returned child PID %d\n", fork_result);
+    }
+	
     int author;
     char msg[20];
     uint32_t len;
