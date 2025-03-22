@@ -158,7 +158,7 @@ int fat12_find(const char* filename, uint32_t* buffer, uint32_t* entryIndex) {
         i++) {
 
         MMCreadblock(i, buffer);
-        uart0_printf("Reading Sector %d ...\n", i);
+        /*uart0_printf("Reading Sector %d ...\n", i);*/
 
         char *buf = (char*)buffer;
 

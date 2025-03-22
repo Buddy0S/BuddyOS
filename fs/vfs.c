@@ -65,13 +65,9 @@ int vfs_open(char* path, int flags) {
 	file_descriptor* fdOpen = NULL;
 	int fdNum = -1;
 
-	uart0_printf("Got to vfs_open(), %s, %d\n", path, flags);
-
 	if (openCount == MAX_OPENED_FILES) {
 		return MAX_REACHED; /* max files open */
 	}
-
-	uart0_printf("Mnt pnt = %s\n", mnt->fs_mountpoint);
 
 	if (mnt != NULL) {
 
@@ -89,14 +85,11 @@ int vfs_open(char* path, int flags) {
 						return ALREADY_OPEN;
 					}
 
-					uart0_printf("CHECKING DUPE\n");	
 				}
 				else if (fdNum < 0) {
 						fdNum = i;
 				}
 			}
-
-			uart0_printf("fdNum = %d\n", fdNum);
 
 			vfs_openFiles[fdNum] = fdOpen;
 			openCount++;
