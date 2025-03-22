@@ -228,8 +228,12 @@ int main(){
     } else {
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
+  
+    /* Initialise all PCBs */
+    for (int i = 0; i < MAX_PROCS; i++) {
+    	PROC_TABLE[i].state = DEAD;
+    }
 
-    
     /* Initialize the ready queue */
     init_ready_queue();
 
