@@ -58,6 +58,10 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             uart0_printf("IPC MSGWAITS\n");
             args[0] = msg_waiting();
             break;
+	case SYSCALL_FORK_NR:
+    	    uart0_printf("fork syscall\n");
+    	    args[0] = do_fork();
+    	    break;
         default:
             uart0_printf("unknown\n");
             break;

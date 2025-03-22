@@ -9,7 +9,9 @@ extern int current_index;
 void yield(void) {}
 
 /* fork */
-int fork(void) {}
+int fork(void) {
+    return SYSCALL(SYSCALL_FORK_NR);
+}
 
 /* malloc (temp) */
 void *malloc(size_t size) {
