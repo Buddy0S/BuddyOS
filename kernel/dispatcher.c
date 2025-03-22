@@ -3,6 +3,7 @@
 #include "proc.h"
 #include <syscall.h>
 #include <srr_ipc.h>
+#include <memory.h>
 
 /* Round-robin yield: switches context to the next process */
 void schedule(void) {
@@ -118,7 +119,7 @@ void dispatcher(void) {
             current_process->quantum_elapsed = false;
             current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
         }
-        else if (current_process->status == 66) {
+        else if (current_process->quantum_elapsed) {
             current_process->cpu_time = PROC_QUANTUM;
             current_process->quantum_elapsed = false;
             schedule();
@@ -155,3 +156,54 @@ void block() {
     list_pop(&ready_queue); /* clears the current process out of the queue */
 }
 
+int32_t do_fork(void) {
+    // Find a free PCB (state == DEAD)
+    int child_pid = -1;
+    for (int i = 0; i < MAX_PROCS; i++) {
+        if (PROC_TABLE[i].state == DEAD) {
+            child_pid = i;
+            break;
+        }
+    }
+    if (child_pid == -1) return -1; // No free process slot
+
+    PCB *parent = current_process;
+    PCB *child = &PROC_TABLE[child_pid];
+
+    // 1. Copy parent's stack to child's stack
+    uint32_t *child_stack = PROC_STACKS[child_pid];
+    kmemcpy(child_stack, parent->stack_base, STACK_SIZE * sizeof(uint32_t));
+
+    // 2. Set child's stack pointer (same offset as parent)
+    uint32_t parent_stack_offset = parent->stack_ptr - parent->stack_base;
+    child->stack_ptr = child_stack + parent_stack_offset;
+
+    // 3. Copy parent's saved context (registers r4-r11, lr)
+    child->context = parent->context;
+
+    // 4. Adjust child's saved r0 (syscall return value) to 0
+    uint32_t *parent_args = parent->r_args;
+    uint32_t parent_arg_offset = parent_args - parent->stack_base;
+    uint32_t *child_args = child_stack + parent_arg_offset;
+    *child_args = 0; // Child returns 0
+
+    // 5. Initialize child's PCB
+    child->pid = child_pid;
+    child->ppid = parent->pid;
+    child->state = READY;
+    child->prio = parent->prio;
+    child->stack_base = child_stack;
+    child->started = false; // Dispatcher will use switch_to_start
+    child->trap_reason = HANDLED;
+    child->cpu_time = PROC_QUANTUM;
+    child->quantum_elapsed = false;
+
+    // 6. Initialize child's mailbox (don't inherit parent's messages)
+    srr_init_mailbox(&child->mailbox);
+
+    // 7. Add child to ready queue
+    list_add_tail(&ready_queue, &child->sched_node);
+
+    uart0_printf("fork: created child PID %d\n", child_pid);
+    return child_pid;
+}
