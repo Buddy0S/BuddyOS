@@ -60,8 +60,8 @@ void dispatcher(void) {
             switch_to_start(kernel_process, current_process);    
         }
         uart0_printf("\nreturned to dispatcher from process #%d\n", current_process->pid);
-
-        uart0_printf("trap reason: ");
+        
+		uart0_printf("trap reason: ");
         switch (current_process->trap_reason) {
             case SYSCALL:
                 uart0_printf("syscall #%d = ", current_process->status);

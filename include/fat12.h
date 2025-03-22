@@ -12,6 +12,12 @@
 #define FAT12_EOF_MIN 0xFF8 /*0xFF8 - 0xFFF: last cluster in a file*/
 #define FAT12_EOF_MAX 0xFFF
 
+/* File attributes */
+#define R_ONLY 0x01
+#define HIDDEN 0x02
+#define SYSTEM 0x04
+#define SUBDIR 0x10
+
 typedef struct fat_bs {
 	unsigned char bootJmp[3]; /* jump over disk format info to actual executable code */
 	unsigned char oemName[8]; /* original equipment manufacturer, states formatting standards */
@@ -52,11 +58,15 @@ typedef struct {
     uint16_t modifyDate;
     uint16_t firstClusterLow;  /* Low 16-bits of the first cluster number */
     uint32_t fileSize;
-} __attribute__((packed)) DirEntry;
+} __attribute__((packed, aligned(4))) DirEntry;
 
 
-void fat12_init(unsigned int startSector, volatile uint32_t* buffer); 
-int fat12_find(volatile char* filename, volatile uint32_t* buffer,
-    volatile uint16_t *startCluster, volatile uint32_t *fileSize); 
-uint32_t fat12_read_file(volatile char* filename, volatile uint32_t* buffer);
+void fat12_init(unsigned int startSector, uint32_t* buffer); 
+int fat12_find(const char* filename, uint32_t* buffer,
+    uint32_t* entryIndex); 
+uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempBuffer);
+uint32_t fat12_create_dir_entry(const char* filename,
+	uint8_t attributes, uint32_t* buffer); 
+uint32_t fat12_write_file(const char* filename, char* data, uint32_t size, 
+	uint32_t* tempBuffer); 
 #endif
