@@ -63,6 +63,7 @@ int vfs_open(char* path, int flags) {
 	mountpoint *mnt = get_mountpoint(path);
 	char relPath[VFS_PATH_LEN];
 	file_descriptor* fdOpen = NULL;
+	int fdNum = -1;
 
 	uart0_printf("Got to vfs_open(), %s, %d\n", path, flags);
 
@@ -73,19 +74,34 @@ int vfs_open(char* path, int flags) {
 	uart0_printf("Mnt pnt = %s\n", mnt->fs_mountpoint);
 
 	if (mnt != NULL) {
-		
-		fdOpen = mnt->operations.open(path + strlen(mnt->fs_mountpoint) + 1,
-			flags);
+
+		strcpy(relPath, path + strlen(mnt->fs_mountpoint) + 1);
+
+		fdOpen = mnt->operations.open(relPath, flags);
 
 		if (fdOpen != NULL) {
 
 			for (int i = 0; i < MAX_OPENED_FILES; i++) {
-				if (vfs_openFiles[i] == NULL) {
-					vfs_openFiles[i] = fdOpen;
-					openCount++;
-					return i; /* Return fd id */
+				if (vfs_openFiles[i] != NULL) {
+					if(strcmp(vfs_openFiles[i]->file_name, relPath) == 0) {
+						kfree(fdOpen->file_buffer);
+						kfree(fdOpen);
+						return ALREADY_OPEN;
+					}
+
+					uart0_printf("CHECKING DUPE\n");	
+				}
+				else if (fdNum < 0) {
+						fdNum = i;
 				}
 			}
+
+			uart0_printf("fdNum = %d\n", fdNum);
+
+			vfs_openFiles[fdNum] = fdOpen;
+			openCount++;
+			return fdNum; /* Return fd id */
+
 		}
 		else {
 			return NOT_FOUND; /* File not found */
@@ -102,6 +118,10 @@ int vfs_close(int fd) {
 	int mountpoint_id; 
 	int result = 1;
 
+	if (fd < 0 || fd > MAX_OPENED_FILES - 1) {
+		return INVALID_FD;
+	}
+
 	if (vfs_openFiles[fd] != NULL) {
 
 		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
@@ -109,7 +129,7 @@ int vfs_close(int fd) {
 
 		result = mnt.operations.close(vfs_openFiles[fd]);
 
-		if (result != 0) {
+		if (result == 0) {
 			vfs_openFiles[fd] = NULL;
 			openCount--;
 			return 0;
@@ -131,6 +151,10 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 	int mountpoint_id;
 	mountpoint mnt;
 	int bytesRead = 0;
+
+	if (fd < 0 || fd > MAX_OPENED_FILES - 1) {
+		return INVALID_FD;
+	}
 
 	if (vfs_openFiles[fd] != NULL) {
 		
@@ -156,6 +180,10 @@ uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
 	int mountpoint_id;
 	mountpoint mnt;
 	int bytesRead = 0;
+
+	if (fd < 0 || fd > MAX_OPENED_FILES - 1) {
+		return INVALID_FD;
+	}
 
 	if (vfs_openFiles[fd] != NULL) {
 		

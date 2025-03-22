@@ -14,13 +14,15 @@
 #define O_WRITE 0x02
 
 /* Error codes */
-#define MAX_REACHED				-1
-#define MEM_ERROR				-2
+#define MAX_REACHED			-1
+#define MEM_ERROR			-2
 #define NOT_FOUND			-3
 #define NOT_OPEN			-4
 #define INCORRECT_MODE		-5
-#define INVALID_MOUNTPOINT		-6
-#define CLOSE_ERROR				-7
+#define INVALID_MOUNTPOINT	-6
+#define CLOSE_ERROR			-7
+#define ALREADY_OPEN		-8
+#define INVALID_FD			-9
 
 typedef struct {
   char file_name[16];

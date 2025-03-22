@@ -56,9 +56,11 @@ file_descriptor* fat12_open(const char* path, int flags) {
 		fat12_read_file(path, (uint32_t*)fdOpen->file_buffer, tempBuffer);
 
 		uart0_printf("File Contents = %s\n", fdOpen->file_buffer);
+
+		return fdOpen;
 		
 	}
-	else {
+	else if (flags & O_WRITE){
 		/* Create file */
 		fat12_write_file(path, "", 0, tempBuffer);
 
@@ -76,9 +78,11 @@ file_descriptor* fat12_open(const char* path, int flags) {
 			return NULL;
 		}
 
+		return fdOpen;
+
 	}
 
-	return fdOpen;
+	return NULL;
 }
 
 int fat12_close(file_descriptor* fd) {
