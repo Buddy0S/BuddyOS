@@ -133,6 +133,11 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 	int bytesRead = 0;
 
 	if (vfs_openFiles[fd] != NULL) {
+		
+		if (!(vfs_openFiles[fd]->flags & O_READ)) {
+			return -4; /* Incorrect Mode */
+		}
+
 		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
 		mnt = vfs_mountpoints[mountpoint_id];
 
@@ -153,6 +158,11 @@ uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
 	int bytesRead = 0;
 
 	if (vfs_openFiles[fd] != NULL) {
+		
+		if (!(vfs_openFiles[fd]->flags & O_WRITE)) {
+			return -4; /* Incorrect Mode */
+		}
+
 		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
 		mnt = vfs_mountpoints[mountpoint_id];
 

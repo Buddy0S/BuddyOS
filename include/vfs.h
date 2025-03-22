@@ -5,7 +5,11 @@
 #define MAX_MOUNTPOINTS 8
 #define MAX_OPENED_FILES 16
 
-#define FAT12 12
+#define FAT12 	12
+#define DEVICE 	13
+
+#define O_READ 	0x01
+#define O_WRITE 0x02
 
 typedef struct {
   char file_name[16];
