@@ -35,11 +35,20 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             uart0_printf("IPC SEND\n");
             args[0] = send((int)args[0], (void*)args[1], (uint32_t)args[2],
                     (void*)args[3], (uint32_t*)args[4]);
+            break; 
+        case SYSCALL_SEND_END:
+            uart0_printf("IPC SEND SECOND HALF\n");
+            args[0] = send_end((void*)args[0], (uint32_t*)args[1]);
             break;
         case SYSCALL_RECEIVE_NR:
             uart0_printf("IPC RECV\n");
-            args[0] = receive((int*)args[0],
-                    (void*)args[1], (uint32_t*)args[2]);
+            args[0] = receive((int*)args[0], (void*)args[1],
+                    (uint32_t*)args[2]);
+            break;
+        case SYSCALL_RECEIVE_END:
+            uart0_printf("IPC RECV SECOND HALF\n");
+            args[0] = receive_end((int*)args[0], (void*)args[1],
+                    (uint32_t*)args[2]);
             break;
         case SYSCALL_REPLY_NR:
             uart0_printf("IPC REPLY\n");
