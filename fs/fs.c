@@ -11,12 +11,14 @@ file_descriptor* fat12_open(const char* path, int flags);
 uint32_t fat12_read(file_descriptor* fd, char* read_buffer, int bytes);
 uint32_t fat12_write(file_descriptor* fd, char* write_buffer, int bytes);
 int fat12_close(file_descriptor* fd);
+uint32_t fat12_seek(file_descriptor* fd, int offset, int mode);
 
 fs_ops fat12_ops = {
     .open = fat12_open,
     .read = fat12_read,
     .write = fat12_write,
-	.close = fat12_close
+	.close = fat12_close,
+	.seek = fat12_seek
 };
 
 extern file_descriptor vfs_openFiles[MAX_OPENED_FILES]; 
@@ -158,6 +160,40 @@ uint32_t fat12_write(file_descriptor* fd, char* write_buffer, int bytes) {
 	}
 
 	return bytes;
+
+}
+
+uint32_t fat12_seek(file_descriptor* fd, int offset, int mode) {
+	
+	int newOffset = 0;
+
+	if (mode & O_READ) {
+		
+		if (offset > fd->file_size) {
+			fd->read_offset = fd->file_size;
+		}
+		else {
+			fd->read_offset = offset;
+		}
+
+		newOffset = fd->read_offset;
+
+	}
+
+	if (mode & O_WRITE) {
+		
+		if (offset > fd->file_size) {
+			fd->write_offset = fd->file_size;
+		}
+		else {
+			fd->write_offset = offset;
+		}
+
+		newOffset = fd->write_offset;
+
+	}
+
+	return newOffset;
 
 }
 

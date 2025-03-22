@@ -204,3 +204,29 @@ uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
 	}
 
 }
+
+uint32_t vfs_seek(int fd, int offset, int mode) {
+	
+	int mountpoint_id;
+	mountpoint mnt;
+	int newOffset = 0;
+
+	if (fd < 0 || fd > MAX_OPENED_FILES - 1) {
+		return INVALID_FD;
+	}
+
+	if (vfs_openFiles[fd] != NULL) {
+		
+		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
+		mnt = vfs_mountpoints[mountpoint_id];
+
+		newOffset = mnt.operations.seek(vfs_openFiles[fd], offset, mode);
+
+		return newOffset;
+
+	}
+	else {
+		return NOT_OPEN; /* File not open */
+	}
+
+}

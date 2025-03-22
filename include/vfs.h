@@ -40,6 +40,7 @@ typedef struct {
 	int (*close)(file_descriptor* fd);
 	uint32_t (*read)(file_descriptor* fd, char* read_buffer, int bytes);
 	uint32_t (*write)(file_descriptor* fd, char* write_buffer, int bytes);
+	uint32_t (*seek)(file_descriptor* fd, int offset, int mode);
 } fs_ops;
 
 typedef struct {
@@ -56,6 +57,7 @@ int vfs_open(char* path, int flags);
 int vfs_close(int fd);
 uint32_t vfs_read(int fd, char* read_buffer, int bytes);
 uint32_t vfs_write(int fd, char* write_buffer, int bytes);
+uint32_t vfs_seek(int fd, int offset, int mode);
 mountpoint *get_mountpoint(char* path);
 
 #endif

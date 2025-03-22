@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "list.h"
 #include "proc.h"
+#include "fat12.h"
 #include "vfs.h"
 #include "net.h"
 #include "led.h"
