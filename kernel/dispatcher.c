@@ -100,7 +100,12 @@ void dispatcher(void) {
         }
 
         /* after dealing with last process, schedule next process to run */
-        if (current_process->status == 66) {
+        if (current_process->state == BLOCKED) {
+            current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
+            current_process->cpu_time = PROC_QUANTUM;
+            current_process->quantum_elapsed = false;
+        }
+        else if (current_process->status == 66) {
             current_process->cpu_time = PROC_QUANTUM;
             current_process->quantum_elapsed = false;
             schedule();
@@ -134,6 +139,6 @@ void wake_proc(int pid) {
 
 void block() {
     current_process->state = BLOCKED;
-    schedule();
+    list_pop(&ready_queue); /* clears the current process out of the queue */
 }
 
