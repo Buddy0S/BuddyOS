@@ -79,12 +79,40 @@ void __yield(void) {
     SYSCALL(0);
 }
 
-int __send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
+int __send_end(void* reply, uint32_t* rlen) {
+    return SYSCALL(SYSCALL_SEND_END);
+}
+
+int __send_start(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     return SYSCALL(SYSCALL_SEND_NR);
 }
 
-int __receive(int* author, void* msg, uint32_t* len) {
+int __send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
+    int result;
+    result = __send_start(pid, msg, len, reply, rlen);
+    if (result != 0) {
+        return result;
+    }
+
+    return __send_end(reply, rlen);
+}
+
+int __receive_end(int* author, void* msg, uint32_t* len) {
+    return SYSCALL(SYSCALL_RECEIVE_END);
+}
+
+int __receive_start(int* author, void* msg, uint32_t* len) {
     return SYSCALL(SYSCALL_RECEIVE_NR);
+}
+
+int __receive(int* author, void* msg, uint32_t* len) {
+    int result;
+    result = __receive_start(author, msg, len);
+    if (result != 0) {
+        return result;
+    }
+
+    return __receive_end(author, msg, len);
 }
 
 int __reply(int pid, void* msg, uint32_t len) {
