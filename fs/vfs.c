@@ -40,13 +40,13 @@ int vfs_mount(char* target, int type) {
 	int i = 0;
 
 	if (mountedCount >= MAX_MOUNTPOINTS) {
-		return -1;
+		return MAX_REACHED;
 	}
 
 	vfs_mountpoints[mountedCount].type = type;
 	
 	if (!strcpy(vfs_mountpoints[mountedCount].fs_mountpoint, target)) {
-		return -1;
+		return MEM_ERROR;
 	}
 
 	if (type == FAT12) {
@@ -55,7 +55,7 @@ int vfs_mount(char* target, int type) {
 
 	mountedCount++;
 
-	return 1;
+	return 0;
 }
 
 int vfs_open(char* path, int flags) {
@@ -67,7 +67,7 @@ int vfs_open(char* path, int flags) {
 	uart0_printf("Got to vfs_open(), %s, %d\n", path, flags);
 
 	if (openCount == MAX_OPENED_FILES) {
-		return -3; /* max files open */
+		return MAX_REACHED; /* max files open */
 	}
 
 	uart0_printf("Mnt pnt = %s\n", mnt->fs_mountpoint);
@@ -88,11 +88,11 @@ int vfs_open(char* path, int flags) {
 			}
 		}
 		else {
-			return -2; /* File not found */
+			return NOT_FOUND; /* File not found */
 		}
 	}
 	else {
-		return -1; /* Mount point not found */
+		return INVALID_MOUNTPOINT; /* Mount point not found */
 	}
 }
 
@@ -100,7 +100,7 @@ int vfs_close(int fd) {
 	
 	mountpoint mnt;
 	int mountpoint_id; 
-	int result = 0;
+	int result = 1;
 
 	if (vfs_openFiles[fd] != NULL) {
 
@@ -109,18 +109,18 @@ int vfs_close(int fd) {
 
 		result = mnt.operations.close(vfs_openFiles[fd]);
 
-		if (result) {
+		if (result != 0) {
 			vfs_openFiles[fd] = NULL;
 			openCount--;
 			return 0;
 		}
 		else {
-			return -2; /* Could not close */
+			return CLOSE_ERROR; /* Could not close */
 		}
 
 	}
 	else {
-		return -1; /* File not open */
+		return NOT_OPEN; /* File not open */
 	}
 
 }
@@ -135,7 +135,7 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 	if (vfs_openFiles[fd] != NULL) {
 		
 		if (!(vfs_openFiles[fd]->flags & O_READ)) {
-			return -4; /* Incorrect Mode */
+			return INCORRECT_MODE; /* Incorrect Mode */
 		}
 
 		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
@@ -147,7 +147,7 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 
 	}
 	else {
-		return -1; /* File not open */
+		return NOT_OPEN; /* File not open */
 	}
 }
 
@@ -160,7 +160,7 @@ uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
 	if (vfs_openFiles[fd] != NULL) {
 		
 		if (!(vfs_openFiles[fd]->flags & O_WRITE)) {
-			return -4; /* Incorrect Mode */
+			return INCORRECT_MODE; /* Incorrect Mode */
 		}
 
 		mountpoint_id = vfs_openFiles[fd]->mountpoint_id;
@@ -172,7 +172,7 @@ uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
 
 	}
 	else {
-		return -1; /* File not open */
+		return NOT_OPEN; /* File not open */
 	}
 
 }

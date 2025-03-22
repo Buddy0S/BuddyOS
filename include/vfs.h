@@ -5,11 +5,22 @@
 #define MAX_MOUNTPOINTS 8
 #define MAX_OPENED_FILES 16
 
+/* Mount point types */
 #define FAT12 	12
 #define DEVICE 	13
 
+/* File Modes */
 #define O_READ 	0x01
 #define O_WRITE 0x02
+
+/* Error codes */
+#define MAX_REACHED				-1
+#define MEM_ERROR				-2
+#define NOT_FOUND			-3
+#define NOT_OPEN			-4
+#define INCORRECT_MODE		-5
+#define INVALID_MOUNTPOINT		-6
+#define CLOSE_ERROR				-7
 
 typedef struct {
   char file_name[16];

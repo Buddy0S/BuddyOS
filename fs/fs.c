@@ -94,7 +94,7 @@ int fat12_close(file_descriptor* fd) {
 		kfree(fd);
 	}
 
-	return 1;
+	return 0;
 
 }
 
