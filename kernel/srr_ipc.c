@@ -9,7 +9,6 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     struct MailEntry* new_mail;
     PCB* receiver;
     void* data;
-    uint32_t usable_len;
     
     /* input and state checking */
     if (msg == NULL || reply == NULL ||rlen == NULL) {
@@ -58,9 +57,19 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     wake_proc(pid);
 
     block();
+    return 0;
+}
 
+int send_end(void* reply, uint32_t* rlen){
+    uint32_t usable_len;
+    struct SRRMailbox *c_box;
+    c_box = &current_process->mailbox;
+
+    if (c_box->reply.msg == NULL) {
+        return -ENOMSG;
+    }
+    
     /* By now the reply has been put in */
-
     usable_len = c_box->reply.len > *rlen ? *rlen : c_box->reply.len;
     kmemcpy(reply, c_box->reply.msg, usable_len);
     *rlen = usable_len;
@@ -74,9 +83,6 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
 
 int receive(int* author, void* msg, uint32_t* len) {
     struct SRRMailbox* mb;
-    uint32_t usable_len;
-    KNode *mail_node;
-    struct MailEntry *entry;
 
     /* input and state checking */
     if (msg == NULL || len == NULL || author == NULL) {
@@ -93,11 +99,25 @@ int receive(int* author, void* msg, uint32_t* len) {
     if (mb->count == 0) {
         /* will be woken once there is a message waiting*/
         block();
-        /* bro THIS BLOCK CALL DOESNT DO SHIT */
+    }
+
+    return 0;
+}
+
+int receive_end(int* author, void* msg, uint32_t* len) {
+    struct SRRMailbox* mb;
+    uint32_t usable_len;
+    KNode *mail_node;
+    struct MailEntry *entry;
+
+    mb = &current_process->mailbox;
+    if (mb->count == 0) {
+        return -ENOMEM;
     }
 
     mail_node = list_pop(&mb->mail);
     entry = knode_data(mail_node, struct MailEntry, node);
+    mb->count--;
 
     usable_len = entry->data.len > *len ? *len : entry->data.len;
     kmemcpy(msg, entry->data.msg, usable_len);

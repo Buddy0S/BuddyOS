@@ -25,5 +25,7 @@
 #define SYSCALL_RECEIVE_NR      7
 #define SYSCALL_REPLY_NR        8
 #define SYSCALL_MSG_WAITING_NR  9
+#define SYSCALL_SEND_END        10
+#define SYSCALL_RECEIVE_END     11
 
 #endif
