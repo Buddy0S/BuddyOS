@@ -170,24 +170,31 @@ int32_t do_fork(void) {
     PCB *parent = current_process;
     PCB *child = &PROC_TABLE[child_pid];
 
-    // 1. Copy parent's stack to child's stack
+    // Copy parent's stack to child's stack
     uint32_t *child_stack = PROC_STACKS[child_pid];
     kmemcpy(child_stack, parent->stack_base, STACK_SIZE * sizeof(uint32_t));
 
-    // 2. Set child's stack pointer (same offset as parent)
+    // Set child's stack pointer (same offset as parent)
     uint32_t parent_stack_offset = parent->stack_ptr - parent->stack_base;
     child->stack_ptr = child_stack + parent_stack_offset;
 
-    // 3. Copy parent's saved context (registers r4-r11, lr)
+    // use the same offset into the child's stack as the parent's saved_sp 
+    // had into the parent's stack.
+    child->saved_sp = child_stack + (parent->saved_sp - parent->stack_base);
+
+    // Keep the saved LR the same as parent's
+    child->saved_lr = parent->saved_lr;
+
+    // Copy parent's saved context (registers r4-r11, lr)
     child->context = parent->context;
 
-    // 4. Adjust child's saved r0 (syscall return value) to 0
+    // Adjust child's saved r0 (syscall return value) to 0
     uint32_t *parent_args = parent->r_args;
     uint32_t parent_arg_offset = parent_args - parent->stack_base;
     uint32_t *child_args = child_stack + parent_arg_offset;
-    *child_args = 0; // Child returns 0
+    *child_args = 0; // Child returns 0 as usual
 
-    // 5. Initialize child's PCB
+    // Initialize child's PCB
     child->pid = child_pid;
     child->ppid = parent->pid;
     child->state = READY;
@@ -198,12 +205,12 @@ int32_t do_fork(void) {
     child->cpu_time = PROC_QUANTUM;
     child->quantum_elapsed = false;
 
-    // 6. Initialize child's mailbox (don't inherit parent's messages)
+    // Initialize child's mail
     srr_init_mailbox(&child->mailbox);
 
-    // 7. Add child to ready queue
+    // Add child to ready queue hopefully works lol
     list_add_tail(&ready_queue, &child->sched_node);
 
-    uart0_printf("fork: created child PID %d\n", child_pid);
+    uart0_printf("fork: child PID %d\n", child_pid);
     return child_pid;
 }
