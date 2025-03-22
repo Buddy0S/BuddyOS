@@ -424,8 +424,8 @@ extern void buddy();
 /* CPDMA header discriptors */
 typedef struct hdp {
 
-    volatile struct hdp* next_descriptor;
-    volatile uint32_t* buffer_pointer;
+    struct hdp* next_descriptor;
+    uint32_t* buffer_pointer;
     volatile uint32_t buffer_length;
     volatile uint32_t flags;
 
@@ -1478,6 +1478,124 @@ int phy_init(){
 
 /* --------------------------ETHERNET----------------------------- */
 
+/*
+ * eth_transmit()
+ *  - takes in packet and adds ethernet frame header
+ *  - first 14 bytes of buffer must be free for header to be added
+ *
+ * */
+void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
+
+    uint8_t* src = eth_interface.mac_addr;
+
+    uart0_printf("Crafting Ethernet Frame\n");	
+ 
+    frame[0] = dest[0];
+    frame[1] = dest[1];
+    frame[2] = dest[2];
+    frame[3] = dest[3];
+    frame[4] = dest[4];
+    frame[5] = dest[5];
+
+    uart0_printf("Destination MAC\n");
+    print_mac(dest);
+
+    frame[6] = src[0];
+    frame[7] = src[1];
+    frame[8] = src[2];
+    frame[9] = src[3];
+    frame[10] = src[4];
+    frame[11] = src[5];
+
+    uart0_printf("Source MAC\n");
+    print_mac(src);
+
+    frame[12] = (type & 0xFF00) >> 8;
+    frame[13] = type & 0xFF;
+
+    uart0_printf("Frame Type %x\n", type);
+
+    cpsw_transmit((uint32_t*)frame,size);
+}
+
+void arp_recv(ethernet_header frame_header, uint32_t* frame, int size);
+
+/*
+ * eth_recv()
+ *  - takes raw frame and extracts ethernet header
+ *  
+ * */
+void eth_recv(uint32_t* frame, int size){
+    
+    ethernet_header frame_header;
+
+    uint32_t word1 = 0;
+    uint32_t word2 = 0;
+    uint32_t word3 = 0;
+    uint32_t word4 = 0;
+
+    uart0_printf("Processing Frame\n");
+
+    word1 = ntohl(frame[0]);
+    word2 = ntohl(frame[1]);
+    word3 = ntohl(frame[2]);
+    word4 = ntohl(frame[3]);
+
+    frame_header.destination_mac[0] = BYTE3(word1);
+    frame_header.destination_mac[1] = BYTE2(word1);
+    frame_header.destination_mac[2] = BYTE1(word1);
+    frame_header.destination_mac[3] = BYTE0(word1);
+    frame_header.destination_mac[4] = BYTE3(word2);
+    frame_header.destination_mac[5] = BYTE2(word2);
+
+    uart0_printf("Destination MAC: \n");
+    print_mac(frame_header.destination_mac);
+
+    frame_header.source_mac[0] = BYTE1(word2);
+    frame_header.source_mac[1] = BYTE0(word2);
+    frame_header.source_mac[2] = BYTE3(word3);
+    frame_header.source_mac[3] = BYTE2(word3);
+    frame_header.source_mac[4] = BYTE1(word3);
+    frame_header.source_mac[5] = BYTE0(word3);
+
+    uart0_printf("Source MAC: \n");
+    print_mac(frame_header.source_mac);
+
+    frame_header.type = (BYTE3(word4) << 8) | (BYTE2(word4));
+
+    uart0_printf("Frame Type: %x \n",frame_header.type);
+
+    switch (frame_header.type) {
+    
+        case ARP:
+	    {
+	        uart0_printf("Packet Type ARP\n");
+
+                // skip frame header but include ether type for alignment
+		
+		frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t));
+
+                size = size - 3*sizeof(uint32_t);
+
+		arp_recv(frame_header,frame,size);
+	    }
+	    break;
+
+	case IPV4:
+	    {
+		uart0_printf("Packet Type IPV4\n");
+	    }
+	    break;
+
+	default:
+	    {
+	        uart0_printf("Unsupported Packet Type\n");
+	    }
+    }
+}
+
+/* --------------------------ARP----------------------------- */
+
 void print_ip(uint32_t ip){
 
 
@@ -1490,7 +1608,70 @@ void print_ip(uint32_t ip){
 
 }
 
-void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint8_t* dether_mac, uint32_t dest_ip, uint16_t opcode);
+/*
+ *
+ * */
+void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint8_t* dether_mac, uint32_t dest_ip, uint16_t opcode){
+
+    frame[14] = (HARDWARE_TYPE & 0xFF00) >> 8;
+    frame[15] = HARDWARE_TYPE & 0x00FF;
+
+    frame[16] = (IPV4 & 0xFF00) >> 8;
+    frame[17] = IPV4 & 0x00FF;
+
+    frame[18] = ARP_HARDWARE_SIZE;
+    frame[19] = ARP_PROTOCOL_SIZE;
+
+    frame[20] = (opcode & 0xFF00) >> 8;
+    frame[21] = opcode & 0x00FF;
+
+    frame[22] = eth_interface.mac_addr[0];
+    frame[23] = eth_interface.mac_addr[1];
+    frame[24] = eth_interface.mac_addr[2];
+    frame[25] = eth_interface.mac_addr[3];
+    frame[26] = eth_interface.mac_addr[4];
+    frame[27] = eth_interface.mac_addr[5];
+
+    frame[28] = BYTE3(eth_interface.ip_addr);
+    frame[29] = BYTE2(eth_interface.ip_addr);
+    frame[30] = BYTE1(eth_interface.ip_addr);
+    frame[31] = BYTE0(eth_interface.ip_addr);
+
+    frame[32] = dest_mac[0];
+    frame[33] = dest_mac[1];
+    frame[34] = dest_mac[2];
+    frame[35] = dest_mac[3];
+    frame[36] = dest_mac[4];
+    frame[37] = dest_mac[5];
+
+    frame[38] = BYTE3(dest_ip);
+    frame[39] = BYTE2(dest_ip);
+    frame[40] = BYTE1(dest_ip);
+    frame[41] = BYTE0(dest_ip);
+
+    eth_transmit(frame,size,dether_mac,ARP);
+
+}
+
+void arp_anounce(){
+
+    uint8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
+
+    uint8_t anoun[6] = { 0, 0 , 0, 0, 0, 0};
+
+    uint8_t* packet = (uint8_t*) kmalloc(128);
+
+    arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
+}
+
+void arp_garp(){
+
+    int8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
+
+    uint8_t* packet = (uint8_t*) kmalloc(128);
+
+    arp_transmit(packet,128, multicast, multicast, eth_interface.ip_addr, ARP_REQUEST);
+}
 
 int arp_reply(arp_header arp_request){
 
@@ -1597,187 +1778,6 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
 
 }
 
-/*
- * eth_recv()
- *  - takes raw frame and extracts ethernet header
- *  
- * */
-void eth_recv(uint32_t* frame, int size){
-    
-    ethernet_header frame_header;
-
-    uint32_t word1 = 0;
-    uint32_t word2 = 0;
-    uint32_t word3 = 0;
-    uint32_t word4 = 0;
-
-    uart0_printf("Processing Frame\n");
-
-    word1 = ntohl(frame[0]);
-    word2 = ntohl(frame[1]);
-    word3 = ntohl(frame[2]);
-    word4 = ntohl(frame[3]);
-
-    frame_header.destination_mac[0] = BYTE3(word1);
-    frame_header.destination_mac[1] = BYTE2(word1);
-    frame_header.destination_mac[2] = BYTE1(word1);
-    frame_header.destination_mac[3] = BYTE0(word1);
-    frame_header.destination_mac[4] = BYTE3(word2);
-    frame_header.destination_mac[5] = BYTE2(word2);
-
-    uart0_printf("Destination MAC: \n");
-    print_mac(frame_header.destination_mac);
-
-    frame_header.source_mac[0] = BYTE1(word2);
-    frame_header.source_mac[1] = BYTE0(word2);
-    frame_header.source_mac[2] = BYTE3(word3);
-    frame_header.source_mac[3] = BYTE2(word3);
-    frame_header.source_mac[4] = BYTE1(word3);
-    frame_header.source_mac[5] = BYTE0(word3);
-
-    uart0_printf("Source MAC: \n");
-    print_mac(frame_header.source_mac);
-
-    frame_header.type = (BYTE3(word4) << 8) | (BYTE2(word4));
-
-    uart0_printf("Frame Type: %x \n",frame_header.type);
-
-    switch (frame_header.type) {
-    
-        case ARP:
-	    {
-	        uart0_printf("Packet Type ARP\n");
-
-                // skip frame header but include ether type for alignment
-		
-		frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t));
-
-                size = size - 3*sizeof(uint32_t);
-
-		arp_recv(frame_header,frame,size);
-	    }
-	    break;
-
-	case IPV4:
-	    {
-		uart0_printf("Packet Type IPV4\n");
-	    }
-	    break;
-
-	default:
-	    {
-	        uart0_printf("Unsupported Packet Type\n");
-	    }
-    }
-}
-
-void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type);
-
-/*
- *
- * */
-void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint8_t* dether_mac, uint32_t dest_ip, uint16_t opcode){
-
-    frame[14] = (HARDWARE_TYPE & 0xFF00) >> 8;
-    frame[15] = HARDWARE_TYPE & 0x00FF;
-
-    frame[16] = (IPV4 & 0xFF00) >> 8;
-    frame[17] = IPV4 & 0x00FF;
-
-    frame[18] = ARP_HARDWARE_SIZE;
-    frame[19] = ARP_PROTOCOL_SIZE;
-
-    frame[20] = (opcode & 0xFF00) >> 8;
-    frame[21] = opcode & 0x00FF;
-
-    frame[22] = eth_interface.mac_addr[0];
-    frame[23] = eth_interface.mac_addr[1];
-    frame[24] = eth_interface.mac_addr[2];
-    frame[25] = eth_interface.mac_addr[3];
-    frame[26] = eth_interface.mac_addr[4];
-    frame[27] = eth_interface.mac_addr[5];
-
-    frame[28] = BYTE3(eth_interface.ip_addr);
-    frame[29] = BYTE2(eth_interface.ip_addr);
-    frame[30] = BYTE1(eth_interface.ip_addr);
-    frame[31] = BYTE0(eth_interface.ip_addr);
-
-    frame[32] = dest_mac[0];
-    frame[33] = dest_mac[1];
-    frame[34] = dest_mac[2];
-    frame[35] = dest_mac[3];
-    frame[36] = dest_mac[4];
-    frame[37] = dest_mac[5];
-
-    frame[38] = BYTE3(dest_ip);
-    frame[39] = BYTE2(dest_ip);
-    frame[40] = BYTE1(dest_ip);
-    frame[41] = BYTE0(dest_ip);
-
-    eth_transmit(frame,size,dether_mac,ARP);
-
-}
-
-/*
- * eth_transmit()
- *  - takes in packet and adds ethernet frame header
- *  - first 14 bytes of buffer must be free for header to be added
- *
- * */
-void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
-
-    uint8_t* src = eth_interface.mac_addr;
-
-    uart0_printf("Crafting Ethernet Frame\n");	
- 
-    frame[0] = dest[0];
-    frame[1] = dest[1];
-    frame[2] = dest[2];
-    frame[3] = dest[3];
-    frame[4] = dest[4];
-    frame[5] = dest[5];
-
-    uart0_printf("Destination MAC\n");
-    print_mac(dest);
-
-    frame[6] = src[0];
-    frame[7] = src[1];
-    frame[8] = src[2];
-    frame[9] = src[3];
-    frame[10] = src[4];
-    frame[11] = src[5];
-
-    uart0_printf("Source MAC\n");
-    print_mac(src);
-
-    frame[12] = (type & 0xFF00) >> 8;
-    frame[13] = type & 0xFF;
-
-    uart0_printf("Frame Type %x\n", type);
-
-    cpsw_transmit((uint32_t*)frame,size);
-}
-
-void arp_anounce(){
-
-    uint8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
-
-    uint8_t anoun[6] = { 0, 0 , 0, 0, 0, 0};
-
-    uint8_t* packet = (uint8_t*) kmalloc(128);
-
-    arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
-}
-
-void arp_garp(){
-
-    int8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
-
-    uint8_t* packet = (uint8_t*) kmalloc(128);
-
-    arp_transmit(packet,128, multicast, multicast, eth_interface.ip_addr, ARP_REQUEST);
-}
-
 /* --------------------------INIT----------------------------- */
 
 /*
@@ -1791,36 +1791,16 @@ void init_network_stack(){
 
     eth_interface.ip_addr = STATIC_IP;
 
-    uint8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
-
-    uint8_t anoun[6] = { 0, 0 , 0, 0, 0, 0};
-
-    uint16_t type = 0x1234;
-
     buddy();
 
-    //cpsw_recv();
+    cpsw_recv();
 
-    //REG(C0_RX_EN) = 0;
-    //REG(C0_TX_EN) = 0;
-
-    //REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
-
-    //cpsw_recv();
-
-    //REG(C0_RX_EN) = CPDMA_CHANNEL_INT;
-    //REG(C0_TX_EN) = CPDMA_CHANNEL_INT;
+    arp_anounce();
+    arp_garp();
 
     while(1){
        cpsw_recv();
        buddy();
-       uint8_t* packet = (uint8_t*) kmalloc(128);
-       
-       // GARP
-       //arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
-
-       arp_anounce();
-       arp_garp();
     }
 
 }
