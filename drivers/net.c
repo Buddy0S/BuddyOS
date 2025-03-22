@@ -348,7 +348,7 @@ extern void buddy();
 
 #define MAC_ADDR_LEN 6
 #define MAX_PACKET_SIZE 1520
-#define STATIC_IP 0xC0A80702
+#define STATIC_IP 0xC0A80114
 
 //*******************************************************************
 // CPPI
@@ -1085,6 +1085,8 @@ void cpsw_init(){
 
     cpsw_start_recieption();
     uart0_printf("CPSW Packet Reception Started\n");
+
+    uart0_printf("RX HDP %x\n",REG(RX0_HDP));
   
 }
 
@@ -1170,7 +1172,7 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
     REG(TX0_HDP) = (uint32_t) tx_desc;
 
-    uart0_printf("Transmiting Packet\n");
+    uart0_printf("\n\nTransmiting Packet\n");
 
     // TX INT STAT RAW
     while (!REG(TX_INT_STATUS_RAW)){}
@@ -1232,7 +1234,7 @@ int cpsw_recv(){
     // int status raw need to replace this with macro
     uint32_t status = REG(RX_INT_STATUS_RAW);
 
-    uart0_printf("Starting Packet Processing\n");
+    uart0_printf("\n\nStarting Packet Processing\n");
 
     if (!status){
         uart0_printf("No Packets\n");
@@ -1484,7 +1486,20 @@ void print_ip(uint32_t ip){
     uint8_t ip3 = BYTE1(ip);
     uint8_t ip4 = BYTE0(ip);
 
-    uart0_printf("IP: %d.%d.%d.%d/n", ip1,ip2,ip3,ip4);
+    uart0_printf("IP: %d.%d.%d.%d\n", ip1,ip2,ip3,ip4);
+
+}
+
+void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint8_t* dether_mac, uint32_t dest_ip, uint16_t opcode);
+
+int arp_reply(arp_header arp_request){
+
+    uint8_t* packet = (uint8_t*) kmalloc(128);
+
+    if (arp_request.dest_ip != STATIC_IP) return -1;
+
+    uart0_printf("\nReplying to Arp Request\n");
+    arp_transmit(packet,128,arp_request.src_mac,arp_request.src_mac,arp_request.src_ip,ARP_REPLY);    
 
 }
 
@@ -1564,7 +1579,7 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
     
         case ARP_REQUEST:
 	    {
-	    
+	        arp_reply(frame_arp);
 	    }
 	    break;
 
@@ -1754,7 +1769,7 @@ void arp_anounce(){
     arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
 }
 
-void arp_grap(){
+void arp_garp(){
 
     int8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
 
@@ -1802,7 +1817,10 @@ void init_network_stack(){
        uint8_t* packet = (uint8_t*) kmalloc(128);
        
        // GARP
-       arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
+       //arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
+
+       arp_anounce();
+       arp_garp();
     }
 
 }
