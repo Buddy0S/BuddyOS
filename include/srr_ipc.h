@@ -36,7 +36,7 @@ static inline void srr_init_mailbox(struct SRRMailbox *mb) {
     mb->reply.len = 0;
 }
 
-int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen);
+int send(int pid, struct Mail* mail_in, void* reply, uint32_t* rlen);
 
 int send_end(void* reply, uint32_t* rlen);
 

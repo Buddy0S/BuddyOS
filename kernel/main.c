@@ -83,14 +83,19 @@ int __send_end(void* reply, uint32_t* rlen) {
     return SYSCALL(SYSCALL_SEND_END);
 }
 
-int __send_start(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
+int __send_start(int pid, struct Mail* mail_in, void* reply, uint32_t* rlen) {
     return SYSCALL(SYSCALL_SEND_NR);
 }
 
 int __send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     int result;
-    result = __send_start(pid, msg, len, reply, rlen);
+    struct Mail mail_in = {
+        .msg = msg,
+        .len = len
+    };
+    result = __send_start(pid, &mail_in, reply, rlen);
     if (result != 0) {
+        uart0_printf("send failed: %d\n", result);
         return result;
     }
 
@@ -141,10 +146,10 @@ void process0(void) {
             uart0_printf("Proc 0: Theres no message from my buddy yet but thats fine ill wait\n");
         }
 
-        __receive(&author, msg, &len);
+        uart0_printf("receive return code %d\n", __receive(&author, msg, &len));
         uart0_printf("Proc 0: I got my buddy's message!\n");
         uart0_printf("Proc 0: msg received:\n\t%s\n", msg);
-        __reply(author, msg, 19);
+        uart0_printf("reply return code %d\n", __reply(author, msg, 19));
 
         uart0_printf("Proc 0: sent my buddy a reply\n");
     }
@@ -162,8 +167,9 @@ void process1(void) {
         uart0_printf("\nProcess 1 has been resurrected\n");
         uart0_printf("Proc1: Sending a message to my buddy :)\n");
         rsp_len = 20;
-        __send(0, message, 20, response, &rsp_len);
+        uart0_printf("send return code %d\n", __send(0, message, 20, response, &rsp_len));
         uart0_printf("PROC1: My buddy received my message!!\n");
+        uart0_printf("Proc 1: receiving %s\n", response);
     }
 }
 

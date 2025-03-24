@@ -4,16 +4,20 @@
 #include <proc.h>
 #include <memory.h>
 
-int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
+int send(int pid, struct Mail* mail_in, void* reply, uint32_t* rlen) {
     struct SRRMailbox *r_box, *c_box;
     struct MailEntry* new_mail;
     PCB* receiver;
     void* data;
+
+    void* msg = mail_in->msg;
+    uint32_t len = mail_in->len;
     
     /* input and state checking */
     if (msg == NULL || reply == NULL ||rlen == NULL) {
         return -EFAULT;
     }
+
 
     if (len == 0 || *rlen == 0) {
         return -EINVAL;
@@ -44,7 +48,8 @@ int send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
         return -ENOMEM;
     }
 
-    kmemcpy(data, msg, len);
+    kmemcpy(msg, data, len);
+
     new_mail->data.msg = data;
     new_mail->data.len = len;
     new_mail->author = current_process->pid;
@@ -71,7 +76,7 @@ int send_end(void* reply, uint32_t* rlen){
     
     /* By now the reply has been put in */
     usable_len = c_box->reply.len > *rlen ? *rlen : c_box->reply.len;
-    kmemcpy(reply, c_box->reply.msg, usable_len);
+    kmemcpy(c_box->reply.msg, reply, usable_len);
     *rlen = usable_len;
 
     kfree(c_box->reply.msg);
@@ -120,7 +125,7 @@ int receive_end(int* author, void* msg, uint32_t* len) {
     mb->count--;
 
     usable_len = entry->data.len > *len ? *len : entry->data.len;
-    kmemcpy(msg, entry->data.msg, usable_len);
+    kmemcpy(entry->data.msg, msg, usable_len);
     *len = usable_len;
     *author = entry->author;
 
@@ -161,7 +166,7 @@ int reply(int pid, void* msg, uint32_t len) {
         return -ENOMEM;
     }
 
-    kmemcpy(reply, msg, len);
+    kmemcpy(msg, reply, len);
     s_box->reply.msg = reply;
     s_box->reply.len = len;
 

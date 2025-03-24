@@ -33,8 +33,8 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             break;
         case SYSCALL_SEND_NR:
             uart0_printf("IPC SEND\n");
-            args[0] = send((int)args[0], (void*)args[1], (uint32_t)args[2],
-                    (void*)args[3], (uint32_t*)args[4]);
+            args[0] = send((int)args[0], (struct Mail*)args[1], (void*)args[2],
+                    (uint32_t*) args[3]);
             break; 
         case SYSCALL_SEND_END:
             uart0_printf("IPC SEND SECOND HALF\n");
