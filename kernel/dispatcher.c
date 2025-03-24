@@ -61,7 +61,7 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             break;
 	case SYSCALL_FORK_NR:
     	    uart0_printf("fork syscall\n");
-    	    fork();
+    	    args[0] = fork();
     	    break;
         default:
             uart0_printf("unknown\n");
@@ -156,7 +156,7 @@ void block() {
     list_pop(&ready_queue); /* clears the current process out of the queue */
 }
 
-void fork(void) {
+int32_t fork(void) {
     // Find a free PCB (state == DEAD)
     int child_pid = -1;
     for (int i = 0; i < MAX_PROCS; i++) {
@@ -175,7 +175,6 @@ void fork(void) {
     uint32_t *child_stack = PROC_STACKS[child_pid];
     kmemcpy(parent->stack_base, child_stack, STACK_SIZE * sizeof(uint32_t));
 
-    child->stack_ptr = parent->stack_ptr;
 
     // use the same offset into the child's stack as the parent's saved_sp 
     // had into the parent's stack.
@@ -189,11 +188,12 @@ void fork(void) {
     // Copy parent's saved context (registers r4-r11, lr)
     child->context = parent->context;
 
-    // Adjust child's saved r0 (syscall return value) to 0
-    uint8_t *child_args = ((uint8_t*)parent->r_args - 4) - (6 * sizeof(uint32_t));
-    kmemcpy(parent->r_args, child_args, 6 * sizeof(uint32_t));
-    child_args[0] = 0;
-    parent->r_args[0] = child_pid;
+    /* get svc stack for child */
+    child->stack_ptr = (uint32_t*)(((uint8_t*)parent->stack_ptr - 4) - (6 * sizeof(uint32_t)) - 16);
+    uint8_t *child_args = ((uint8_t*)child->stack_ptr + ((uint8_t*)parent->r_args - (uint8_t*)parent->stack_ptr));
+    kmemcpy(parent->stack_ptr, child->stack_ptr, 6 * sizeof(uint32_t) + 16);
+    /* ?????????? lol lol lol lol ????????? */
+    /* 16 is like probably correct but like i just guessed until something worked */
 
     // Initialize child's PCB
     child->pid = child_pid;
@@ -206,6 +206,8 @@ void fork(void) {
     child->cpu_time = PROC_QUANTUM;
     child->quantum_elapsed = false;
     child->r_args = (uint32_t*)child_args;
+    // Adjust child's saved r0 (syscall return value) to 0
+    child->r_args[0] = 0;
 
     // Initialize child's mail
     srr_init_mailbox(&child->mailbox);
@@ -214,4 +216,5 @@ void fork(void) {
     list_add_tail(&ready_queue, &child->sched_node);
 
     uart0_printf("fork: child PID %d\n", child_pid);
+    return child_pid;
 }

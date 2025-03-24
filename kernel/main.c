@@ -141,7 +141,7 @@ void process0(void) {
         uart0_printf("Process 0 (child): My PID is %d\n", current_process->pid);
     } else {
         // This branch is executed in the paren
-        uart0_printf("Process 0 (parent): fork returned child PID %d\n", fork_result);
+        uart0_printf("Process 0 (parent): fork returned child PID %x\n", fork_result);
     }
 	
     int author;
