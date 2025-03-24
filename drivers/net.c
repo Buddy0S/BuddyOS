@@ -1239,7 +1239,8 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
     REG(TX_INTMASK_SET) = CPDMA_CHANNEL_INT;
 
-    kfree(packet);
+    // change design and make caller free packet
+    //kfree(packet);
 
     // HARD WARE BUG TRYING TO FIX THIS 
     
@@ -1261,7 +1262,7 @@ void eth_recv(uint32_t* frame, int size);
  * */
 void process_packet(uint8_t* packet, int size){
 
-     uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
+     //uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
 
      //hex_dump((uint32_t*)packet,size);
 
@@ -1290,29 +1291,29 @@ int cpsw_recv(){
 
     if (!status){
         uart0_printf("No Packets\n");
-	return -1;
+	      return -1;
     }
 
     while (!(start->flags & BIT(29))){
     
         uart0_printf("\nPacket Recieved\n");
 
-	process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
+	      process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
 
-	start->flags = RX_INIT_FLAGS;
-	start->buffer_length = MAX_PACKET_SIZE;
+	      start->flags = RX_INIT_FLAGS;
+	      start->buffer_length = MAX_PACKET_SIZE;
 	
         REG(RX0_CP) = (uint32_t) start;
 
-	start = start->next_descriptor;
+	      start = start->next_descriptor;
 
 	// End of queue
-	if (start == 0){   
-	    eoq = 1;
-            uart0_printf("End of queue reached\n");
-            cpsw_start_recieption();	    
-	    break;
-	}
+	      if (start == 0){   
+	        eoq = 1;
+          uart0_printf("End of queue reached\n");
+          cpsw_start_recieption();	    
+	        break;
+	      }
 
 
     }
@@ -1549,8 +1550,8 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
     frame[4] = dest[4];
     frame[5] = dest[5];
 
-    uart0_printf("Destination MAC\n");
-    print_mac(dest);
+    //uart0_printf("Destination MAC\n");
+    //print_mac(dest);
 
     frame[6] = src[0];
     frame[7] = src[1];
@@ -1559,19 +1560,19 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
     frame[10] = src[4];
     frame[11] = src[5];
 
-    uart0_printf("Source MAC\n");
-    print_mac(src);
+    //uart0_printf("Source MAC\n");
+    //print_mac(src);
 
     frame[12] = (type & 0xFF00) >> 8;
     frame[13] = type & 0xFF;
 
-    uart0_printf("Frame Type %x\n", type);
+    //uart0_printf("Frame Type %x\n", type);
 
     cpsw_transmit((uint32_t*)frame,size);
 }
 
 void arp_recv(ethernet_header frame_header, uint32_t* frame, int size);
-void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size);
+void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* frame_ptr);
 
 /*
  * eth_recv()
@@ -1581,6 +1582,7 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size);
 void eth_recv(uint32_t* frame, int size){
     
     ethernet_header frame_header;
+    uint8_t* frame_ptr = (uint8_t*) frame; // for packets that will be reperposed on transmit
 
     uint32_t word1 = 0;
     uint32_t word2 = 0;
@@ -1643,7 +1645,7 @@ void eth_recv(uint32_t* frame, int size){
       frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t));
       size = size - 3*sizeof(uint32_t);
 
-		  ipv4_recv(frame_header,frame,size);
+		  ipv4_recv(frame_header,frame,size, frame_ptr);
 	  }
 	  break;
 
@@ -1728,6 +1730,8 @@ void arp_anounce(){
     uint8_t* packet = (uint8_t*) kmalloc(128);
 
     arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
+
+    kfree(packet);
 }
 
 /*
@@ -1740,6 +1744,8 @@ void arp_garp(){
     uint8_t* packet = (uint8_t*) kmalloc(128);
 
     arp_transmit(packet,128, multicast, multicast, eth_interface.ip_addr, ARP_REQUEST);
+
+    kfree(packet);
 }
 
 /*
@@ -1752,7 +1758,9 @@ int arp_reply(arp_header arp_request){
     if (arp_request.dest_ip != STATIC_IP) return -1;
 
     uart0_printf("\nReplying to Arp Request\n");
-    arp_transmit(packet,128,arp_request.src_mac,arp_request.src_mac,arp_request.src_ip,ARP_REPLY);    
+    arp_transmit(packet,128,arp_request.src_mac,arp_request.src_mac,arp_request.src_ip,ARP_REPLY);
+
+    kfree(packet);
 
 }
 
@@ -1880,12 +1888,12 @@ uint16_t ipv4_checksum(void *ipv4_header, int size){
   return ret;
 }
 
-void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size);
+void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size, uint8_t* frame_ptr);
 
 /*
  *
  * */
-void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
+void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* frame_ptr){
 
   ipv4_header ip_header;
 
@@ -1941,7 +1949,7 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
         frame = (uint32_t*)((uint32_t) frame + 5*sizeof(uint32_t));
         size = size - 5*sizeof(uint32_t);
 
-        icmp_recv(frame_header, ip_header, frame, size);
+        icmp_recv(frame_header, ip_header, frame, size, frame_ptr);
       }
       break;
 
@@ -2012,7 +2020,9 @@ void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t des
 
 /* --------------------------ICMP----------------------------- */
 
-void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size){
+void icmp_echo_reply(ethernet_header eth_header, ipv4_header ip_header, icmp_header icmp ,uint8_t* frame, int size);
+
+void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size, uint8_t* frame_ptr){
  
   icmp_header icmp;
 
@@ -2040,6 +2050,7 @@ void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* fram
     case ECHO_REQUEST:
       {
         uart0_printf("ICMP echo request\n");
+        icmp_echo_reply(eth_header,ip_header,icmp,frame_ptr,size);
       }
       break;
 
@@ -2080,6 +2091,14 @@ void icmp_transmit(uint8_t* frame, int size, uint8_t type, uint8_t code, uint32_
   frame[37] = checksum & 0x00FF;
 
   ipv4_transmit(frame,size,ICMP,dest_ip,dest_mac);
+
+}
+
+void icmp_echo_reply(ethernet_header eth_header, ipv4_header ip_header, icmp_header icmp ,uint8_t* frame, int size){
+
+  size = size + IPV4_HEADER_SIZE + ETH_HEADER_SIZE;
+
+  icmp_transmit(frame, size, ECHO_REPLY, ECHO_REPLY_CODE, icmp.data, ip_header.src_ip, eth_header.source_mac);
 
 }
 
