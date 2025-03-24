@@ -348,6 +348,7 @@ extern void buddy();
 
 #define MAC_ADDR_LEN 6
 #define MAX_PACKET_SIZE 1520
+#define ETH_HEADER_SIZE 14
 
 //*******************************************************************
 // CPPI
@@ -429,6 +430,10 @@ extern void buddy();
 #define IP_ID 1
 #define IPV4_FLAGS 0
 #define TTL 0x80
+
+#define ICMP 1 
+#define TCP 4 
+#define UDP 17
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -1631,6 +1636,9 @@ void eth_recv(uint32_t* frame, int size){
 
 /* --------------------------ARP----------------------------- */
 
+/*
+ *
+ * */
 void print_ip(uint32_t ip){
 
 
@@ -1688,6 +1696,9 @@ void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint8_t* dether_m
 
 }
 
+/*
+ *
+ * */
 void arp_anounce(){
 
     uint8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
@@ -1699,6 +1710,9 @@ void arp_anounce(){
     arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
 }
 
+/*
+ *
+ * */
 void arp_garp(){
 
     int8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
@@ -1708,6 +1722,9 @@ void arp_garp(){
     arp_transmit(packet,128, multicast, multicast, eth_interface.ip_addr, ARP_REQUEST);
 }
 
+/*
+ *
+ * */
 int arp_reply(arp_header arp_request){
 
     uint8_t* packet = (uint8_t*) kmalloc(128);
@@ -1815,6 +1832,37 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
 
 /* --------------------------IPV4----------------------------- */
 
+/*
+ * https://tools.ietf.org/html/rfc1071
+ * modified to work for 4 byte aligned Access
+ * */
+uint16_t ipv4_checksum(void *ipv4_header, int size){
+
+  uint32_t sum = 0;
+  uint16_t ret;
+  uint32_t temp;
+
+  while (size > 1) {
+
+    temp = *((uint32_t *) ipv4_header);
+    sum += (temp & 0xFFFF0000) >> 16;
+    sum += (temp & 0x0000FFFF);
+    size -= sizeof(uint32_t);
+    ipv4_header = (void*)((uint32_t)ipv4_header + sizeof(uint32_t));
+  }
+
+  if (size > 0) sum += *(uint8_t*) ipv4_header;
+
+  while (sum>>16) sum = (sum & 0xFFFF) + (sum >> 16);
+
+  ret = (~sum) & 0x0000FFFF;
+
+  return ret;
+}
+
+/*
+ *
+ * */
 void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
 
   ipv4_header ip_header;
@@ -1848,6 +1896,8 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
   ip_header.time_to_live = BYTE1(word3);
   ip_header.protocol = BYTE0(word3);
 
+  uart0_printf("Protocol %x\n",ip_header.protocol);
+
   ip_header.header_checksum = (BYTE3(word4) << 8) & BYTE2(word4); 
 
   ip_header.src_ip = ((word4 & 0x0000FFFF) << 16) & ((word5 & 0xFFFF0000) >> 16);
@@ -1860,6 +1910,31 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
   uart0_printf("Dest IP\n");
   print_ip(ip_header.src_ip);
 
+  switch (ip_header.protocol){
+    case ICMP:
+      {
+        uart0_printf("ICMP Packet \n");
+      }
+      break;
+
+    case UDP:
+      {
+        uart0_printf("UDP Packet \n");
+      }
+      break;
+      
+    case TCP:
+      {
+        uart0_printf("TCP Packet \n");
+      } 
+      break;
+
+    default:
+      {
+        uart0_printf("Unsupported IPV4 Protocol\n");
+      }
+  }
+
 }
 
 /*
@@ -1868,12 +1943,13 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
 void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t dest_ip, uint8_t* dest_mac){
 
   uint16_t checksum = 0;
+  uint16_t len = size - ETH_HEADER_SIZE;
 
   frame[14] = (IP_VERSION << 4) | (IPV4_HEADER_SIZE);
   frame[15] = DHSP_ECN;
 
-  frame[16] = (size & 0xFF00) >> 8;
-  frame[17] = size & 0x00FF;
+  frame[16] = (len & 0xFF00) >> 8;
+  frame[17] = len & 0x00FF;
 
   // only supporting datagrams of 1 packet size
   frame[18] = (IP_ID & 0xFF00) >> 8;
@@ -1897,6 +1973,10 @@ void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t des
   frame[31] = BYTE2(dest_ip);
   frame[32] = BYTE1(dest_ip);
   frame[33] = BYTE0(dest_ip);
+
+  checksum = ipv4_checksum(&(frame[14]),IPV4_HEADER_SIZE);
+  frame[24] = (checksum & 0xFF00) >> 8;
+  frame[25] = checksum & 0x00FF;
 
   eth_transmit(frame, size, dest_mac, IPV4);
 
