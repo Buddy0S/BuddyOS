@@ -523,6 +523,7 @@ typedef struct icmp {
   uint8_t code;
   uint8_t header_checksum;
   uint32_t data;
+  uint8_t* payload;
 
 } icmp_header;
 
@@ -2031,6 +2032,9 @@ void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* fram
   icmp.header_checksum = (word2 & 0xFFFF0000) >> 16;
   icmp.data = ((word2 & 0x0000FFFF) << 16) | ((word3 & 0xFFFF0000) >> 16);
 
+  // remember that last 2 bytes of icmp header is included
+  icmp.payload = (uint8_t*) &(frame[2]);
+
   switch (icmp.type) {  
 
     case ECHO_REQUEST:
@@ -2052,6 +2056,30 @@ void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* fram
       break;
 
   }
+
+}
+
+void icmp_transmit(uint8_t* frame, int size, uint8_t type, uint8_t code, uint32_t data, uint32_t dest_ip, uint8_t* dest_mac){
+
+  uint16_t checksum = 0;
+  int len = size - ETH_HEADER_SIZE - IPV4_HEADER_SIZE;
+
+  frame[34] = type;
+  frame[35] = code;
+  
+  frame[36] = (checksum & 0xFF00) >> 8;
+  frame[37] = checksum & 0x00FF;
+
+  frame[38] = BYTE3(data);
+  frame[39] = BYTE2(data);
+  frame[40] = BYTE1(data);
+  frame[41] = BYTE0(data);
+
+  checksum = ipv4_checksum((&(frame[34])),len);
+  frame[36] = (checksum & 0xFF00) >> 8;
+  frame[37] = checksum & 0x00FF;
+
+  ipv4_transmit(frame,size,ICMP,dest_ip,dest_mac);
 
 }
 
