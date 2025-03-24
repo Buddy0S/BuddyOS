@@ -2120,6 +2120,9 @@ void icmp_echo_request(uint32_t ip, uint8_t* mac){
  * */
 void init_network_stack(){
 
+    uint32_t gateway_ip = 0xC0A8010A;
+    uint8_t gateway_mac[MAC_ADDR_LEN] = {0xD8,0xBB,0xC1,0xF7,0xD0,0xD3};
+
     cpsw_init();
 
     phy_init();
@@ -2136,6 +2139,7 @@ void init_network_stack(){
     while(1){
        cpsw_recv();
        buddy();
+       icmp_echo_request(gateway_ip,gateway_mac);
     }
 
 }
