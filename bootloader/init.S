@@ -53,6 +53,11 @@ init:
    @ Cortex a8 manual 3.2.68
    ldr r0, =__vector_load__
    mcr p15, #0, r0, c12, c0, #0
+    
+   @ enable unaligned memory accesses
+   mrc p15, #0, r0, c1, c0, #0
+   bic r0, r0, #2
+   mcr p15, #0, r0, c1, c0, #0
 
    @ jump to main
    bl main
