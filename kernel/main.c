@@ -159,6 +159,7 @@ int main(){
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
 
+  init_network_stack();
 
 	/* ********* Test File system ********* */
 

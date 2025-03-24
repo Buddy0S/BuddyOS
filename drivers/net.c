@@ -435,6 +435,11 @@ extern void buddy();
 #define TCP 4 
 #define UDP 17
 
+//*******************************************************************
+// ICMP                                                               
+//*******************************************************************
+
+
 /* ----------------------------STRUCTS----------------------------- */
 
 /* CPDMA header discriptors */
@@ -506,6 +511,15 @@ typedef struct ipv4 {
     uint32_t dest_ip;
 
 } ipv4_header;
+
+typedef struct icmp {
+
+  uint8_t type;
+  uint8_t code;
+  uint8_t header_checksum;
+  uint32_t data;
+
+} icmp_header;
 
 /* --------------------------CPSW CODE----------------------------- */
 
@@ -1860,6 +1874,8 @@ uint16_t ipv4_checksum(void *ipv4_header, int size){
   return ret;
 }
 
+void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size);
+
 /*
  *
  * */
@@ -1914,6 +1930,12 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
     case ICMP:
       {
         uart0_printf("ICMP Packet \n");
+        
+        // removing ipv4 header but keeping in last word for alignment
+        frame = (uint32_t*)((uint32_t) frame + 5*sizeof(uint32_t));
+        size = size - 5*sizeof(uint32_t);
+
+        icmp_recv(frame_header, ip_header, frame, size);
       }
       break;
 
@@ -1982,6 +2004,11 @@ void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t des
 
 }
 
+/* --------------------------ICMP----------------------------- */
+
+void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size){
+  
+}
 
 /* --------------------------INIT----------------------------- */
 
