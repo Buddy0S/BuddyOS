@@ -159,6 +159,7 @@ int main(){
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
 
+
 	/* ********* Test File system ********* */
 
 	uint32_t* buffer = (uint32_t*)kmalloc(128 * sizeof(uint32_t));
@@ -188,19 +189,7 @@ int main(){
 
 	fd = vfs_open("/home/DIS.TXT", O_WRITE);
 	vfs_close(fd);
-
-
-	//uart0_printf("FS TEST = %s(%d)\n", mnt->fs_mountpoint, mnt->type);
-
-	/*****************************************/
     
-	/************** NETWORK INIT ----- COMMENTED OUT TO TEST OTHER STUFF
-	//cpsw_init();
-
-    //phy_init(); 
-    
-	//init_network_stack(); 
-	/**************************************************/
     
     /* Initialize the ready queue */
     init_ready_queue();

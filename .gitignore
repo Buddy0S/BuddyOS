@@ -1,3 +1,5 @@
 *.img
 .cache/
 compile_commands.json
+*.swp
+*.swo
