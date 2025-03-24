@@ -424,6 +424,11 @@ extern void buddy();
 
 #define STATIC_IP 0xC0A80114
 #define IPV4_HEADER_SIZE 20
+#define IP_VERSION 4
+#define DHSP_ECN 0
+#define IP_ID 1
+#define IPV4_FLAGS 0
+#define TTL 0x80
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -1846,9 +1851,57 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
   ip_header.header_checksum = (BYTE3(word4) << 8) & BYTE2(word4); 
 
   ip_header.src_ip = ((word4 & 0x0000FFFF) << 16) & ((word5 & 0xFFFF0000) >> 16);
+ 
+  uart0_printf("Source IP\n");
+  print_ip(ip_header.src_ip);
+ 
   ip_header.dest_ip = ((word5 & 0x0000FFFF) << 16) & ((word6 & 0xFFFF0000) >> 16);
 
+  uart0_printf("Dest IP\n");
+  print_ip(ip_header.src_ip);
+
 }
+
+/*
+ *
+ * */
+void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t dest_ip, uint8_t* dest_mac){
+
+  uint16_t checksum = 0;
+
+  frame[14] = (IP_VERSION << 4) | (IPV4_HEADER_SIZE);
+  frame[15] = DHSP_ECN;
+
+  frame[16] = (size & 0xFF00) >> 8;
+  frame[17] = size & 0x00FF;
+
+  // only supporting datagrams of 1 packet size
+  frame[18] = (IP_ID & 0xFF00) >> 8;
+  frame[19] = IP_ID & 0x00FF;
+  frame[20] = (IPV4_FLAGS & 0xFF00) >> 8;
+  frame[21] = IPV4_FLAGS & 0x00FF;
+  
+  frame[22] = TTL;
+
+  frame[23] = protocol;
+
+  frame[24] = (checksum & 0xFF00) >> 8;
+  frame[25] = checksum & 0x00FF;
+
+  frame[26] = BYTE3(STATIC_IP);
+  frame[27] = BYTE2(STATIC_IP);
+  frame[28] = BYTE1(STATIC_IP);
+  frame[29] = BYTE0(STATIC_IP);
+
+  frame[30] = BYTE3(dest_ip);
+  frame[31] = BYTE2(dest_ip);
+  frame[32] = BYTE1(dest_ip);
+  frame[33] = BYTE0(dest_ip);
+
+  eth_transmit(frame, size, dest_mac, IPV4);
+
+}
+
 
 /* --------------------------INIT----------------------------- */
 
