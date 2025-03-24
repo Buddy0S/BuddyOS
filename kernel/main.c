@@ -5,8 +5,11 @@
 #include "memory.h"
 #include "list.h"
 #include "proc.h"
+#include "fat12.h"
+#include "vfs.h"
 #include "net.h"
 #include "led.h"
+#include "vfs.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
@@ -56,6 +59,13 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
     /* Make sure started is false, so the dispatch switches into proc properly */
     p->started = false;
 
+    /* This way if it returns to the dispatcher on its own without syscalling
+     * or being interrupted then we just know that the process is done */
+    p->trap_reason = HANDLED;
+
+    /* start all processes with a 100 ms quantum for now */
+    p->cpu_time = PROC_QUANTUM;
+
     /* Add this process to the ready queue */
     list_add_tail(&ready_queue, &p->sched_node);
 }
@@ -72,7 +82,7 @@ void __yield(void) {
 void process0(void) {
     uart0_printf("Process 0\n");
     while (1) {
-        uart0_printf("\nProcess 0 received %d\n", __syscalltest(5, 10));
+        uart0_printf("\nProcess 0 received 5 + 10 = %d\n", __syscalltest(5, 10));
         delay();
     }
 }
@@ -80,18 +90,17 @@ void process0(void) {
 void process1(void) {
     uart0_printf("Process 1\n");
     while (1) {
-        __yield();
-        uart0_printf("\nProcess 1 yielded\n");
+        uart0_printf("\nProcess 1 is going to sleep\n");
         delay();
+        WFI();
+        uart0_printf("\nProcess 1 has been resurrected\n");
     }
 }
 
 void null_proc(void) {
     while (1) {
         uart0_printf("null proc going to sleep... zzzzzzz\n");
-        asm volatile("  \n\t \
-                wfi     \n\t \
-                ");
+        WFI();
     }
 }
 
@@ -150,7 +159,37 @@ int main(){
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
 
-    init_network_stack();
+
+	/* ********* Test File system ********* */
+
+	uint32_t* buffer = (uint32_t*)kmalloc(128 * sizeof(uint32_t));
+	fat12_init(0, buffer);
+	kfree(buffer);
+
+	vfs_mount("/", FAT12);
+	vfs_mount("/home", FAT12);
+
+	char buf[64];
+
+	int fd = vfs_open("/home/TEST.TXT", O_READ | O_WRITE);
+	int bytes = vfs_read(fd, buf, 64);
+	uart0_printf("%s (%d bytes)\n", buf, bytes);
+	bytes = vfs_write(fd, "I ain't reading all that", sizeof("I ain't reading all that"));
+	vfs_close(fd);
+
+	fd = vfs_open("/home/HELLO.TXT", O_WRITE);
+	bytes = vfs_write(fd, "Hello World!", sizeof("Hello World!"));
+	uart0_printf("Wrote %d bytes\n", bytes);
+	vfs_close(fd);
+
+	fd = vfs_open("/home/NOT_EX.TXT", O_READ);
+	bytes = vfs_write(fd, "Hello World!", sizeof("Hello World!"));
+	uart0_printf("Wrote %d bytes\n", bytes);
+	vfs_close(fd);
+
+	fd = vfs_open("/home/DIS.TXT", O_WRITE);
+	vfs_close(fd);
+    
     
     /* Initialize the ready queue */
     init_ready_queue();

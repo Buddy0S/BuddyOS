@@ -9,6 +9,7 @@
 #define MAX_PROCS   3
 #define STACK_SIZE  256
 #define KERNEL_STACK_SIZE 256
+#define PROC_QUANTUM 1000
 
 /* Process states */
 enum ProcessState {
@@ -19,6 +20,7 @@ enum ProcessState {
 };
 
 enum TrapReason {
+    HANDLED,
     SYSCALL,
     INTERRUPT,
 };
@@ -55,7 +57,7 @@ typedef struct PCB {
     int32_t state;                  /* Process state */
     int32_t prio;                   /* Process priority */
     int32_t exitStatus;             /* Code/signal from when a process is interrupted */
-    int32_t syscall_num;
+    int32_t status;
 
     uint32_t *stack_base;           /* Base address of the allocated stack */
     uint32_t *stack_ptr;            /* Pointer to the saved context (stack pointer) */
@@ -65,7 +67,9 @@ typedef struct PCB {
 
     uint32_t *r_args;
     int32_t trap_reason;
+    int32_t cpu_time;
     bool started;
+    bool quantum_elapsed;
 
     struct KList children;          /* A list of this proc's children */
     struct KList sched_node;        /* Node for the scheduler's ready queue */
@@ -93,6 +97,7 @@ void yield(void);
 void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio);
 void init_ready_queue(void);
 extern void switch_to_svc(PCB *from, PCB *to);
+extern void switch_to_irq(PCB *from, PCB *to);
 extern void switch_to_start(PCB *from, PCB *to);
 extern void switch_to_dispatch(PCB *from, PCB *to);
 

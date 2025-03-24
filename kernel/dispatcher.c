@@ -39,36 +39,53 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
 
 void dispatcher(void) {
     // run first process
+    uart0_printf("\nstart of dispatcher\n");
     while (1) {
-        uart0_printf("\nstart of dispatcher\n");
-        uart0_printf("returned to dispatcher from process #%d\n", current_process->pid);
-
-
-        uart0_printf("trap reason: ");
+        if (current_process->started) {
+            if (current_process->trap_reason == SYSCALL) {
+                /* if the process then returns to the dispatcher without 
+                 * going through a syscall or an interrupt then that means it just
+                 * returned from the function it started at which means it should 
+                 * probably just get killed */
+                uart0_printf("svc\n");
+                current_process->trap_reason = HANDLED;
+                switch_to_svc(kernel_process, current_process);    
+            } else if (current_process->trap_reason == INTERRUPT) {
+                uart0_printf("interrupt\n");
+                current_process->trap_reason = HANDLED;
+                switch_to_irq(kernel_process, current_process);
+            }
+        } else {
+            current_process->started = true;
+            switch_to_start(kernel_process, current_process);    
+        }
+        uart0_printf("\nreturned to dispatcher from process #%d\n", current_process->pid);
+        
+		uart0_printf("trap reason: ");
         switch (current_process->trap_reason) {
             case SYSCALL:
-                uart0_printf("syscall #%d = ", current_process->syscall_num);
+                uart0_printf("syscall #%d = ", current_process->status);
                 /* call some sort of syscall handler here */
-                execute_syscall(current_process->syscall_num, current_process->r_args);
+                execute_syscall(current_process->status, current_process->r_args);
                 break;
             case INTERRUPT:
-                uart0_printf("interrupt\n");
+                uart0_printf("interrupt #%d\n", current_process->status);
+                break;
+            case HANDLED:
+                uart0_printf("time to die\n");
                 break;
             default:
                 uart0_printf("unknown\n");
                 break;
         }
 
-
         /* after dealing with last process, schedule next process to run */
-        schedule();
-        uart0_printf("jumping to %x for process #%d\n", current_process->context.lr, current_process->pid);
-        if (current_process->started) {
-            switch_to_svc(kernel_process, current_process);    
-        } else {
-            current_process->started = true;
-            switch_to_start(kernel_process, current_process);    
+        if (current_process->status == 66) {
+            current_process->cpu_time = PROC_QUANTUM;
+            current_process->quantum_elapsed = false;
+            schedule();
         }
+        uart0_printf("jumping to %x for process #%d through ", current_process->context.lr, current_process->pid);
 
     }
 }

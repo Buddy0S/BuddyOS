@@ -8,6 +8,11 @@
     return_val;                             \
 })                                          \
 
+#define WFI()                               \
+({                                          \
+    asm volatile ("wfi  \n\t");             \
+})  
+
 #define SYSCALL_TEST_2_ARGS_NR  0
 #define SYSCALL_YIELD_NR        1
 #define SYSCALL_MALLOC_NR       2

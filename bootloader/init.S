@@ -26,6 +26,7 @@ init:
    mrs r0, cpsr
    bic r0, r0, #0x1F @ clear mode bits
    orr r0, r0, #0x12 @ set IRQ mode
+   orr r0, r0, #0xC0 @ disable interrupts?
    msr cpsr, r0
 
    ldr sp, =__stack_IRQ_start__
