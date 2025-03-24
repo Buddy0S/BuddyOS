@@ -485,12 +485,10 @@ typedef struct ipv4 {
 
     uint8_t version;
     uint8_t ihl;
-    uint8_t dhsp;
-    uint8_t ecn;
+    uint8_t dhsp_ecn;
     uint16_t total_length;
     uint16_t identification;
-    uint8_t flags;
-    uint16_t fragment_offset;
+    uint16_t flags;
     uint8_t time_to_live;
     uint8_t protocol;
     uint16_t header_checksum;
@@ -1592,38 +1590,37 @@ void eth_recv(uint32_t* frame, int size){
 
     switch (frame_header.type) {
     
-        case ARP:
-	    {
-	        uart0_printf("Packet Type ARP\n");
+    case ARP:
+	  {
+	    uart0_printf("Packet Type ARP\n");
 
-                // skip frame header but include ether type for alignment
+      // skip frame header but include ether type for alignment
 		
-		frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t));
+		  frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t)); 
+      size = size - 3*sizeof(uint32_t);
 
-                size = size - 3*sizeof(uint32_t);
+	    arp_recv(frame_header,frame,size);
+	  }
+	  break;
 
-		arp_recv(frame_header,frame,size);
-	    }
-	    break;
+	  case IPV4:
+	  {
 
-	case IPV4:
-	    {
+		  uart0_printf("Packet Type IPV4\n");
 
-		uart0_printf("Packet Type IPV4\n");
+		  // skip frame header but include ether type for alignment
 
-		// skip frame header but include ether type for alignment
+      frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t));
+      size = size - 3*sizeof(uint32_t);
 
-                frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t));
-                                                                                      size = size - 3*sizeof(uint32_t);
+		  ipv4_recv(frame_header,frame,size);
+	  }
+	  break;
 
-		ipv4_recv(frame_header,frame,size);
-	    }
-	    break;
-
-	default:
-	    {
-	        uart0_printf("Unsupported Packet Type\n");
-	    }
+	  default:
+	  {
+	    uart0_printf("Unsupported Packet Type\n");
+	  }
     }
 }
 
@@ -1814,6 +1811,42 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
 /* --------------------------IPV4----------------------------- */
 
 void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
+
+  ipv4_header ip_header;
+
+  uint32_t word1 = 0;
+  uint32_t word2 = 0;
+  uint32_t word3 = 0;
+  uint32_t word4 = 0;
+  uint32_t word5 = 0;
+  uint32_t word6 = 0;
+
+  uart0_printf("Handling IPV4 Request\n");
+
+  word1 = ntohl(frame[0]);
+  word2 = ntohl(frame[1]);
+  word3 = ntohl(frame[2]);
+  word4 = ntohl(frame[3]);
+  word5 = ntohl(frame[4]);
+  word6 = ntohl(frame[5]); 
+
+  ip_header.version = BYTE1(word1) & 0xF0;
+  ip_header.ihl = BYTE1(word1) & 0x0F;
+
+  ip_header.dhsp_ecn = BYTE0(word1);
+
+  ip_header.total_length = (BYTE3(word2) << 8) & BYTE2(word2);
+  ip_header.identification = (BYTE1(word2) << 8) & BYTE0(word2);
+
+  ip_header.flags = (BYTE3(word3) << 8) & BYTE2(word3);
+
+  ip_header.time_to_live = BYTE1(word3);
+  ip_header.protocol = BYTE0(word3);
+
+  ip_header.header_checksum = (BYTE3(word4) << 8) & BYTE2(word4); 
+
+  ip_header.src_ip = ((word4 & 0x0000FFFF) << 16) & ((word5 & 0xFFFF0000) >> 16);
+  ip_header.dest_ip = ((word5 & 0x0000FFFF) << 16) & ((word6 & 0xFFFF0000) >> 16);
 
 }
 
