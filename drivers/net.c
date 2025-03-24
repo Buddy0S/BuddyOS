@@ -439,6 +439,11 @@ extern void buddy();
 // ICMP                                                               
 //*******************************************************************
 
+#define ECHO_REPLY 0 
+#define ECHO_REPLY_CODE 0 
+
+#define ECHO_REQUEST 8 
+#define ECHO_REQUEST_CODE 0
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -1890,7 +1895,7 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
   uint32_t word5 = 0;
   uint32_t word6 = 0;
 
-  uart0_printf("Handling IPV4 Request\n");
+  uart0_printf("Handling IPV4 Packet\n");
 
   word1 = ntohl(frame[0]);
   word2 = ntohl(frame[1]);
@@ -2007,7 +2012,47 @@ void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t des
 /* --------------------------ICMP----------------------------- */
 
 void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size){
-  
+ 
+  icmp_header icmp;
+
+  uint32_t word1 = 0;
+  uint32_t word2 = 0;
+  uint32_t word3 = 0;
+
+  uart0_printf("Handling ICMP Packet\n");
+
+  word1 = ntohl(frame[0]);
+  word2 = ntohl(frame[1]);
+  word3 = ntohl(frame[2]); 
+
+  icmp.type = BYTE1(word1);
+  icmp.code = BYTE0(word1);
+
+  icmp.header_checksum = (word2 & 0xFFFF0000) >> 16;
+  icmp.data = ((word2 & 0x0000FFFF) << 16) | ((word3 & 0xFFFF0000) >> 16);
+
+  switch (icmp.type) {  
+
+    case ECHO_REQUEST:
+      {
+        uart0_printf("ICMP echo request\n");
+      }
+      break;
+
+    case ECHO_REPLY:
+      {
+        uart0_printf("ICMP echo reply\n");
+      }
+      break;
+
+    default:
+      {
+        uart0_printf("Unsupported ICMP type\n");
+      }
+      break;
+
+  }
+
 }
 
 /* --------------------------INIT----------------------------- */
