@@ -130,7 +130,8 @@ int __fork() {
 void process0(void) {
     
     // Call fork and capture its return value.
-    int fork_result = fork();
+    uart0_printf("Process 0\n");
+    int fork_result = __fork();
 
     // Check the result
     if (fork_result == -1) {
@@ -149,7 +150,6 @@ void process0(void) {
 
     len = 20;
 
-    uart0_printf("Process 0\n");
     while (1) {
         uart0_printf("\nProcess 0 received 5 + 10 = %d\n", __syscalltest(5, 10));
         delay();

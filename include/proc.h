@@ -103,6 +103,6 @@ extern void switch_to_svc(PCB *from, PCB *to);
 extern void switch_to_irq(PCB *from, PCB *to);
 extern void switch_to_start(PCB *from, PCB *to);
 extern void switch_to_dispatch(PCB *from, PCB *to);
-int32_t fork(void);
+void fork(void);
 
 #endif /* PROC_H */

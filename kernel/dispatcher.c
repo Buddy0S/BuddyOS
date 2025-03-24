@@ -61,7 +61,7 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             break;
 	case SYSCALL_FORK_NR:
     	    uart0_printf("fork syscall\n");
-    	    args[0] = fork();
+    	    fork();
     	    break;
         default:
             uart0_printf("unknown\n");
@@ -156,7 +156,7 @@ void block() {
     list_pop(&ready_queue); /* clears the current process out of the queue */
 }
 
-int32_t fork(void) {
+void fork(void) {
     // Find a free PCB (state == DEAD)
     int child_pid = -1;
     for (int i = 0; i < MAX_PROCS; i++) {
@@ -165,22 +165,23 @@ int32_t fork(void) {
             break;
         }
     }
-    if (child_pid == -1) return -1; // No free process slot
 
     PCB *parent = current_process;
+    if (child_pid == -1) parent->r_args[0] = -1;; // No free process slot
+
     PCB *child = &PROC_TABLE[child_pid];
 
     // Copy parent's stack to child's stack
     uint32_t *child_stack = PROC_STACKS[child_pid];
-    kmemcpy(child_stack, parent->stack_base, STACK_SIZE * sizeof(uint32_t));
+    kmemcpy(parent->stack_base, child_stack, STACK_SIZE * sizeof(uint32_t));
 
-    // Set child's stack pointer (same offset as parent)
-    uint32_t parent_stack_offset = parent->stack_ptr - parent->stack_base;
-    child->stack_ptr = child_stack + parent_stack_offset;
+    child->stack_ptr = parent->stack_ptr;
 
     // use the same offset into the child's stack as the parent's saved_sp 
     // had into the parent's stack.
-    child->saved_sp = child_stack + (parent->saved_sp - parent->stack_base);
+    // Set child's stack pointer (same offset as parent)
+    uint32_t parent_stack_offset = parent->saved_sp - parent->stack_base;
+    child->saved_sp = child_stack - parent_stack_offset;
 
     // Keep the saved LR the same as parent's
     child->saved_lr = parent->saved_lr;
@@ -189,10 +190,10 @@ int32_t fork(void) {
     child->context = parent->context;
 
     // Adjust child's saved r0 (syscall return value) to 0
-    uint32_t *parent_args = parent->r_args;
-    uint32_t parent_arg_offset = parent_args - parent->stack_base;
-    uint32_t *child_args = child_stack + parent_arg_offset;
-    *child_args = 0; // Child returns 0 as usual
+    uint32_t *child_args = (parent->r_args - 4) - (6 * sizeof(uint32_t));
+    kmemcpy(parent->r_args, child_args, 6 * sizeof(uint32_t));
+    child_args[0] = 0;
+    parent->r_args = child_args;
 
     // Initialize child's PCB
     child->pid = child_pid;
@@ -200,10 +201,11 @@ int32_t fork(void) {
     child->state = READY;
     child->prio = parent->prio;
     child->stack_base = child_stack;
-    child->started = false; // Dispatcher will use switch_to_start
-    child->trap_reason = HANDLED;
+    child->started = true; 
+    child->trap_reason = SYSCALL;
     child->cpu_time = PROC_QUANTUM;
     child->quantum_elapsed = false;
+    child->r_args = child_args;
 
     // Initialize child's mail
     srr_init_mailbox(&child->mailbox);
@@ -212,5 +214,4 @@ int32_t fork(void) {
     list_add_tail(&ready_queue, &child->sched_node);
 
     uart0_printf("fork: child PID %d\n", child_pid);
-    return child_pid;
 }
