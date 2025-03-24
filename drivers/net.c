@@ -445,6 +445,8 @@ extern void buddy();
 #define ECHO_REQUEST 8 
 #define ECHO_REQUEST_CODE 0
 
+#define ICMP_PACKET_SIZE 74
+
 /* ----------------------------STRUCTS----------------------------- */
 
 /* CPDMA header discriptors */
@@ -2100,6 +2102,15 @@ void icmp_echo_reply(ethernet_header eth_header, ipv4_header ip_header, icmp_hea
 
   icmp_transmit(frame, size, ECHO_REPLY, ECHO_REPLY_CODE, icmp.data, ip_header.src_ip, eth_header.source_mac);
 
+}
+
+void icmp_echo_request(uint32_t ip, uint8_t* mac){
+
+  uint8_t* packet = (uint8_t*) kmalloc(ICMP_PACKET_SIZE);
+
+  icmp_transmit(packet, ICMP_PACKET_SIZE, ECHO_REQUEST, ECHO_REQUEST_CODE, 0, ip, mac);
+
+  kfree(packet);
 }
 
 /* --------------------------INIT----------------------------- */
