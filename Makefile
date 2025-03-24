@@ -1,6 +1,6 @@
 PREFIX = arm-none-eabi-
 CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include
-KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -mno-unaligned-access -O0 -I./include
+KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include
 
 BUILD_DIR = build/
 BIN_DIR = bin/
