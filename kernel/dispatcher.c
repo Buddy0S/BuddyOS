@@ -190,10 +190,10 @@ void fork(void) {
     child->context = parent->context;
 
     // Adjust child's saved r0 (syscall return value) to 0
-    uint32_t *child_args = (parent->r_args - 4) - (6 * sizeof(uint32_t));
+    uint8_t *child_args = ((uint8_t*)parent->r_args - 4) - (6 * sizeof(uint32_t));
     kmemcpy(parent->r_args, child_args, 6 * sizeof(uint32_t));
     child_args[0] = 0;
-    parent->r_args = child_args;
+    parent->r_args[0] = child_pid;
 
     // Initialize child's PCB
     child->pid = child_pid;
@@ -205,7 +205,7 @@ void fork(void) {
     child->trap_reason = SYSCALL;
     child->cpu_time = PROC_QUANTUM;
     child->quantum_elapsed = false;
-    child->r_args = child_args;
+    child->r_args = (uint32_t*)child_args;
 
     // Initialize child's mail
     srr_init_mailbox(&child->mailbox);
