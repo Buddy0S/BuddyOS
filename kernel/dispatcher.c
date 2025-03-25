@@ -20,8 +20,8 @@ void schedule(void) {
         current_process = &PROC_TABLE[0];
         return;
     } else if (current->prio != LOW) {
-        struct KList *node = list_pop(&ready_queue);
         if (current->state != BLOCKED) {
+            struct KList *node = list_pop(&ready_queue);
             list_add_tail(&ready_queue, node);
         }
     }
