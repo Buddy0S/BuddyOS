@@ -426,6 +426,7 @@ extern void buddy();
 #define STATIC_IP 0xC0A80114
 #define IPV4_HEADER_SIZE 20
 #define IP_VERSION 4
+#define IP_VERSION_HEADER 0x45
 #define DHSP_ECN 0
 #define IP_ID 1
 #define IPV4_FLAGS 0
@@ -1866,28 +1867,25 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
  * https://tools.ietf.org/html/rfc1071
  * modified to work for 4 byte aligned Access
  * */
-uint16_t ipv4_checksum(void *ipv4_header, int size){
+uint16_t ipv4_checksum(uint8_t* ipv4_header, int size){
 
   uint32_t sum = 0;
-  uint16_t ret;
-  uint32_t temp;
+  uint8_t* temp;
 
   while (size > 1) {
 
-    temp = *((uint32_t *) ipv4_header);
-    sum += (temp & 0xFFFF0000) >> 16;
-    sum += (temp & 0x0000FFFF);
-    size -= sizeof(uint32_t);
-    ipv4_header = (void*)((uint32_t)ipv4_header + sizeof(uint32_t));
+    temp = (uint8_t*)((uint32_t)ipv4_header + sizeof(uint8_t));
+    sum += *ipv4_header;
+    sum += *temp;
+    size -= sizeof(uint16_t);
+    ipv4_header = (uint8_t*)((uint32_t)ipv4_header + sizeof(uint16_t));
   }
 
   if (size > 0) sum += *(uint8_t*) ipv4_header;
 
   while (sum>>16) sum = (sum & 0xFFFF) + (sum >> 16);
 
-  ret = (~sum) & 0x0000FFFF;
-
-  return ret;
+  return ~sum;
 }
 
 void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size, uint8_t* frame_ptr);
@@ -1932,15 +1930,15 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* 
 
   ip_header.header_checksum = (BYTE3(word4) << 8) & BYTE2(word4); 
 
-  ip_header.src_ip = ((word4 & 0x0000FFFF) << 16) & ((word5 & 0xFFFF0000) >> 16);
+  ip_header.src_ip = ((word4 & 0x0000FFFF) << 16) | ((word5 & 0xFFFF0000) >> 16);
  
   uart0_printf("Source IP\n");
   print_ip(ip_header.src_ip);
  
-  ip_header.dest_ip = ((word5 & 0x0000FFFF) << 16) & ((word6 & 0xFFFF0000) >> 16);
+  ip_header.dest_ip = ((word5 & 0x0000FFFF) << 16) | ((word6 & 0xFFFF0000) >> 16);
 
   uart0_printf("Dest IP\n");
-  print_ip(ip_header.src_ip);
+  print_ip(ip_header.dest_ip);
 
   switch (ip_header.protocol){
     case ICMP:
@@ -1983,7 +1981,7 @@ void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t des
   uint16_t checksum = 0;
   uint16_t len = size - ETH_HEADER_SIZE;
 
-  frame[14] = (IP_VERSION << 4) | (IPV4_HEADER_SIZE);
+  frame[14] = IP_VERSION_HEADER;
   frame[15] = DHSP_ECN;
 
   frame[16] = (len & 0xFF00) >> 8;
@@ -2058,7 +2056,8 @@ void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* fram
 
     case ECHO_REPLY:
       {
-        uart0_printf("ICMP echo reply\n");
+        uart0_printf("Recieved Echo Reply from:\n");
+        print_ip(ip_header.src_ip);
       }
       break;
 
@@ -2108,6 +2107,7 @@ void icmp_echo_request(uint32_t ip, uint8_t* mac){
 
   uint8_t* packet = (uint8_t*) kmalloc(ICMP_PACKET_SIZE);
 
+  uart0_printf("Creating ICMP echo request\n");
   icmp_transmit(packet, ICMP_PACKET_SIZE, ECHO_REQUEST, ECHO_REQUEST_CODE, 0, ip, mac);
 
   kfree(packet);
