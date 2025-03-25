@@ -1,6 +1,6 @@
 PREFIX = arm-none-eabi-
 CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include
-KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -mno-unaligned-access -O0 -I./include
+KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -mno-unaligned-access -O0 -I./include -DDEBUG
 
 BUILD_DIR = build/
 BIN_DIR = bin/
@@ -98,11 +98,6 @@ $(BUILD_DIR)cpsw.o: drivers/cpsw.c
 
 $(BUILD_DIR)kernel.o: kernel/main.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/main.c -o $@
-
-
-
-$(BUILD_DIR)net.o: drivers/net.c
-	$(PREFIX)gcc $(CFLAGS) drivers/net.c -o $@
 
 kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o\
 $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o\

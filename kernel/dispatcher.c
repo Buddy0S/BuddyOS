@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "list.h"
 #include "uart.h"
 #include "proc.h"
 #include <syscall.h>
@@ -11,13 +12,23 @@ extern uint8_t * KERNEL_STACK_TOP;
 /* Round-robin yield: switches context to the next process */
 void schedule(void) {
     PCB *current = current_process;
-    
+
     /* Remove the head node and add it to the tail */
-    struct KList *node = list_pop(&ready_queue);
-    list_add_tail(&ready_queue, node);
-    
+    if (list_empty(&ready_queue)) {
+        /* null proc */
+        uart0_printf("going to null proc\n");
+        current_process = &PROC_TABLE[0];
+        return;
+    } else if (current->prio != LOW) {
+        struct KList *node = list_pop(&ready_queue);
+        if (current->state != BLOCKED) {
+            list_add_tail(&ready_queue, node);
+        }
+    }
+
     /* The new head of the ready queue is the next process */
     PCB *next = knode_data(list_first(&ready_queue), PCB, sched_node);
+
     current_process = next;
 }
 
@@ -79,12 +90,12 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
 #endif
             args[0] = msg_waiting();
             break;
-	case SYSCALL_FORK_NR:
+        case SYSCALL_FORK_NR:
 #ifdef DEBUG
-    	    uart0_printf("fork syscall\n");
+            uart0_printf("fork syscall\n");
 #endif
-    	    args[0] = fork();
-    	    break;
+            args[0] = fork();
+            break;
         default:
 #ifdef DEBUG
             uart0_printf("unknown\n");
@@ -157,7 +168,7 @@ void dispatcher(void) {
         if (current_process->state == BLOCKED) {
             current_process->cpu_time = PROC_QUANTUM;
             current_process->quantum_elapsed = false;
-            current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
+            schedule();
         }
         else if (current_process->quantum_elapsed) {
             current_process->cpu_time = PROC_QUANTUM;

@@ -74,7 +74,9 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
     srr_init_mailbox(&p->mailbox);
 
     /* Add this process to the ready queue */
-    list_add_tail(&ready_queue, &p->sched_node);
+    if (prio != LOW) {
+        list_add_tail(&ready_queue, &p->sched_node);
+    }
 }
 
 /* test function that calls a syscall that takes 2 arguments */
@@ -165,7 +167,7 @@ void process0(void) {
     len = 20;
 
     while (1) {
-        uart0_printf("\nProcess %d received 5 + 10 = %d\n", pid, __syscalltest(5, 10));
+        uart0_printf("\nThe kernel told his buddy (process %d) that 5 + 10 = %d\n", pid, __syscalltest(5, 10));
         delay();
         if (__msg_waiting()) {
             uart0_printf("Proc %d: Theres a message from my buddy!\n", pid);
@@ -179,6 +181,8 @@ void process0(void) {
         __reply(author, msg, 19);
 
         uart0_printf("Proc %d: sent my buddy a reply\n", pid);
+        block();
+        __yield();
     }
 }
 
@@ -186,7 +190,7 @@ void process1(void) {
     char message[20] = "Hey buddy";
     char response[20];
     uint32_t rsp_len;
-    int dest = 0;
+    int dest = 1;
     uart0_printf("Process 1\n");
     int fork_result = __fork();
 
@@ -196,7 +200,7 @@ void process1(void) {
     } else if (fork_result == 0) {
         // This branch is executed in the child
         uart0_printf("Process 1 (child): My PID is %d\n", current_process->pid);
-        dest = 2;
+        dest = 3;
     } else {
         // This branch is executed in the paren
         uart0_printf("Process 1 (parent): fork returned child PID %x\n", fork_result);
@@ -214,6 +218,8 @@ void process1(void) {
         __send(dest, message, 20, response, &rsp_len);
         uart0_printf("PROC%d: My buddy received my message!!\n", pid);
         uart0_printf("Proc %d: receiving %s\n", pid, response);
+        block();
+        __yield();
     }
 }
 
@@ -221,6 +227,7 @@ void null_proc(void) {
     while (1) {
         uart0_printf("null proc going to sleep... zzzzzzz\n");
         WFI();
+        delay();
     }
 }
 
@@ -316,14 +323,15 @@ int main(){
     /* Initialize the ready queue */
     init_ready_queue();
 
-    /* Initialize three processes (using only the first three slots) with MEDIUM priority */
-    init_process(&PROC_TABLE[0], process0, PROC_STACKS[0], MEDIUM);
-    init_process(&PROC_TABLE[1], process1, PROC_STACKS[1], MEDIUM);
+    init_process(&PROC_TABLE[0], null_proc, PROC_STACKS[0], LOW);
+    init_process(&PROC_TABLE[1], process0, PROC_STACKS[1], MEDIUM);
+    init_process(&PROC_TABLE[2], process1, PROC_STACKS[2], MEDIUM);
 
     uart0_printf("process gonan jump to %x\n", process1);
 
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
+    current_process = &PROC_TABLE[0];
 
     /* Call dispatcher */
     dispatcher();
