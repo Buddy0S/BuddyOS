@@ -448,6 +448,13 @@ extern void buddy();
 
 #define ICMP_PACKET_SIZE 74
 
+//*******************************************************************
+// UDP                                                               
+//*******************************************************************
+
+#define UDP_HEADER_SIZE 8
+#define PSUEDO_HEADER_SIZE 20
+
 /* ----------------------------STRUCTS----------------------------- */
 
 /* CPDMA header discriptors */
@@ -1212,6 +1219,16 @@ void hex_dump(uint32_t* data, int len){
     
         uart0_printf("%x\n",ntohl(data[i])); 
     }
+}
+
+/*
+ * normal byte copy
+ * */
+void net_memcopy(uint8_t* dest, uint8_t* src, int size){
+
+  for (int i = 0; i < size ; i++){
+    dest[i] = src[i];
+  }
 }
 
 /* --------------------------PACKETS----------------------------- */
@@ -2166,10 +2183,52 @@ void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame
 
 }
 
+/*
+ * udp checksum uses pseudo header to compute checksum
+ * */
+uint16_t udp_checksum(uint8_t* frame, uint32_t src_ip, uint32_t dest_ip, uint16_t size, uint16_t src_port, uint16_t dest_port){
+
+  uint16_t pseudo_len = size - UDP_HEADER_SIZE + PSUEDO_HEADER_SIZE;
+
+  uint8_t* pseudo_packet = (uint8_t*)kmalloc(pseudo_len);
+
+  pseudo_packet[0] = BYTE3(src_ip);
+  pseudo_packet[1] = BYTE2(src_ip);
+  pseudo_packet[2] = BYTE1(src_ip);
+  pseudo_packet[3] = BYTE0(src_ip);
+
+  pseudo_packet[4] = BYTE3(dest_ip);
+  pseudo_packet[5] = BYTE2(dest_ip);
+  pseudo_packet[6] = BYTE1(dest_ip);
+  pseudo_packet[7] = BYTE0(dest_ip);
+
+  pseudo_packet[8] = 0;
+  pseudo_packet[9] = UDP;
+
+  pseudo_packet[10] = (pseudo_len & 0xFF00) >> 8;
+  pseudo_packet[11] = pseudo_len & 0x00FF;
+
+  pseudo_packet[12] = (src_port & 0xFF00) >> 8;
+  pseudo_packet[13] = src_port & 0x00FF;
+
+  pseudo_packet[14] = (dest_port & 0xFF00) >> 8;
+  pseudo_packet[15] = dest_port & 0x00FF;
+
+  pseudo_packet[16] = (pseudo_len & 0xFF00) >> 8;
+  pseudo_packet[17] = pseudo_len & 0x00FF;
+
+  pseudo_packet[18] = 0;
+  pseudo_packet[19] = 0;
+
+  net_memcopy(&(pseudo_packet[20]),&(frame[41]), size - UDP_HEADER_SIZE);
+
+  return ipv4_checksum(pseudo_packet, pseudo_len);
+}
+
 void udp_transmit(uint8_t* frame, uint16_t size, uint16_t src_port, uint16_t dest_port, uint32_t dest_ip, uint8_t* dest_mac){
 
   uint16_t length = size - ETH_HEADER_SIZE - IPV4_HEADER_SIZE;
-  uint16_t checksum = 0; // checksum is calculated using pseudoheader
+  uint16_t checksum = udp_checksum(frame,STATIC_IP,dest_ip,length,src_port,dest_port); 
   
   frame[34] = (src_port & 0xFF00) >> 8;
   frame[35] = src_port & 0x00FF;
