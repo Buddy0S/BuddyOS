@@ -1872,18 +1872,26 @@ uint16_t ipv4_checksum(uint8_t* ipv4_header, int size){
   uint32_t sum = 0;
   uint8_t* temp;
 
+  uart0_printf("Computing Checksum\n");
+
   while (size > 1) {
 
     temp = (uint8_t*)((uint32_t)ipv4_header + sizeof(uint8_t));
-    sum += *ipv4_header;
-    sum += *temp;
+    sum += ((uint16_t)(*ipv4_header)) << 8 | *temp;
     size -= sizeof(uint16_t);
     ipv4_header = (uint8_t*)((uint32_t)ipv4_header + sizeof(uint16_t));
+    uart0_printf("Sum %x\n", sum);
   }
 
   if (size > 0) sum += *(uint8_t*) ipv4_header;
 
+  uart0_printf("Sum %x\n", sum);
+
   while (sum>>16) sum = (sum & 0xFFFF) + (sum >> 16);
+
+  uart0_printf("Sum %x\n", sum);
+
+  uart0_printf("Sum %x\n", ~sum);
 
   return ~sum;
 }
