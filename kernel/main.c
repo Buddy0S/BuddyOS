@@ -6,8 +6,11 @@
 #include "memory.h"
 #include "list.h"
 #include "proc.h"
+#include "fat12.h"
+#include "vfs.h"
 #include "net.h"
 #include "led.h"
+#include "vfs.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
@@ -278,6 +281,38 @@ int main(){
     	PROC_TABLE[i].state = DEAD;
     }
 
+
+	/* ********* Test File system ********* */
+
+	uint32_t* buffer = (uint32_t*)kmalloc(128 * sizeof(uint32_t));
+	fat12_init(0, buffer);
+	kfree(buffer);
+
+	vfs_mount("/", FAT12);
+	vfs_mount("/home", FAT12);
+
+	char buf[64];
+
+	int fd = vfs_open("/home/TEST.TXT", O_READ | O_WRITE);
+	int bytes = vfs_read(fd, buf, 64);
+	uart0_printf("%s (%d bytes)\n", buf, bytes);
+	bytes = vfs_write(fd, "I ain't reading all that", sizeof("I ain't reading all that"));
+	vfs_close(fd);
+
+	fd = vfs_open("/home/HELLO.TXT", O_WRITE);
+	bytes = vfs_write(fd, "Hello World!", sizeof("Hello World!"));
+	uart0_printf("Wrote %d bytes\n", bytes);
+	vfs_close(fd);
+
+	fd = vfs_open("/home/NOT_EX.TXT", O_READ);
+	bytes = vfs_write(fd, "Hello World!", sizeof("Hello World!"));
+	uart0_printf("Wrote %d bytes\n", bytes);
+	vfs_close(fd);
+
+	fd = vfs_open("/home/DIS.TXT", O_WRITE);
+	vfs_close(fd);
+    
+    
     /* Initialize the ready queue */
     init_ready_queue();
 
