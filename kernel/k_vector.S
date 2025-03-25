@@ -37,11 +37,15 @@ data_abort:
 not_used:
     b loop
 
+.extern current_process
+
 @ interrupt exception handler
 irq_interrupt:
     
     @ save registers to stack
-    sub sp, sp, #4 @ stack hole just in case
+    ldr sp, =current_process
+    ldr sp, [sp]
+    ldr sp, [sp, #76]
     stmfd sp!, {r0-r3, r11, lr}
  
     @ save the saved program status register
@@ -53,12 +57,13 @@ irq_interrupt:
     mov r1, #0x1 @ gonna set bit one to enable new irq generation
     str r1, [r0, #0x48] @ write the bit to INTC_CONTROL register
 
+    mov r0, sp
+
     @ jump to interrupt handler 
     bl interrupt_handler
 
     msr spsr, r11 @ restore saved program status register
     ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
-    add sp, sp, #4
 
     subs pc, lr, #4 @ restore execution
 
@@ -74,12 +79,17 @@ loop:
 
 .extern testprint
 
+
 @ can't use svc in supervisor node
 .global supervisor_call
 supervisor_call:
 
     @ save registers to stack
-    sub sp, sp, #4 @ stack hole just in case
+    ldr sp, =current_process
+    ldr sp, [sp]
+    ldr sp, [sp, #76]
+    /* ????? lol ????? */
+
     stmfd sp!, {r0-r3, r11, lr}
 
     @ save address of stack for access to parameters
@@ -99,7 +109,6 @@ supervisor_call:
 
     msr spsr, r11 @ restore saved program status register
     ldmfd sp!, {r0-r3, r11, lr} @ restore saved registers
-    add sp, sp, #4
 
     subs pc, lr, #0 @ restore execution
 

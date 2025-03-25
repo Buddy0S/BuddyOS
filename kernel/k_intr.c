@@ -12,8 +12,10 @@ uint32_t test_syscall(int a, int b) {
     return a + b;
 }
 
-void testprint(int a, int b) {
-    uart0_printf("hi guys %x %x\n", a, b);
+void testprint(PCB* a) {
+    uart0_printf("hi guys %x %x\n", a, a->exception_stack_top);
+    uart0_printf("hi guys %x %x\n", (*(PCB**)a), (*(PCB**)a)->exception_stack_top);
+    uart0_printf("hi guys %x %x\n", current_process, current_process->exception_stack_top);
 }
 
 /* called by supervisor vector in idt when svc interrupt is raised.
@@ -33,7 +35,8 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
     switch_to_dispatch(current_process, kernel_process);
 }
 
-void isr_switch(uint32_t isr_num) {
+void isr_switch(uint32_t isr_num, uint32_t args[]) {
+    current_process->r_args = args;
     current_process->status = isr_num;
     current_process->trap_reason = INTERRUPT;
     switch_to_dispatch(current_process, kernel_process);
@@ -84,7 +87,7 @@ void UART0_isr(){
  * it down, but if i move the whole thing into the dispatcher, the timer
  * irq goes off 1000 times per second and obliterates everything with like 5
  * different context switches per timer interrupt */
-void interrupt_handler() {
+void interrupt_handler(uint32_t args[]) {
 
     /* get interrupt number */
     volatile uint32_t irqnum = *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_IRQ) & 0x7F; 
@@ -118,7 +121,7 @@ void interrupt_handler() {
             //uart0_printf("time to switch\n");
             /* jump back to the dispatcher */
             current_process->quantum_elapsed = true;
-            isr_switch(irqnum);
+            isr_switch(irqnum, args);
         }
 
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;

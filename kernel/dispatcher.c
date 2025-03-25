@@ -5,6 +5,9 @@
 #include <srr_ipc.h>
 #include <memory.h>
 
+
+extern uint8_t * KERNEL_STACK_TOP;
+
 /* Round-robin yield: switches context to the next process */
 void schedule(void) {
     PCB *current = current_process;
@@ -27,6 +30,7 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
     switch (svc_num) {
         case 0:
             uart0_printf("yield\n");
+            schedule();
             break;
         case 1:
             uart0_printf("add two numbers together tye shi\n");
@@ -167,7 +171,7 @@ int32_t fork(void) {
     }
 
     PCB *parent = current_process;
-    if (child_pid == -1) parent->r_args[0] = -1;; // No free process slot
+    if (child_pid == -1) return -1; // No free process slot
 
     PCB *child = &PROC_TABLE[child_pid];
 
@@ -179,8 +183,8 @@ int32_t fork(void) {
     // use the same offset into the child's stack as the parent's saved_sp 
     // had into the parent's stack.
     // Set child's stack pointer (same offset as parent)
-    uint32_t parent_stack_offset = parent->saved_sp - parent->stack_base;
-    child->saved_sp = child_stack - parent_stack_offset;
+    int32_t parent_stack_offset = parent->saved_sp - parent->stack_base;
+    child->saved_sp = child_stack + parent_stack_offset;
 
     // Keep the saved LR the same as parent's
     child->saved_lr = parent->saved_lr;
@@ -189,11 +193,18 @@ int32_t fork(void) {
     child->context = parent->context;
 
     /* get svc stack for child */
-    child->stack_ptr = (uint32_t*)(((uint8_t*)parent->stack_ptr - 4) - (6 * sizeof(uint32_t)) - 16);
-    uint8_t *child_args = ((uint8_t*)child->stack_ptr + ((uint8_t*)parent->r_args - (uint8_t*)parent->stack_ptr));
-    kmemcpy(parent->stack_ptr, child->stack_ptr, 6 * sizeof(uint32_t) + 16);
-    /* ?????????? lol lol lol lol ????????? */
-    /* 16 is like probably correct but like i just guessed until something worked */
+    child->exception_stack_top = (uint32_t*)KERNEL_STACK_TOP - (child_pid * KERNEL_STACK_SIZE);
+    child->stack_ptr = child->exception_stack_top - (parent->exception_stack_top - parent->stack_ptr);
+    uint32_t *child_args = (child->stack_ptr + (parent->r_args - parent->stack_ptr));
+    kmemcpy(parent->exception_stack_top - KERNEL_STACK_SIZE, child->exception_stack_top - KERNEL_STACK_SIZE, sizeof(uint32_t) * KERNEL_STACK_SIZE);
+
+    for (int i = 0; i < KERNEL_STACK_SIZE; ++i) {
+        uart0_printf("parent stack[%d] = %x\n", i, (parent->exception_stack_top - KERNEL_STACK_SIZE)[i]);
+    }
+
+    for (int i = 0; i < KERNEL_STACK_SIZE; ++i) {
+        uart0_printf("child stack[%d] = %x\n", i, (child->exception_stack_top - KERNEL_STACK_SIZE)[i]);
+    }
 
     // Initialize child's PCB
     child->pid = child_pid;

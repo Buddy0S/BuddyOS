@@ -6,9 +6,9 @@
 #include <list.h>
 #include <srr_ipc.h>
 
-#define MAX_PROCS   3
+#define MAX_PROCS   5
 #define STACK_SIZE  256
-#define KERNEL_STACK_SIZE 256
+#define KERNEL_STACK_SIZE 32
 #define PROC_QUANTUM 1000
 
 /* Process states */
@@ -65,6 +65,8 @@ typedef struct PCB {
     uint32_t *saved_sp;            /* Pointer to the suspended process' sp (when in svc mode) */
     uint32_t saved_lr;            /* Pointer to the suspended process' lr (when in svc mode) */
 
+    uint32_t *exception_stack_top;
+
     uint32_t *r_args;
     int32_t trap_reason;
     int32_t cpu_time;
@@ -81,6 +83,7 @@ typedef struct PCB {
 
 /* Current running process pointer */
 extern PCB *current_process;
+extern PCB** curr_ptr;
 extern PCB *kernel_process;
 
 /* Ready queue for processes */
