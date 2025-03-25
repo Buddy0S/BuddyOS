@@ -29,46 +29,66 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
     /* might refactor this */
     switch (svc_num) {
         case 0:
+#ifdef DEBUG
             uart0_printf("yield\n");
+#endif
             schedule();
             break;
         case 1:
+#ifdef DEBUG
             uart0_printf("add two numbers together tye shi\n");
+#endif
             args[0] = add_two_numbers(args[0], args[1]);
             break;
         case SYSCALL_SEND_NR:
+#ifdef DEBUG
             uart0_printf("IPC SEND\n");
+#endif
             args[0] = send((int)args[0], (struct Mail*)args[1], (void*)args[2],
                     (uint32_t*) args[3]);
             break; 
         case SYSCALL_SEND_END:
+#ifdef DEBUG
             uart0_printf("IPC SEND SECOND HALF\n");
+#endif
             args[0] = send_end((void*)args[0], (uint32_t*)args[1]);
             break;
         case SYSCALL_RECEIVE_NR:
+#ifdef DEBUG
             uart0_printf("IPC RECV\n");
+#endif
             args[0] = receive((int*)args[0], (void*)args[1],
                     (uint32_t*)args[2]);
             break;
         case SYSCALL_RECEIVE_END:
+#ifdef DEBUG
             uart0_printf("IPC RECV SECOND HALF\n");
+#endif
             args[0] = receive_end((int*)args[0], (void*)args[1],
                     (uint32_t*)args[2]);
             break;
         case SYSCALL_REPLY_NR:
+#ifdef DEBUG
             uart0_printf("IPC REPLY\n");
+#endif
             args[0] = reply((int)args[0], (void*)args[1], (uint32_t)args[2]);
             break;
         case SYSCALL_MSG_WAITING_NR:
+#ifdef DEBUG
             uart0_printf("IPC MSGWAITS\n");
+#endif
             args[0] = msg_waiting();
             break;
 	case SYSCALL_FORK_NR:
+#ifdef DEBUG
     	    uart0_printf("fork syscall\n");
+#endif
     	    args[0] = fork();
     	    break;
         default:
+#ifdef DEBUG
             uart0_printf("unknown\n");
+#endif
             break;
     }
 
@@ -77,7 +97,9 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
 
 void dispatcher(void) {
     // run first process
+#ifdef DEBUG
     uart0_printf("\nstart of dispatcher\n");
+#endif
     while (1) {
         if (current_process->started) {
             if (current_process->trap_reason == SYSCALL) {
@@ -85,11 +107,15 @@ void dispatcher(void) {
                  * going through a syscall or an interrupt then that means it just
                  * returned from the function it started at which means it should 
                  * probably just get killed */
+#ifdef DEBUG
                 uart0_printf("svc\n");
+#endif
                 current_process->trap_reason = HANDLED;
                 switch_to_svc(kernel_process, current_process);    
             } else if (current_process->trap_reason == INTERRUPT) {
+#ifdef DEBUG
                 uart0_printf("interrupt\n");
+#endif
                 current_process->trap_reason = HANDLED;
                 switch_to_irq(kernel_process, current_process);
             }
@@ -97,23 +123,33 @@ void dispatcher(void) {
             current_process->started = true;
             switch_to_start(kernel_process, current_process);    
         }
+#ifdef DEBUG
         uart0_printf("\nreturned to dispatcher from process #%d\n", current_process->pid);
-
         uart0_printf("trap reason: ");
+#endif
+
         switch (current_process->trap_reason) {
             case SYSCALL:
+#ifdef DEBUG
                 uart0_printf("syscall #%d = ", current_process->status);
+#endif
                 /* call some sort of syscall handler here */
                 execute_syscall(current_process->status, current_process->r_args);
                 break;
             case INTERRUPT:
+#ifdef DEBUG
                 uart0_printf("interrupt #%d\n", current_process->status);
+#endif
                 break;
             case HANDLED:
+#ifdef DEBUG
                 uart0_printf("time to die\n");
+#endif
                 break;
             default:
+#ifdef DEBUG
                 uart0_printf("unknown\n");
+#endif
                 break;
         }
 
@@ -128,7 +164,9 @@ void dispatcher(void) {
             current_process->quantum_elapsed = false;
             schedule();
         }
+#ifdef DEBUG
         uart0_printf("jumping to %x for process #%d through ", current_process->context.lr, current_process->pid);
+#endif
 
     }
 }
@@ -198,14 +236,6 @@ int32_t fork(void) {
     uint32_t *child_args = (child->stack_ptr + (parent->r_args - parent->stack_ptr));
     kmemcpy(parent->exception_stack_top - KERNEL_STACK_SIZE, child->exception_stack_top - KERNEL_STACK_SIZE, sizeof(uint32_t) * KERNEL_STACK_SIZE);
 
-    for (int i = 0; i < KERNEL_STACK_SIZE; ++i) {
-        uart0_printf("parent stack[%d] = %x\n", i, (parent->exception_stack_top - KERNEL_STACK_SIZE)[i]);
-    }
-
-    for (int i = 0; i < KERNEL_STACK_SIZE; ++i) {
-        uart0_printf("child stack[%d] = %x\n", i, (child->exception_stack_top - KERNEL_STACK_SIZE)[i]);
-    }
-
     // Initialize child's PCB
     child->pid = child_pid;
     child->ppid = parent->pid;
@@ -226,6 +256,8 @@ int32_t fork(void) {
     // Add child to ready queue hopefully works lol
     list_add_tail(&ready_queue, &child->sched_node);
 
+#ifdef DEBUG
     uart0_printf("fork: child PID %d\n", child_pid);
+#endif
     return child_pid;
 }

@@ -46,6 +46,10 @@ irq_interrupt:
     ldr sp, =current_process
     ldr sp, [sp]
     ldr sp, [sp, #76]
+    /* ????? lol ????? */
+    /* my actual garbage code and planning led to this */
+    /* THREE LOADS FROM DRAM 1000 TIMES PER SECOND */
+
     stmfd sp!, {r0-r3, r11, lr}
  
     @ save the saved program status register
@@ -88,7 +92,6 @@ supervisor_call:
     ldr sp, =current_process
     ldr sp, [sp]
     ldr sp, [sp, #76]
-    /* ????? lol ????? */
 
     stmfd sp!, {r0-r3, r11, lr}
 

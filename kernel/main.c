@@ -148,6 +148,7 @@ void process0(void) {
     } else if (fork_result == 0) {
         // This branch is executed in the child
         uart0_printf("Process 0 (child): My PID is %d\n", current_process->pid);
+        delay();
     } else {
         // This branch is executed in the paren
         uart0_printf("Process 0 (parent): fork returned child PID %x\n", fork_result);
@@ -169,10 +170,10 @@ void process0(void) {
             uart0_printf("Proc %d: Theres no message from my buddy yet but thats fine ill wait\n", pid);
         }
 
-        uart0_printf("receive return code %d\n", __receive(&author, msg, &len));
+        __receive(&author, msg, &len);
         uart0_printf("Proc %d: I got my buddy's message!\n", pid);
         uart0_printf("Proc %d: msg received from %d:\n\t%s\n", pid, author, msg);
-        uart0_printf("reply return code %d\n", __reply(author, msg, 19));
+        __reply(author, msg, 19);
 
         uart0_printf("Proc %d: sent my buddy a reply\n", pid);
     }
@@ -207,7 +208,7 @@ void process1(void) {
         uart0_printf("\nProcess %d has been resurrected\n", pid);
         uart0_printf("Proc %d: Sending a message to my buddy :)\n", pid);
         rsp_len = 20;
-        uart0_printf("send return code %d\n", __send(dest, message, 20, response, &rsp_len));
+        __send(dest, message, 20, response, &rsp_len);
         uart0_printf("PROC%d: My buddy received my message!!\n", pid);
         uart0_printf("Proc %d: receiving %s\n", pid, response);
     }
@@ -264,9 +265,6 @@ void buddy(void) {
 int main(){
 
     uart0_printf("Entering Kernel\n");
-    register uint32_t sp asm("sp");
-    uart0_printf("current sp: %x\n", sp);
-
 
     /* Initialize buddyOS memory allocator */
     if (init_alloc() >= 0) {
@@ -291,8 +289,6 @@ int main(){
 
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
-
-    uart0_printf("?????? %x\n", current_process->exception_stack_top);
 
     /* Call dispatcher */
     dispatcher();
