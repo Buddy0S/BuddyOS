@@ -34,4 +34,4 @@ uint32_t *getPid(int current_index) {
 int kill(uint32_t pid);
 
 /* printf */
-//void printf(void *in) {}
+/* void printf(void *in) {} */

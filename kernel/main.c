@@ -79,11 +79,11 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
 
 /* test function that calls a syscall that takes 2 arguments */
 int __syscalltest(int a, int b) {
-    return SYSCALL(1);
+    return SYSCALL(SYSCALL_TEST_2_ARGS_NR);
 }
 
-void __yield(void) {
-    SYSCALL(0);
+int __yield(void) {
+    return SYSCALL(SYSCALL_YIELD_NR);
 }
 
 int __send_end(void* reply, uint32_t* rlen) {

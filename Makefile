@@ -69,6 +69,9 @@ $(BUILD_DIR)kinit.o : kernel/kinit.S | $(BUILD_DIR)
 $(BUILD_DIR)k_vector.o : kernel/k_vector.S | $(BUILD_DIR)
 	$(PREFIX)as kernel/k_vector.S -o $@
 
+$(BUILD_DIR)context_switch.o : kernel/context_switch.S | $(BUILD_DIR)
+	$(PREFIX)as kernel/context_switch.S -o $@
+
 $(BUILD_DIR)k_intr.o : kernel/k_intr.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $(BUILD_DIR)
 	$(PREFIX)gcc $(KCFLAGS) kernel/k_intr.c -o $@
 
@@ -99,16 +102,12 @@ $(BUILD_DIR)cpsw.o: drivers/cpsw.c
 $(BUILD_DIR)kernel.o: kernel/main.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/main.c -o $@
 
-
-
-$(BUILD_DIR)net.o: drivers/net.c
-	$(PREFIX)gcc $(CFLAGS) drivers/net.c -o $@
-
 kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o\
 $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o\
 $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)net.o\
 $(BUILD_DIR)dispatcher.o $(BUILD_DIR)memcmd.o\
-$(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o $(BUILD_DIR)fs.o $(BUILD_DIR)vfs.o $(BUILD_DIR)srr_ipc.o
+$(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o $(BUILD_DIR)fs.o $(BUILD_DIR)vfs.o\
+$(BUILD_DIR)srr_ipc.o $(BUILD_DIR)context_switch.o
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 kernel.bin: kernel.elf
