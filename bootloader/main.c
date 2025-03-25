@@ -36,8 +36,8 @@ void exception_handler(uint32_t exception) {
 
                 reason = status & 0xF;
 
-                switch(reason){
-                    case 0x0: uart0_printf("Alignment Fault\n"); break;
+		switch(reason){
+		    case 0x1: uart0_printf("Alignment Fault\n"); break;
                     case 0x4: uart0_printf("Translation Fault (Section)\n"); break;
                     case 0x5: uart0_printf("Translation Fault (Page)\n"); break;
                     case 0x8: uart0_printf("Permission Fault (Section)\n"); break;
@@ -120,13 +120,21 @@ int main(void) {
     enable_interrupts();
 
     mmc.init();
-
-    volatile uint32_t __attribute__((aligned(4))) buffer[128];
+    
+    uint32_t __attribute__((aligned(4))) buffer[256];
 
     uart0_printf("Attempting to init fat12......\n");
     fat12_init(0, buffer);
 
-    fat12_read_file("KERNEL.BIN", (volatile uint32_t *)0x80000000);
+	fat12_create_dir_entry("TEST.TXT", 0x20, buffer);
+
+	fat12_write_file("TEST.TXT","The quick brown fox jumps over the lazy dog near the riverbank every morning without fail. This simple sentence has been used for years to test typewriters, keyboards, and fonts because it contains every letter of the alphabet at least once, making it a perfect tool for such purposes. Beyond that, it tells a brief story of a fox and a dog, two animals living their daily lives in a peaceful coexistence by the water's edge. Imagine the scene: the sun is just rising, casting a golden glow over the rippling river, while the fox, full of energy, leaps gracefully over the resting dog, who barely stirs from his slumber. This little tale could go on, exploring their adventures, their friendship, or even the other creatures they meet, like the birds chirping overhead or the fish swimming below. It’s a small snapshot of nature, painted with words, that stretches just far enough to fill the space we need.", 909, buffer);
+
+    fat12_read_file("TEST.TXT", buffer, buffer);
+
+	uart0_printf("Read from TEST.TXT - %s", buffer);
+
+	fat12_read_file("KERNEL.BIN", (uint32_t *)0x80000000, buffer);
 
     /*jump to kernel*/
     uint32_t* kernel = (uint32_t*)0x80000000;

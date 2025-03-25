@@ -12,8 +12,10 @@ uint32_t test_syscall(int a, int b) {
     return a + b;
 }
 
-void testprint(int a, int b) {
-    uart0_printf("hi guys %x %x\n", a, b);
+void testprint(PCB* a) {
+    uart0_printf("hi guys %x %x\n", a, a->exception_stack_top);
+    uart0_printf("hi guys %x %x\n", (*(PCB**)a), (*(PCB**)a)->exception_stack_top);
+    uart0_printf("hi guys %x %x\n", current_process, current_process->exception_stack_top);
 }
 
 /* called by supervisor vector in idt when svc interrupt is raised.
@@ -34,8 +36,9 @@ void svc_handler(uint32_t svc_num, uint32_t args[]) {
 }
 
 /* stores irq num into process context before switching to dispatcher */
-void isr_switch(uint32_t irq_num) {
-    current_process->status = irq_num;
+void isr_switch(uint32_t isr_num, uint32_t args[]) {
+    current_process->r_args = args;
+    current_process->status = isr_num;
     current_process->trap_reason = INTERRUPT;
     switch_to_dispatch(current_process, kernel_process);
 }
@@ -85,12 +88,12 @@ void UART0_isr(){
  * it down, but if i move the whole thing into the dispatcher, the timer
  * irq goes off 1000 times per second and obliterates everything with like 5
  * different context switches per timer interrupt */
-void interrupt_handler() {
+void interrupt_handler(uint32_t args[]) {
 
     /* get interrupt number */
     volatile uint32_t irqnum = *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_IRQ) & 0x7F; 
 
-    static uint32_t seconds = 0;
+    //if (irqnum != 66) uart0_printf("IRQ number %d\n", (int) irqnum);
 
     /* TIMER 0 interrrupt*/
     if (irqnum == 66) {
@@ -100,6 +103,8 @@ void interrupt_handler() {
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_ISR_CLEAR2) = (0x1 << 2);	
 
         timer_counter -= 1;
+        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
+
         if (timer_counter <= 0) {
             timer_isr();
             timer_counter = 1000;
@@ -109,10 +114,9 @@ void interrupt_handler() {
         if (current_process->cpu_time <= 0) {
             /* jump back to the dispatcher */
             current_process->quantum_elapsed = true;
-            isr_switch(irqnum);
+            isr_switch(irqnum, args);
         }
 
-        *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
     }
 
     /* UART 0 interrupt*/
@@ -150,7 +154,7 @@ void disable_interrupts(void){
 
 }
 
-void kexception_handler(uint32_t exception) {
+void kexception_handler(uint32_t exception, uint32_t pc) {
     uart0_printf("Exception Occurred: ");
 
     switch (exception) {
@@ -170,11 +174,12 @@ void kexception_handler(uint32_t exception) {
                 asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
                 uart0_printf("Addr: %x \n", addr);
                 uart0_printf("Status: %x \n", status);
+                uart0_printf("Exception PC: %x \n", pc);
 
                 reason = status & 0xF;
 
                 switch(reason){
-                    case 0x0: uart0_printf("Alignment Fault\n"); break;
+                    case 0x1: uart0_printf("Alignment Fault\n"); break;
                     case 0x4: uart0_printf("Translation Fault (Section)\n"); break;
                     case 0x5: uart0_printf("Translation Fault (Page)\n"); break;
                     case 0x8: uart0_printf("Permission Fault (Section)\n"); break;

@@ -1,6 +1,6 @@
 PREFIX = arm-none-eabi-
 CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include
-KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include
+KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -mno-unaligned-access -O0 -I./include
 
 BUILD_DIR = build/
 BIN_DIR = bin/
@@ -54,8 +54,8 @@ $(BUILD_DIR)memcmd.o : misc/memcmd.c | $(BUILD_DIR)
 $(BUILD_DIR)ddr.o : boardinit/ddr.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) boardinit/ddr.c -o $@
 
-$(BUILD_DIR)fat12.o : drivers/fat12.c | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) drivers/fat12.c -o $@
+$(BUILD_DIR)fat12.o : fs/fat12.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) fs/fat12.c -o $@
 
 $(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o $(BUILD_DIR)clock.o $(BUILD_DIR)ddr.o $(BUILD_DIR)memcmd.o $(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o | $(BIN_DIR)
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
@@ -78,9 +78,23 @@ $(BUILD_DIR)k_intr.o : kernel/k_intr.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | 
 $(BUILD_DIR)dispatcher.o: kernel/dispatcher.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/dispatcher.c -o $@
 
+$(BUILD_DIR)srr_ipc.o: kernel/srr_ipc.c
+	$(PREFIX)gcc $(KCFLAGS) kernel/srr_ipc.c -o $@
+
+$(BUILD_DIR)fs.o: fs/fs.c
+	$(PREFIX)gcc $(CFLAGS) fs/fs.c -o $@
+
+$(BUILD_DIR)vfs.o: $(BUILD_DIR)fs.o fs/vfs.c 
+	$(PREFIX)gcc $(CFLAGS) fs/vfs.c -o $@
+
 $(BUILD_DIR)memory.o: kernel/memory.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/memory.c -o $@
 
+$(BUILD_DIR)string.o: misc/string.c
+	$(PREFIX)gcc $(CFLAGS) misc/string.c -o $@
+
+$(BUILD_DIR)net.o: drivers/net.c
+	$(PREFIX)gcc $(CFLAGS) drivers/net.c -o $@
 
 $(BUILD_DIR)cpsw.o: drivers/cpsw.c
 	$(PREFIX)gcc $(KCFLAGS) drivers/cpsw.c -o $@
@@ -88,11 +102,12 @@ $(BUILD_DIR)cpsw.o: drivers/cpsw.c
 $(BUILD_DIR)kernel.o: kernel/main.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/main.c -o $@
 
-
-$(BUILD_DIR)net.o: drivers/net.c
-	$(PREFIX)gcc $(CFLAGS) drivers/net.c -o $@
-
-kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)net.o $(BUILD_DIR)dispatcher.o $(BUILD_DIR)context_switch.o
+kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o\
+$(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o\
+$(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)net.o\
+$(BUILD_DIR)dispatcher.o $(BUILD_DIR)memcmd.o\
+$(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o $(BUILD_DIR)fs.o $(BUILD_DIR)vfs.o\
+$(BUILD_DIR)srr_ipc.o $(BUILD_DIR)context_switch.o
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 kernel.bin: kernel.elf
