@@ -2166,6 +2166,26 @@ void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame
 
 }
 
+void udp_transmit(uint8_t* frame, uint16_t size, uint16_t src_port, uint16_t dest_port, uint32_t dest_ip, uint8_t* dest_mac){
+
+  uint16_t length = size - ETH_HEADER_SIZE - IPV4_HEADER_SIZE;
+  uint16_t checksum = 0; // checksum is calculated using pseudoheader
+  
+  frame[34] = (src_port & 0xFF00) >> 8;
+  frame[35] = src_port & 0x00FF;
+
+  frame[36] = (dest_port & 0xFF00 ) >> 8;
+  frame[37] = dest_port & 0x00FF;
+
+  frame[38] = (length & 0xFF00) >> 8;
+  frame[39] = length & 0x00FF;
+
+  frame[40] = (checksum & 0xFF00) >> 8;
+  frame[41] = checksum & 0x00FF;
+
+  ipv4_transmit(frame,size,UDP,dest_ip, dest_mac);
+}
+
 /* --------------------------INIT----------------------------- */
 /*
  *
