@@ -6,6 +6,7 @@
  *      top of context  68
  *      banked sp       68
  *      banked lr       72
+ *      exception fp    76
  */
 
 .global switch_to_dispatch
