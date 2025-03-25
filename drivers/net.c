@@ -1227,12 +1227,12 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
     REG(TX0_HDP) = (uint32_t) tx_desc;
 
-    uart0_printf("Transmiting Packet\n");
+    //uart0_printf("Transmiting Packet\n");
 
     // TX INT STAT RAW
     while (!REG(TX_INT_STATUS_RAW)){}
 
-    uart0_printf("Packet Transmited\n"); 
+    //uart0_printf("Packet Transmited\n"); 
 
     REG(TX_INTMASK_CLEAR) = CPDMA_CHANNEL_INT;
 
@@ -1290,16 +1290,16 @@ int cpsw_recv(){
     // int status raw need to replace this with macro
     uint32_t status = REG(RX_INT_STATUS_RAW);
 
-    uart0_printf("\n\nStarting Packet Processing\n");
+    //uart0_printf("\n\nStarting Packet Processing\n");
 
     if (!status){
-        uart0_printf("No Packets\n");
+        //uart0_printf("No Packets\n");
 	      return -1;
     }
 
     while (!(start->flags & BIT(29))){
     
-        uart0_printf("\nPacket Recieved\n");
+        //uart0_printf("\nPacket Recieved\n");
 
 	      process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
 
@@ -1313,7 +1313,7 @@ int cpsw_recv(){
 	// End of queue
 	      if (start == 0){   
 	        eoq = 1;
-          uart0_printf("End of queue reached\n");
+          //uart0_printf("End of queue reached\n");
           cpsw_start_recieption();	    
 	        break;
 	      }
@@ -1544,7 +1544,7 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
 
     uint8_t* src = eth_interface.mac_addr;
 
-    uart0_printf("\nCrafting Ethernet Frame\n");	
+    //uart0_printf("\nCrafting Ethernet Frame\n");	
  
     frame[0] = dest[0];
     frame[1] = dest[1];
@@ -1592,7 +1592,7 @@ void eth_recv(uint32_t* frame, int size){
     uint32_t word3 = 0;
     uint32_t word4 = 0;
 
-    uart0_printf("Processing Frame\n");
+    //uart0_printf("Processing Frame\n");
 
     word1 = ntohl(frame[0]);
     word2 = ntohl(frame[1]);
@@ -1627,7 +1627,7 @@ void eth_recv(uint32_t* frame, int size){
     
     case ARP:
 	  {
-	    uart0_printf("Packet Type ARP\n");
+	    //uart0_printf("Packet Type ARP\n");
 
       // skip frame header but include ether type for alignment
 		
@@ -1641,7 +1641,7 @@ void eth_recv(uint32_t* frame, int size){
 	  case IPV4:
 	  {
 
-		  uart0_printf("Packet Type IPV4\n");
+		  //uart0_printf("Packet Type IPV4\n");
 
 		  // skip frame header but include ether type for alignment
 
@@ -1654,7 +1654,7 @@ void eth_recv(uint32_t* frame, int size){
 
 	  default:
 	  {
-	    uart0_printf("Unsupported Packet Type\n");
+	    //uart0_printf("Unsupported Packet Type\n");
 	  }
     }
 }
@@ -1732,6 +1732,8 @@ void arp_anounce(){
 
     uint8_t* packet = (uint8_t*) kmalloc(128);
 
+    uart0_printf("Broadcasting ARP Anouncement packet\n");
+
     arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
 
     kfree(packet);
@@ -1745,6 +1747,8 @@ void arp_garp(){
     int8_t multicast[6] = { 0xFF, 0xFF , 0xFF, 0xFF, 0xFF, 0xFF};
 
     uint8_t* packet = (uint8_t*) kmalloc(128);
+
+    uart0_printf("Broadcasting ARP Gratuitous packet\n");
 
     arp_transmit(packet,128, multicast, multicast, eth_interface.ip_addr, ARP_REQUEST);
 
@@ -1784,7 +1788,7 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
     uint32_t word7 = 0;
     uint32_t word8 = 0;
 
-    uart0_printf("Handling ARP Request\n");
+    //uart0_printf("Handling ARP Request\n");
 
     word1 = ntohl(frame[0]);
     word2 = ntohl(frame[1]);
@@ -1872,26 +1876,17 @@ uint16_t ipv4_checksum(uint8_t* ipv4_header, int size){
   uint32_t sum = 0;
   uint8_t* temp;
 
-  uart0_printf("Computing Checksum\n");
-
   while (size > 1) {
 
     temp = (uint8_t*)((uint32_t)ipv4_header + sizeof(uint8_t));
     sum += ((uint16_t)(*ipv4_header)) << 8 | *temp;
     size -= sizeof(uint16_t);
     ipv4_header = (uint8_t*)((uint32_t)ipv4_header + sizeof(uint16_t));
-    uart0_printf("Sum %x\n", sum);
   }
 
   if (size > 0) sum += *(uint8_t*) ipv4_header;
 
-  uart0_printf("Sum %x\n", sum);
-
   while (sum>>16) sum = (sum & 0xFFFF) + (sum >> 16);
-
-  uart0_printf("Sum %x\n", sum);
-
-  uart0_printf("Sum %x\n", ~sum);
 
   return ~sum;
 }
@@ -1912,7 +1907,7 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* 
   uint32_t word5 = 0;
   uint32_t word6 = 0;
 
-  uart0_printf("Handling IPV4 Packet\n");
+  //uart0_printf("Handling IPV4 Packet\n");
 
   word1 = ntohl(frame[0]);
   word2 = ntohl(frame[1]);
@@ -1934,24 +1929,24 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* 
   ip_header.time_to_live = BYTE1(word3);
   ip_header.protocol = BYTE0(word3);
 
-  uart0_printf("Protocol %x\n",ip_header.protocol);
+  //uart0_printf("Protocol %x\n",ip_header.protocol);
 
   ip_header.header_checksum = (BYTE3(word4) << 8) & BYTE2(word4); 
 
   ip_header.src_ip = ((word4 & 0x0000FFFF) << 16) | ((word5 & 0xFFFF0000) >> 16);
  
-  uart0_printf("Source IP\n");
-  print_ip(ip_header.src_ip);
+  //uart0_printf("Source IP\n");
+  //print_ip(ip_header.src_ip);
  
   ip_header.dest_ip = ((word5 & 0x0000FFFF) << 16) | ((word6 & 0xFFFF0000) >> 16);
 
-  uart0_printf("Dest IP\n");
-  print_ip(ip_header.dest_ip);
+  //uart0_printf("Dest IP\n");
+  //print_ip(ip_header.dest_ip);
 
   switch (ip_header.protocol){
     case ICMP:
       {
-        uart0_printf("ICMP Packet \n");
+        //uart0_printf("ICMP Packet \n");
         
         // removing ipv4 header but keeping in last word for alignment
         frame = (uint32_t*)((uint32_t) frame + 5*sizeof(uint32_t));
@@ -1963,19 +1958,19 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* 
 
     case UDP:
       {
-        uart0_printf("UDP Packet \n");
+        //uart0_printf("UDP Packet \n");
       }
       break;
       
     case TCP:
       {
-        uart0_printf("TCP Packet \n");
+        //uart0_printf("TCP Packet \n");
       } 
       break;
 
     default:
       {
-        uart0_printf("Unsupported IPV4 Protocol\n");
+        //uart0_printf("Unsupported IPV4 Protocol\n");
       }
   }
 
@@ -2038,7 +2033,7 @@ void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* fram
   uint32_t word2 = 0;
   uint32_t word3 = 0;
 
-  uart0_printf("Handling ICMP Packet\n");
+  //uart0_printf("Handling ICMP Packet\n");
 
   word1 = ntohl(frame[0]);
   word2 = ntohl(frame[1]);
@@ -2057,21 +2052,22 @@ void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* fram
 
     case ECHO_REQUEST:
       {
-        uart0_printf("ICMP echo request\n");
+        uart0_printf("Ping from ");
+        print_ip(ip_header.src_ip);
         icmp_echo_reply(eth_header,ip_header,icmp,frame_ptr,size);
       }
       break;
 
     case ECHO_REPLY:
       {
-        uart0_printf("Recieved Echo Reply from:\n");
+        uart0_printf("Recieved Echo Reply from: ");
         print_ip(ip_header.src_ip);
       }
       break;
 
     default:
       {
-        uart0_printf("Unsupported ICMP type\n");
+        //uart0_printf("Unsupported ICMP type\n");
       }
       break;
 
@@ -2115,7 +2111,8 @@ void icmp_echo_request(uint32_t ip, uint8_t* mac){
 
   uint8_t* packet = (uint8_t*) kmalloc(ICMP_PACKET_SIZE);
 
-  uart0_printf("Creating ICMP echo request\n");
+  uart0_printf("Pinging ");
+  print_ip(ip);
   icmp_transmit(packet, ICMP_PACKET_SIZE, ECHO_REQUEST, ECHO_REQUEST_CODE, 0, ip, mac);
 
   kfree(packet);
@@ -2144,10 +2141,12 @@ void init_network_stack(){
     arp_anounce();
     arp_garp();
 
+    icmp_echo_request(gateway_ip,gateway_mac);
+
     while(1){
        cpsw_recv();
-       buddy();
-       icmp_echo_request(gateway_ip,gateway_mac);
+       //buddy();
+       //icmp_echo_request(gateway_ip,gateway_mac);
     }
 
 }
