@@ -482,7 +482,7 @@ typedef struct cpsw_interface {
 
 ethernet_interface eth_interface;
 
-typedef struct eth_header {
+typedef struct ethernet {
 
     uint8_t destination_mac[MAC_ADDR_LEN];
     uint8_t source_mac[MAC_ADDR_LEN];
@@ -524,11 +524,21 @@ typedef struct icmp {
 
   uint8_t type;
   uint8_t code;
-  uint8_t header_checksum;
+  uint8_t header_checksum; // should be called checksum realisticly
   uint32_t data;
   uint8_t* payload;
 
 } icmp_header;
+
+typedef struct udp {
+
+  uint16_t src_port;
+  uint16_t dest_port;
+  uint16_t length;
+  uint16_t checksum;
+  uint8_t* payload;
+
+} udp_header;
 
 /* --------------------------CPSW CODE----------------------------- */
 
@@ -1892,6 +1902,7 @@ uint16_t ipv4_checksum(uint8_t* ipv4_header, int size){
 }
 
 void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size, uint8_t* frame_ptr);
+void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size);
 
 /*
  *
@@ -1959,6 +1970,12 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* 
     case UDP:
       {
         //uart0_printf("UDP Packet \n");
+      
+        // removing ipv4 header but keeping in last word for alignment
+        frame = (uint32_t*)((uint32_t) frame + 5*sizeof(uint32_t));
+        size = size - 5*sizeof(uint32_t);
+
+        udp_recv(frame_header, ip_header, frame, size);
       }
       break;
       
@@ -2118,8 +2135,38 @@ void icmp_echo_request(uint32_t ip, uint8_t* mac){
   kfree(packet);
 }
 
-/* --------------------------INIT----------------------------- */
+/* --------------------------UDP------------------------------ */
 
+void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size){
+
+  udp_header udp;
+
+  uint32_t word1 = 0;
+  uint32_t word2 = 0;
+  uint32_t word3 = 0;
+
+  uart0_printf("Handling UDP packet\n");
+
+  word1 = ntohl(frame[0]);
+  word2 = ntohl(frame[1]);
+  word3 = ntohl(frame[2]);
+
+  udp.src_port = word1 & 0x0000FFFF;
+  udp.dest_port = (word2 & 0xFFFF0000) >> 16;
+
+  uart0_printf("Source port: %d | Destination port %d\n",udp.src_port,udp.dest_port);
+
+  udp.length = word2 & 0x0000FFFF;
+  udp.checksum = (word3 & 0xFFFF0000 ) >> 16;
+
+  // remember that last 2 bytes of header are included in payload due to alignment issues
+  // payload needs to still be converted from network order
+  // can lowkey use first 2 bytes of payload as small header for our own udp protocols
+  udp.payload = (uint8_t*) &(frame[2]);
+
+}
+
+/* --------------------------INIT----------------------------- */
 /*
  *
  * */
