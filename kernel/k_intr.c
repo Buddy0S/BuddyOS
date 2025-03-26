@@ -82,10 +82,10 @@ extern int net_ready;
 
 void timer_net_isr(){
   if (net_ready){
-    uart0_printf("NET ISR\n");
+    //uart0_printf("NET ISR\n");
     cpsw_recv();
     transmit();
-    uart0_printf("NET IST DONE\n");
+    //uart0_printf("NET IST DONE\n");
   }
 }
 
