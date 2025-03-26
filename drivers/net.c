@@ -454,7 +454,13 @@ extern void buddy();
 
 #define UDP_HEADER_SIZE 8
 #define PSUEDO_HEADER_SIZE 20
+
+//*******************************************************************
+// SOCKETS                                                               
+//*******************************************************************
+
 #define MAX_SOCKETS 8
+#define MAX_PENDING_PACKETS 10
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -544,9 +550,16 @@ typedef struct udp {
   uint16_t dest_port;
   uint16_t length;
   uint16_t checksum;
-  uint8_t* payload;
+  uint32_t* payload;
 
 } udp_header;
+
+struct payload {
+
+  uint8_t* data;
+  int size;
+
+};
 
 struct socket {
   
@@ -559,7 +572,8 @@ struct socket {
   uint8_t protocol;
   uint16_t buddy_protocol;
   uint8_t waiting; // is it waiting for data?
-  uint32_t* data;
+  struct payload data[MAX_PENDING_PACKETS];
+  uint8_t packets_pending;
 
 };
 
@@ -2172,15 +2186,67 @@ void icmp_echo_request(uint32_t ip, uint8_t* mac){
 
 /* --------------------------UDP------------------------------ */
 
+int socket_waiting(int socket_num, uint16_t dest_port, uint16_t bp){
+
+  struct socket soc = socket_table[socket_num];
+
+  if (!soc.waiting){
+    return 0;
+  }
+
+  if (soc.src_port != dest_port){
+    return 0;
+  }
+
+  if (soc.buddy_protocol != bp){
+    return 0;
+  }
+
+  return 1;
+
+}
+
+/*
+ * drops packets if pending packet buffer is full
+ *
+ * */
+int socket_store(int socket_num, uint32_t* payload, int size){
+
+  uint32_t* buffer;
+  struct socket soc = socket_table[socket_num];
+
+  if (soc.packets_pending >= MAX_PENDING_PACKETS){
+    return -1;
+  }
+
+  buffer = (uint32_t*) kmalloc(size);
+
+  for (int i = 0; i < (size / sizeof(uint32_t)); i++){
+    buffer[i] = ntohl(payload[i]); 
+  }
+
+  socket_table[socket_num].data[soc.packets_pending].data = (uint8_t*) buffer;
+  socket_table[socket_num].data[soc.packets_pending].size = size;
+
+  socket_table[socket_num].packets_pending += 1; 
+  
+  uart0_printf("Socket %d Recieved Packet\n", socket_num);
+
+  return 1;
+
+}
+
 void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size){
 
   udp_header udp;
+  uint16_t buddy_protocol;
+  int payload_length;
 
   uint32_t word1 = 0;
   uint32_t word2 = 0;
   uint32_t word3 = 0;
 
-  uart0_printf("Handling UDP packet\n");
+  //uart0_printf("Handling UDP packet\n");
 
   word1 = ntohl(frame[0]);
   word2 = ntohl(frame[1]);
@@ -2189,7 +2255,7 @@ void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame
   udp.src_port = word1 & 0x0000FFFF;
   udp.dest_port = (word2 & 0xFFFF0000) >> 16;
 
-  uart0_printf("Source port: %d | Destination port %d\n",udp.src_port,udp.dest_port);
+  //uart0_printf("Source port: %d | Destination port %d\n",udp.src_port,udp.dest_port);
 
   udp.length = word2 & 0x0000FFFF;
   udp.checksum = (word3 & 0xFFFF0000 ) >> 16;
@@ -2197,7 +2263,19 @@ void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame
   // remember that last 2 bytes of header are included in payload due to alignment issues
   // payload needs to still be converted from network order
   // can lowkey use first 2 bytes of payload as small header for our own udp protocols
-  udp.payload = (uint8_t*) &(frame[2]);
+  
+  buddy_protocol = word3 & 0x0000FFFF;
+
+  udp.payload = &(frame[3]);
+  payload_length = size - 3*sizeof(uint32_t);
+
+  // check if socket is waiting for this packet
+  
+  for (int i = 0; i < MAX_SOCKETS; i++){
+    if (socket_waiting(i,udp.dest_port,0)){
+      socket_store(i,udp.payload,payload_length);
+    }
+  }
 
 }
 
@@ -2277,7 +2355,7 @@ void init_sockets(){
     socket_table[i].protocol = 0;
     socket_table[i].buddy_protocol = 0;
     socket_table[i].waiting = 0;
-    socket_table[i].data = 0;
+    socket_table[i].packets_pending = 0;
   }
 
 }
@@ -2339,9 +2417,15 @@ void socket_unbind(int socket_num){
  * returns pointer to data 
  *
  * */
-uint32_t* socket_recv(int socket_num){
+struct payload socket_recv(int socket_num){
 
-  return socket_table[socket_num].data;
+  uint8_t data_index = socket_table[socket_num].packets_pending;
+
+  struct payload data = socket_table[socket_num].data[data_index];
+
+  socket_table[socket_num].packets_pending -= 1;
+
+  return data;
 
 }
 
@@ -2386,6 +2470,8 @@ void init_network_stack(){
     icmp_echo_request(gateway_ip,gateway_mac);
 
     int soc = socket(0,80,80,gateway_mac,gateway_ip,UDP,0);
+
+    socket_bind(soc);
 
     while(1){
       cpsw_recv();
