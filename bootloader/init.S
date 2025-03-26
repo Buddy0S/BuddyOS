@@ -53,7 +53,7 @@ init:
    @ Cortex a8 manual 3.2.68
    ldr r0, =__vector_load__
    mcr p15, #0, r0, c12, c0, #0
-
+    
    @ jump to main
    bl main
 

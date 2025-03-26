@@ -219,7 +219,7 @@ int kfree(void *ptr) {
         order_arr[order]->tail->next = free_block;
         order_arr[order]->tail = free_block;
     }
-    //uart0_puts("kfree reached return\n");
+    /*uart0_puts("kfree reached return\n"); */
     order_arr[order]->num_free++;
     return 0;
 
@@ -230,11 +230,11 @@ int kmemcpy(void *src_ptr, void *dst_ptr, uint32_t size) {
         return -1;
     }
 
-    uint32_t *src = (uint32_t *)src_ptr;
-    uint32_t *dst = (uint32_t *)dst_ptr;
-    uint32_t count = size / sizeof(uint32_t);
 
-    for (uint32_t i = 0; i < count; ++i) {
+    uint8_t *src = (uint8_t *)src_ptr;
+    uint8_t *dst = (uint8_t *)dst_ptr;
+
+    for (uint32_t i = 0; i < size; ++i) {
         dst[i] = src[i];
     }
 

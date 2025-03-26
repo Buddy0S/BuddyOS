@@ -8,8 +8,12 @@ extern int current_index;
 /* yield */
 void yield(void) {}
 
-/* fork */
-int fork(void) {}
+/*
+* fork *
+int fork(void) {
+    return SYSCALL(SYSCALL_FORK_NR);
+}
+*/
 
 /* malloc (temp) */
 void *malloc(size_t size) {
@@ -30,4 +34,4 @@ uint32_t *getPid(int current_index) {
 int kill(uint32_t pid);
 
 /* printf */
-//void printf(void *in) {}
+/* void printf(void *in) {} */

@@ -1,10 +1,13 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
 
+/* lets us pass a macro to SYSCALL(x) */
+#define STR(x) #x
+
 #define SYSCALL(x)                          \
 ({                                          \
-    register int return_val asm("r0");      \
-    asm volatile (" svc #" #x "  \n\t");    \
+    register int32_t return_val asm("r0");  \
+    asm volatile ("svc #" STR(x) "  \n\t"); \
     return_val;                             \
 })                                          \
 
@@ -19,5 +22,11 @@
 #define SYSCALL_FORK_NR         3
 #define SYSCALL_KILL_NR         4
 #define SYSCALL_GETPID_NR       5
+#define SYSCALL_SEND_NR         6
+#define SYSCALL_RECEIVE_NR      7
+#define SYSCALL_REPLY_NR        8
+#define SYSCALL_MSG_WAITING_NR  9
+#define SYSCALL_SEND_END        10
+#define SYSCALL_RECEIVE_END     11
 
 #endif
