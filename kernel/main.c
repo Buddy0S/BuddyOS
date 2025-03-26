@@ -281,6 +281,7 @@ int main(){
     	PROC_TABLE[i].state = DEAD;
     }
 
+  //init_network_stack();
 
 	/* ********* Test File system ********* */
 

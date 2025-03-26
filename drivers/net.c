@@ -426,6 +426,7 @@ extern void buddy();
 #define STATIC_IP 0xC0A80114
 #define IPV4_HEADER_SIZE 20
 #define IP_VERSION 4
+#define IP_VERSION_HEADER 0x45
 #define DHSP_ECN 0
 #define IP_ID 1
 #define IPV4_FLAGS 0
@@ -434,6 +435,36 @@ extern void buddy();
 #define ICMP 1 
 #define TCP 4 
 #define UDP 17
+
+//*******************************************************************
+// ICMP                                                               
+//*******************************************************************
+
+#define ECHO_REPLY 0 
+#define ECHO_REPLY_CODE 0 
+
+#define ECHO_REQUEST 8 
+#define ECHO_REQUEST_CODE 0
+
+#define ICMP_PACKET_SIZE 74
+
+//*******************************************************************
+// UDP                                                               
+//*******************************************************************
+
+#define UDP_HEADER_SIZE 8
+#define PSUEDO_HEADER_SIZE 20
+
+//*******************************************************************
+// SOCKETS                                                               
+//*******************************************************************
+
+#define MAX_SOCKETS 8
+#define MAX_PENDING_PACKETS 10
+
+#define PING_REQ 1 
+#define SOCKET_REQ 2
+#define MAX_TRANSMIT_REQUEST 10
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -469,7 +500,7 @@ typedef struct cpsw_interface {
 
 ethernet_interface eth_interface;
 
-typedef struct eth_header {
+typedef struct ethernet {
 
     uint8_t destination_mac[MAC_ADDR_LEN];
     uint8_t source_mac[MAC_ADDR_LEN];
@@ -506,6 +537,72 @@ typedef struct ipv4 {
     uint32_t dest_ip;
 
 } ipv4_header;
+
+typedef struct icmp {
+
+  uint8_t type;
+  uint8_t code;
+  uint8_t header_checksum; // should be called checksum realisticly
+  uint32_t data;
+  uint8_t* payload;
+
+} icmp_header;
+
+typedef struct udp {
+
+  uint16_t src_port;
+  uint16_t dest_port;
+  uint16_t length;
+  uint16_t checksum;
+  uint32_t* payload;
+
+} udp_header;
+
+struct payload {
+
+  uint8_t* data;
+  int size;
+
+};
+
+struct socket {
+  
+  uint8_t free; // is the socket free?
+  uint32_t pid;
+  uint16_t src_port;
+  uint16_t dest_port;
+  uint32_t dest_ip;
+  uint8_t* dest_mac;
+  uint8_t protocol;
+  uint16_t buddy_protocol;
+  uint8_t waiting; // is it waiting for data?
+  struct payload data[MAX_PENDING_PACKETS];
+  uint8_t packets_pending;
+
+};
+
+struct socket socket_table[MAX_SOCKETS];
+
+struct transmit_req {
+
+  int req_type;
+  int socket_num;
+  uint8_t* frame;
+  int size;
+  // for icmp
+  uint32_t ip;
+  uint8_t* mac;
+
+};
+
+struct transmit_queue {
+
+  struct transmit_req req_queue[MAX_TRANSMIT_REQUEST];
+  int req_pending;
+
+};
+
+struct transmit_queue transmit_que;
 
 /* --------------------------CPSW CODE----------------------------- */
 
@@ -1181,6 +1278,16 @@ void hex_dump(uint32_t* data, int len){
     }
 }
 
+/*
+ * normal byte copy
+ * */
+void net_memcopy(uint8_t* dest, uint8_t* src, int size){
+
+  for (int i = 0; i < size ; i++){
+    dest[i] = src[i];
+  }
+}
+
 /* --------------------------PACKETS----------------------------- */
 
 /*
@@ -1204,12 +1311,12 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
     REG(TX0_HDP) = (uint32_t) tx_desc;
 
-    uart0_printf("Transmiting Packet\n");
+    //uart0_printf("Transmiting Packet\n");
 
     // TX INT STAT RAW
     while (!REG(TX_INT_STATUS_RAW)){}
 
-    uart0_printf("Packet Transmited\n"); 
+    //uart0_printf("Packet Transmited\n"); 
 
     REG(TX_INTMASK_CLEAR) = CPDMA_CHANNEL_INT;
 
@@ -1219,7 +1326,8 @@ int cpsw_transmit(uint32_t* packet, uint32_t size){
 
     REG(TX_INTMASK_SET) = CPDMA_CHANNEL_INT;
 
-    kfree(packet);
+    // change design and make caller free packet
+    //kfree(packet);
 
     /* HARD WARE BUG TRYING TO FIX THIS */
     
@@ -1241,7 +1349,7 @@ void eth_recv(uint32_t* frame, int size);
  * */
 void process_packet(uint8_t* packet, int size){
 
-     uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
+     //uart0_printf("Packet Addr %x | Packet Size %d \n",packet,size);
 
      /*hex_dump((uint32_t*)packet,size);*/
 
@@ -1266,35 +1374,33 @@ int cpsw_recv(){
     // int status raw need to replace this with macro
     uint32_t status = REG(RX_INT_STATUS_RAW);
 
-    uart0_printf("\n\nStarting Packet Processing\n");
+    //uart0_printf("\n\nStarting Packet Processing\n");
 
     if (!status){
-        uart0_printf("No Packets\n");
-	return -1;
+        //uart0_printf("No Packets\n");
+	      return -1;
     }
 
     while (!(start->flags & BIT(29))){
     
-        uart0_printf("\nPacket Recieved\n");
+        //uart0_printf("\nPacket Recieved\n");
 
-	process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
+	      process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
 
-	start->flags = RX_INIT_FLAGS;
-	start->buffer_length = MAX_PACKET_SIZE;
+	      start->flags = RX_INIT_FLAGS;
+	      start->buffer_length = MAX_PACKET_SIZE;
 	
         REG(RX0_CP) = (uint32_t) start;
 
-	start = start->next_descriptor;
+	      start = start->next_descriptor;
 
-	/* End of queue*/
-	if (start == 0){   
-	    eoq = 1;
-            uart0_printf("End of queue reached\n");
-            cpsw_start_recieption();	    
-	    break;
-	}
-
-
+	// End of queue
+	      if (start == 0){   
+	        eoq = 1;
+          //uart0_printf("End of queue reached\n");
+          cpsw_start_recieption();	    
+	        break;
+	      }
     }
 
     if (eoq) eth_interface.rxch.free = eth_interface.rxch.head;
@@ -1520,7 +1626,7 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
 
     uint8_t* src = eth_interface.mac_addr;
 
-    uart0_printf("\nCrafting Ethernet Frame\n");	
+    //uart0_printf("\nCrafting Ethernet Frame\n");	
  
     frame[0] = dest[0];
     frame[1] = dest[1];
@@ -1529,8 +1635,8 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
     frame[4] = dest[4];
     frame[5] = dest[5];
 
-    uart0_printf("Destination MAC\n");
-    print_mac(dest);
+    //uart0_printf("Destination MAC\n");
+    //print_mac(dest);
 
     frame[6] = src[0];
     frame[7] = src[1];
@@ -1539,19 +1645,19 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
     frame[10] = src[4];
     frame[11] = src[5];
 
-    uart0_printf("Source MAC\n");
-    print_mac(src);
+    //uart0_printf("Source MAC\n");
+    //print_mac(src);
 
     frame[12] = (type & 0xFF00) >> 8;
     frame[13] = type & 0xFF;
 
-    uart0_printf("Frame Type %x\n", type);
+    //uart0_printf("Frame Type %x\n", type);
 
     cpsw_transmit((uint32_t*)frame,size);
 }
 
 void arp_recv(ethernet_header frame_header, uint32_t* frame, int size);
-void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size);
+void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* frame_ptr);
 
 /*
  * eth_recv()
@@ -1561,13 +1667,14 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size);
 void eth_recv(uint32_t* frame, int size){
     
     ethernet_header frame_header;
+    uint8_t* frame_ptr = (uint8_t*) frame; // for packets that will be reperposed on transmit
 
     uint32_t word1 = 0;
     uint32_t word2 = 0;
     uint32_t word3 = 0;
     uint32_t word4 = 0;
 
-    uart0_printf("Processing Frame\n");
+    //uart0_printf("Processing Frame\n");
 
     word1 = ntohl(frame[0]);
     word2 = ntohl(frame[1]);
@@ -1602,7 +1709,7 @@ void eth_recv(uint32_t* frame, int size){
     
     case ARP:
 	  {
-	    uart0_printf("Packet Type ARP\n");
+	    //uart0_printf("Packet Type ARP\n");
 
       // skip frame header but include ether type for alignment
 		
@@ -1616,20 +1723,20 @@ void eth_recv(uint32_t* frame, int size){
 	  case IPV4:
 	  {
 
-		  uart0_printf("Packet Type IPV4\n");
+		  //uart0_printf("Packet Type IPV4\n");
 
 		  // skip frame header but include ether type for alignment
 
       frame = (uint32_t*)((uint32_t) frame + 3*sizeof(uint32_t));
       size = size - 3*sizeof(uint32_t);
 
-		  ipv4_recv(frame_header,frame,size);
+		  ipv4_recv(frame_header,frame,size, frame_ptr);
 	  }
 	  break;
 
 	  default:
 	  {
-	    uart0_printf("Unsupported Packet Type\n");
+	    //uart0_printf("Unsupported Packet Type\n");
 	  }
     }
 }
@@ -1707,7 +1814,11 @@ void arp_anounce(){
 
     uint8_t* packet = (uint8_t*) kmalloc(128);
 
+    uart0_printf("Broadcasting ARP Anouncement packet\n");
+
     arp_transmit(packet,128, anoun, multicast, eth_interface.ip_addr, ARP_REQUEST);
+
+    kfree(packet);
 }
 
 /*
@@ -1719,7 +1830,11 @@ void arp_garp(){
 
     uint8_t* packet = (uint8_t*) kmalloc(128);
 
+    uart0_printf("Broadcasting ARP Gratuitous packet\n");
+
     arp_transmit(packet,128, multicast, multicast, eth_interface.ip_addr, ARP_REQUEST);
+
+    kfree(packet);
 }
 
 /*
@@ -1732,7 +1847,9 @@ int arp_reply(arp_header arp_request){
     if (arp_request.dest_ip != STATIC_IP) return -1;
 
     uart0_printf("\nReplying to Arp Request\n");
-    arp_transmit(packet,128,arp_request.src_mac,arp_request.src_mac,arp_request.src_ip,ARP_REPLY);    
+    arp_transmit(packet,128,arp_request.src_mac,arp_request.src_mac,arp_request.src_ip,ARP_REPLY);
+
+    kfree(packet);
 
 }
 
@@ -1753,7 +1870,7 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
     uint32_t word7 = 0;
     uint32_t word8 = 0;
 
-    uart0_printf("Handling ARP Request\n");
+    //uart0_printf("Handling ARP Request\n");
 
     word1 = ntohl(frame[0]);
     word2 = ntohl(frame[1]);
@@ -1836,34 +1953,33 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
  * https://tools.ietf.org/html/rfc1071
  * modified to work for 4 byte aligned Access
  * */
-uint16_t ipv4_checksum(void *ipv4_header, int size){
+uint16_t ipv4_checksum(uint8_t* ipv4_header, int size){
 
   uint32_t sum = 0;
-  uint16_t ret;
-  uint32_t temp;
+  uint8_t* temp;
 
   while (size > 1) {
 
-    temp = *((uint32_t *) ipv4_header);
-    sum += (temp & 0xFFFF0000) >> 16;
-    sum += (temp & 0x0000FFFF);
-    size -= sizeof(uint32_t);
-    ipv4_header = (void*)((uint32_t)ipv4_header + sizeof(uint32_t));
+    temp = (uint8_t*)((uint32_t)ipv4_header + sizeof(uint8_t));
+    sum += ((uint16_t)(*ipv4_header)) << 8 | *temp;
+    size -= sizeof(uint16_t);
+    ipv4_header = (uint8_t*)((uint32_t)ipv4_header + sizeof(uint16_t));
   }
 
   if (size > 0) sum += *(uint8_t*) ipv4_header;
 
   while (sum>>16) sum = (sum & 0xFFFF) + (sum >> 16);
 
-  ret = (~sum) & 0x0000FFFF;
-
-  return ret;
+  return ~sum;
 }
+
+void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size, uint8_t* frame_ptr);
+void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size);
 
 /*
  *
  * */
-void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
+void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* frame_ptr){
 
   ipv4_header ip_header;
 
@@ -1874,7 +1990,7 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
   uint32_t word5 = 0;
   uint32_t word6 = 0;
 
-  uart0_printf("Handling IPV4 Request\n");
+  //uart0_printf("Handling IPV4 Packet\n");
 
   word1 = ntohl(frame[0]);
   word2 = ntohl(frame[1]);
@@ -1896,42 +2012,54 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size){
   ip_header.time_to_live = BYTE1(word3);
   ip_header.protocol = BYTE0(word3);
 
-  uart0_printf("Protocol %x\n",ip_header.protocol);
+  //uart0_printf("Protocol %x\n",ip_header.protocol);
 
   ip_header.header_checksum = (BYTE3(word4) << 8) & BYTE2(word4); 
 
-  ip_header.src_ip = ((word4 & 0x0000FFFF) << 16) & ((word5 & 0xFFFF0000) >> 16);
+  ip_header.src_ip = ((word4 & 0x0000FFFF) << 16) | ((word5 & 0xFFFF0000) >> 16);
  
-  uart0_printf("Source IP\n");
-  print_ip(ip_header.src_ip);
+  //uart0_printf("Source IP\n");
+  //print_ip(ip_header.src_ip);
  
-  ip_header.dest_ip = ((word5 & 0x0000FFFF) << 16) & ((word6 & 0xFFFF0000) >> 16);
+  ip_header.dest_ip = ((word5 & 0x0000FFFF) << 16) | ((word6 & 0xFFFF0000) >> 16);
 
-  uart0_printf("Dest IP\n");
-  print_ip(ip_header.src_ip);
+  //uart0_printf("Dest IP\n");
+  //print_ip(ip_header.dest_ip);
 
   switch (ip_header.protocol){
     case ICMP:
       {
-        uart0_printf("ICMP Packet \n");
+        //uart0_printf("ICMP Packet \n");
+        
+        // removing ipv4 header but keeping in last word for alignment
+        frame = (uint32_t*)((uint32_t) frame + 5*sizeof(uint32_t));
+        size = size - 5*sizeof(uint32_t);
+
+        icmp_recv(frame_header, ip_header, frame, size, frame_ptr);
       }
       break;
 
     case UDP:
       {
-        uart0_printf("UDP Packet \n");
+        //uart0_printf("UDP Packet \n");
+      
+        // removing ipv4 header but keeping in last word for alignment
+        frame = (uint32_t*)((uint32_t) frame + 5*sizeof(uint32_t));
+        size = size - 5*sizeof(uint32_t);
+
+        udp_recv(frame_header, ip_header, frame, size);
       }
       break;
       
     case TCP:
       {
-        uart0_printf("TCP Packet \n");
+        //uart0_printf("TCP Packet \n");
       } 
       break;
 
     default:
       {
-        uart0_printf("Unsupported IPV4 Protocol\n");
+        //uart0_printf("Unsupported IPV4 Protocol\n");
       }
   }
 
@@ -1945,7 +2073,7 @@ void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t des
   uint16_t checksum = 0;
   uint16_t len = size - ETH_HEADER_SIZE;
 
-  frame[14] = (IP_VERSION << 4) | (IPV4_HEADER_SIZE);
+  frame[14] = IP_VERSION_HEADER;
   frame[15] = DHSP_ECN;
 
   frame[16] = (len & 0xFF00) >> 8;
@@ -1982,30 +2110,488 @@ void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t des
 
 }
 
+/* --------------------------ICMP----------------------------- */
+
+void icmp_echo_reply(ethernet_header eth_header, ipv4_header ip_header, icmp_header icmp ,uint8_t* frame, int size);
+
+void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size, uint8_t* frame_ptr){
+ 
+  icmp_header icmp;
+
+  uint32_t word1 = 0;
+  uint32_t word2 = 0;
+  uint32_t word3 = 0;
+
+  //uart0_printf("Handling ICMP Packet\n");
+
+  word1 = ntohl(frame[0]);
+  word2 = ntohl(frame[1]);
+  word3 = ntohl(frame[2]); 
+
+  icmp.type = BYTE1(word1);
+  icmp.code = BYTE0(word1);
+
+  icmp.header_checksum = (word2 & 0xFFFF0000) >> 16;
+  icmp.data = ((word2 & 0x0000FFFF) << 16) | ((word3 & 0xFFFF0000) >> 16);
+
+  // remember that last 2 bytes of icmp header is included
+  icmp.payload = (uint8_t*) &(frame[2]);
+
+  switch (icmp.type) {  
+
+    case ECHO_REQUEST:
+      {
+        uart0_printf("Ping from ");
+        print_ip(ip_header.src_ip);
+        icmp_echo_reply(eth_header,ip_header,icmp,frame_ptr,size);
+      }
+      break;
+
+    case ECHO_REPLY:
+      {
+        uart0_printf("Recieved Echo Reply from: ");
+        print_ip(ip_header.src_ip);
+      }
+      break;
+
+    default:
+      {
+        //uart0_printf("Unsupported ICMP type\n");
+      }
+      break;
+
+  }
+
+}
+
+void icmp_transmit(uint8_t* frame, int size, uint8_t type, uint8_t code, uint32_t data, uint32_t dest_ip, uint8_t* dest_mac){
+
+  uint16_t checksum = 0;
+  int len = size - ETH_HEADER_SIZE - IPV4_HEADER_SIZE;
+
+  frame[34] = type;
+  frame[35] = code;
+  
+  frame[36] = (checksum & 0xFF00) >> 8;
+  frame[37] = checksum & 0x00FF;
+
+  frame[38] = BYTE3(data);
+  frame[39] = BYTE2(data);
+  frame[40] = BYTE1(data);
+  frame[41] = BYTE0(data);
+
+  checksum = ipv4_checksum((&(frame[34])),len);
+  frame[36] = (checksum & 0xFF00) >> 8;
+  frame[37] = checksum & 0x00FF;
+
+  ipv4_transmit(frame,size,ICMP,dest_ip,dest_mac);
+
+}
+
+void icmp_echo_reply(ethernet_header eth_header, ipv4_header ip_header, icmp_header icmp ,uint8_t* frame, int size){
+
+  size = size + IPV4_HEADER_SIZE + ETH_HEADER_SIZE;
+
+  icmp_transmit(frame, size, ECHO_REPLY, ECHO_REPLY_CODE, icmp.data, ip_header.src_ip, eth_header.source_mac);
+
+}
+
+void icmp_echo_request(uint32_t ip, uint8_t* mac){
+
+  uint8_t* packet = (uint8_t*) kmalloc(ICMP_PACKET_SIZE);
+
+  uart0_printf("Pinging ");
+  print_ip(ip);
+  icmp_transmit(packet, ICMP_PACKET_SIZE, ECHO_REQUEST, ECHO_REQUEST_CODE, 0, ip, mac);
+
+  kfree(packet);
+}
+
+/* --------------------------UDP------------------------------ */
+
+int socket_waiting(int socket_num, uint16_t dest_port, uint16_t bp){
+
+  struct socket soc = socket_table[socket_num];
+
+  if (!soc.waiting){
+    return 0;
+  }
+
+  if (soc.src_port != dest_port){
+    return 0;
+  }
+
+  if (soc.buddy_protocol != bp){
+    return 0;
+  }
+
+  return 1;
+
+}
+
+/*
+ * drops packets if pending packet buffer is full
+ *
+ * */
+int socket_store(int socket_num, uint32_t* payload, int size){
+
+  uint32_t* buffer;
+  struct socket soc = socket_table[socket_num];
+
+  if (soc.packets_pending >= MAX_PENDING_PACKETS){
+    return -1;
+  }
+
+  buffer = (uint32_t*) kmalloc(size);
+
+  for (int i = 0; i < (size / sizeof(uint32_t)); i++){
+    buffer[i] = ntohl(payload[i]); 
+  }
+
+  socket_table[socket_num].data[soc.packets_pending].data = (uint8_t*) buffer;
+  socket_table[socket_num].data[soc.packets_pending].size = size;
+
+  socket_table[socket_num].packets_pending += 1; 
+  
+  uart0_printf("Socket %d Recieved Packet\n", socket_num);
+
+  return 1;
+
+}
+
+void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size){
+
+  udp_header udp;
+  uint16_t buddy_protocol;
+  int payload_length;
+
+  uint32_t word1 = 0;
+  uint32_t word2 = 0;
+  uint32_t word3 = 0;
+
+  //uart0_printf("Handling UDP packet\n");
+
+  word1 = ntohl(frame[0]);
+  word2 = ntohl(frame[1]);
+  word3 = ntohl(frame[2]);
+
+  udp.src_port = word1 & 0x0000FFFF;
+  udp.dest_port = (word2 & 0xFFFF0000) >> 16;
+
+  //uart0_printf("Source port: %d | Destination port %d\n",udp.src_port,udp.dest_port);
+
+  udp.length = word2 & 0x0000FFFF;
+  udp.checksum = (word3 & 0xFFFF0000 ) >> 16;
+
+  // remember that last 2 bytes of header are included in payload due to alignment issues
+  // payload needs to still be converted from network order
+  // can lowkey use first 2 bytes of payload as small header for our own udp protocols
+  
+  buddy_protocol = word3 & 0x0000FFFF;
+
+  udp.payload = &(frame[3]);
+  payload_length = size - 3*sizeof(uint32_t);
+
+  // check if socket is waiting for this packet
+  
+  for (int i = 0; i < MAX_SOCKETS; i++){
+    if (socket_waiting(i,udp.dest_port,0)){
+      socket_store(i,udp.payload,payload_length);
+    }
+  }
+
+}
+
+/*
+ * udp checksum uses pseudo header to compute checksum
+ * */
+uint16_t udp_checksum(uint8_t* frame, uint32_t src_ip, uint32_t dest_ip, uint16_t size, uint16_t src_port, uint16_t dest_port){
+
+  uint16_t pseudo_len = size - UDP_HEADER_SIZE + PSUEDO_HEADER_SIZE;
+
+  uint8_t* pseudo_packet = (uint8_t*)kmalloc(pseudo_len);
+
+  pseudo_packet[0] = BYTE3(src_ip);
+  pseudo_packet[1] = BYTE2(src_ip);
+  pseudo_packet[2] = BYTE1(src_ip);
+  pseudo_packet[3] = BYTE0(src_ip);
+
+  pseudo_packet[4] = BYTE3(dest_ip);
+  pseudo_packet[5] = BYTE2(dest_ip);
+  pseudo_packet[6] = BYTE1(dest_ip);
+  pseudo_packet[7] = BYTE0(dest_ip);
+
+  pseudo_packet[8] = 0;
+  pseudo_packet[9] = UDP;
+
+  pseudo_packet[10] = (pseudo_len & 0xFF00) >> 8;
+  pseudo_packet[11] = pseudo_len & 0x00FF;
+
+  pseudo_packet[12] = (src_port & 0xFF00) >> 8;
+  pseudo_packet[13] = src_port & 0x00FF;
+
+  pseudo_packet[14] = (dest_port & 0xFF00) >> 8;
+  pseudo_packet[15] = dest_port & 0x00FF;
+
+  pseudo_packet[16] = (pseudo_len & 0xFF00) >> 8;
+  pseudo_packet[17] = pseudo_len & 0x00FF;
+
+  pseudo_packet[18] = 0;
+  pseudo_packet[19] = 0;
+
+  net_memcopy(&(pseudo_packet[20]),&(frame[42]), size - UDP_HEADER_SIZE);
+
+  return ipv4_checksum(pseudo_packet, pseudo_len);
+}
+
+void udp_transmit(uint8_t* frame, uint16_t size, uint16_t src_port, uint16_t dest_port, uint32_t dest_ip, uint8_t* dest_mac){
+
+  uint16_t length = size - ETH_HEADER_SIZE - IPV4_HEADER_SIZE;
+  uint16_t checksum = udp_checksum(frame,STATIC_IP,dest_ip,length,src_port,dest_port); 
+  
+  frame[34] = (src_port & 0xFF00) >> 8;
+  frame[35] = src_port & 0x00FF;
+
+  frame[36] = (dest_port & 0xFF00 ) >> 8;
+  frame[37] = dest_port & 0x00FF;
+
+  frame[38] = (length & 0xFF00) >> 8;
+  frame[39] = length & 0x00FF;
+
+  frame[40] = (checksum & 0xFF00) >> 8;
+  frame[41] = checksum & 0x00FF;
+
+  ipv4_transmit(frame,size,UDP,dest_ip, dest_mac);
+}
+
+/* --------------------------SOCKETS-------------------------- */
+
+void init_sockets(){
+
+  for(int i = 0; i < MAX_SOCKETS; i++){
+    socket_table[i].free = 1;
+    socket_table[i].pid = 0;
+    socket_table[i].src_port = 0;
+    socket_table[i].dest_port = 0;
+    socket_table[i].dest_ip = 0;
+    socket_table[i].dest_mac = 0;
+    socket_table[i].protocol = 0;
+    socket_table[i].buddy_protocol = 0;
+    socket_table[i].waiting = 0;
+    socket_table[i].packets_pending = 0;
+  }
+
+}
+
+int find_free_socket(){
+
+  for (int i = 0; i < MAX_SOCKETS; i++){
+    if(socket_table[i].free) return i;
+  }
+
+  return -1;
+}
+
+/*
+ * Allocates Socket and returns index in socket table
+ *
+ * */
+int socket(uint32_t pid, uint16_t src_port, uint16_t dest_port,uint8_t* dest_mac,uint32_t dest_ip, uint8_t protocol, uint8_t bp){
+
+  int socket_num = find_free_socket();
+
+  if (socket_num == -1) return -1;
+
+  socket_table[socket_num].free = 0;
+
+  socket_table[socket_num].pid = pid;
+  socket_table[socket_num].src_port = src_port;
+  socket_table[socket_num].dest_port = dest_port;
+  socket_table[socket_num].dest_ip = dest_ip;
+  socket_table[socket_num].dest_mac = dest_mac;
+  socket_table[socket_num].protocol = protocol;
+  socket_table[socket_num].buddy_protocol = bp;
+
+  return socket_num;
+
+}
+
+/*
+ * set socket as waiting for data
+ *
+ * */
+void socket_bind(int socket_num){
+
+  socket_table[socket_num].waiting = 1;
+
+}
+
+/*
+ * set socket as not waiting for data
+ *
+ * */
+void socket_unbind(int socket_num){
+
+  socket_table[socket_num].waiting = 0;
+
+}
+
+/*
+ * returns pointer to data 
+ *
+ * */
+struct payload socket_recv(int socket_num){
+
+  uint8_t data_index = socket_table[socket_num].packets_pending - 1;
+
+  struct payload data = socket_table[socket_num].data[data_index];
+
+  socket_table[socket_num].packets_pending -= 1;
+
+  return data;
+
+}
+
+void socket_send(int socket_num, uint8_t* frame, int size){
+
+  struct socket soc = socket_table[socket_num];
+
+  switch(soc.protocol){
+    case UDP:
+      {
+        udp_transmit(frame,size,soc.src_port,soc.dest_port,soc.dest_ip,soc.dest_mac);
+      }
+      break;
+  }
+}
+/* --------------------------FUSION--------------------------- */
+
+/*
+ * creates and ands transmit request to queue
+ *
+ * */
+int transmit_request(uint8_t* frame, int size, int req_type, int socket_num, uint32_t ip, uint8_t* mac){
+
+  int index = transmit_que.req_pending;
+
+  if (index >= MAX_TRANSMIT_REQUEST){
+    return -1;
+  }
+
+  transmit_que.req_queue[index].req_type = req_type;
+  transmit_que.req_queue[index].socket_num = socket_num;
+  transmit_que.req_queue[index].frame = frame;
+  transmit_que.req_queue[index].size = size;
+  transmit_que.req_queue[index].ip = ip;
+  transmit_que.req_queue[index].mac = mac;
+
+  transmit_que.req_pending += 1;
+
+  return 1;
+
+}
+
+int socket_transmit_request(int socket_num, uint8_t* frame, int size){
+
+  return transmit_request(frame, size, SOCKET_REQ, socket_num, 0, 0);
+
+}
+
+int ping_request(uint32_t ip, uint8_t* mac){
+
+  uint8_t* mac_copy = (uint8_t*) kmalloc(MAC_ADDR_LEN);
+
+  net_memcopy(mac_copy, mac, MAC_ADDR_LEN);
+
+  return transmit_request(0,0,PING_REQ,0,ip,mac_copy);
+
+}
+
+void handle_transmit_request(struct transmit_req* req){
+
+  int req_type = req->req_type;
+
+  switch (req_type) {
+
+    case PING_REQ:
+      {
+        icmp_echo_request(req->ip,req->mac);
+        kfree(req->mac);
+      }
+      break;
+
+    case SOCKET_REQ:
+      {
+        socket_send(req->socket_num,req->frame,req->size);
+        kfree(req->frame);
+      }
+      break;
+  }
+
+}
+
+int transmit(){
+
+  int index;
+  int req_pending = transmit_que.req_pending;
+  struct transmit_req* cur_req;
+
+  if (req_pending == 0){
+    return 0;
+  }
+
+  while ( req_pending > 0){
+    index = req_pending - 1;
+    cur_req = &(transmit_que.req_queue[index]);
+    handle_transmit_request(cur_req); 
+    req_pending -= 1;
+  }
+
+  transmit_que.req_pending = req_pending;
+
+  return 1;
+
+}
 
 /* --------------------------INIT----------------------------- */
-
 /*
  *
  * */
 void init_network_stack(){
 
+    uint32_t gateway_ip = 0xC0A8010A;
+    uint8_t gateway_mac[MAC_ADDR_LEN] = {0xD8,0xBB,0xC1,0xF7,0xD0,0xD3};
+
     cpsw_init();
 
     phy_init();
+
+    init_sockets();
+
+    transmit_que.req_pending = 0;
 
     eth_interface.ip_addr = STATIC_IP;
 
     buddy();
 
+    // clear recv cache
     cpsw_recv();
 
     arp_anounce();
     arp_garp();
 
+    ping_request(gateway_ip,gateway_mac);
+
+    int soc = socket(0,80,80,gateway_mac,gateway_ip,UDP,0);
+
+    socket_bind(soc);
+
     while(1){
-       cpsw_recv();
-       buddy();
+      cpsw_recv();
+      buddy();
+      uint8_t* frame = (uint8_t*) kmalloc(128);
+      socket_transmit_request(soc,frame,128);
+      transmit();
     }
 
 }
