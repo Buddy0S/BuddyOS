@@ -2238,7 +2238,7 @@ uint16_t udp_checksum(uint8_t* frame, uint32_t src_ip, uint32_t dest_ip, uint16_
   pseudo_packet[18] = 0;
   pseudo_packet[19] = 0;
 
-  net_memcopy(&(pseudo_packet[20]),&(frame[41]), size - UDP_HEADER_SIZE);
+  net_memcopy(&(pseudo_packet[20]),&(frame[42]), size - UDP_HEADER_SIZE);
 
   return ipv4_checksum(pseudo_packet, pseudo_len);
 }
@@ -2295,7 +2295,7 @@ int find_free_socket(){
  * Allocates Socket and returns index in socket table
  *
  * */
-int socket(uint32_t pid, uint16_t src_port, uint16_t dest_port,uint8_t* dest_mac,uint16_t dest_ip, uint8_t protocol, uint8_t bp){
+int socket(uint32_t pid, uint16_t src_port, uint16_t dest_port,uint8_t* dest_mac,uint32_t dest_ip, uint8_t protocol, uint8_t bp){
 
   int socket_num = find_free_socket();
 
