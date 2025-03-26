@@ -5,6 +5,7 @@
 #include "reg.h"
 #include "uart.h"
 #include <stdint.h>
+#include "net.h"
 
 uint32_t timer_counter = 1000;
 
@@ -77,6 +78,17 @@ void timer_isr(){
 
 }
 
+extern int net_ready;
+
+void timer_net_isr(){
+  if (net_ready){
+    uart0_printf("NET ISR\n");
+    cpsw_recv();
+    transmit();
+    uart0_printf("NET IST DONE\n");
+  }
+}
+
 void UART0_isr(){
 
     char rec = *(volatile uint8_t*)UART0_BASE;
@@ -104,9 +116,10 @@ void interrupt_handler(uint32_t args[]) {
 
         timer_counter -= 1;
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
-
+ 
         if (timer_counter <= 0) {
             timer_isr();
+            timer_net_isr();
             timer_counter = 1000;
         }
 

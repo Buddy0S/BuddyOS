@@ -604,6 +604,8 @@ struct transmit_queue {
 
 struct transmit_queue transmit_que;
 
+int net_ready = 0;
+
 /* --------------------------CPSW CODE----------------------------- */
 
 /*
@@ -1521,18 +1523,19 @@ int phy_autonegotiate(uint8_t phy_addr){
 
     phy_writereg(phy_addr, PHY_BCR, data);
 
+    // this loop is here if iwant to try multiple times but just gonna break at 1 attempt
     for (int i = 0; i < 5; i++){
     
-	uart0_printf("PHY attempting auto negotiation, this will take a while..\n"); 
-        buddy();
-	if ( phy_get_autoneg_status(phy_addr) ) break;
+	    uart0_printf("PHY attempting auto negotiation, this will take a while..\n"); 
+      buddy();
+	    if ( phy_get_autoneg_status(phy_addr) ) break;
 
-	if (i == 4){
+	    if (i == 1){
 	
-	    uart0_printf("AUTO NEG FAILED\n");
+	      uart0_printf("AUTO NEG FAILED\n");
 		
-	    return -1;
-	}
+	      return -1;
+	    }
     }
 
     uart0_printf("AUTO NEG SUCCESSFUL\n");
@@ -2559,14 +2562,14 @@ int transmit(){
 /*
  *
  * */
-void init_network_stack(){
+int init_network_stack(){
 
     uint32_t gateway_ip = 0xC0A8010A;
     uint8_t gateway_mac[MAC_ADDR_LEN] = {0xD8,0xBB,0xC1,0xF7,0xD0,0xD3};
 
     cpsw_init();
 
-    phy_init();
+    if (phy_init() == -1) return -1; 
 
     init_sockets();
 
@@ -2582,19 +2585,16 @@ void init_network_stack(){
     arp_anounce();
     arp_garp();
 
+    net_ready = 1;
+
     ping_request(gateway_ip,gateway_mac);
 
     int soc = socket(0,80,80,gateway_mac,gateway_ip,UDP,0);
 
     socket_bind(soc);
-
-    while(1){
-      cpsw_recv();
-      buddy();
-      uint8_t* frame = (uint8_t*) kmalloc(128);
-      socket_transmit_request(soc,frame,128);
-      transmit();
-    }
+    
+    uint8_t* frame = (uint8_t*) kmalloc(128);
+    socket_transmit_request(soc,frame,128);
 
 }
 

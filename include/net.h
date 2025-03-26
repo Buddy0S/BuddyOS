@@ -1,6 +1,8 @@
 #ifndef NET_H
 #define NET_H
 
-void init_network_stack();
+int init_network_stack();
+void cpsw_recv();
+void transmit();
 
 #endif
