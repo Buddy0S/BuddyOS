@@ -454,6 +454,7 @@ extern void buddy();
 
 #define UDP_HEADER_SIZE 8
 #define PSUEDO_HEADER_SIZE 20
+#define MAX_SOCKETS 8
 
 /* ----------------------------STRUCTS----------------------------- */
 
@@ -546,6 +547,23 @@ typedef struct udp {
   uint8_t* payload;
 
 } udp_header;
+
+struct socket {
+  
+  uint8_t free; // is the socket free?
+  uint32_t pid;
+  uint16_t src_port;
+  uint16_t dest_port;
+  uint32_t dest_ip;
+  uint8_t* dest_mac;
+  uint8_t protocol;
+  uint16_t buddy_protocol;
+  uint8_t waiting; // is it waiting for data?
+  uint32_t* data;
+
+};
+
+struct socket socket_table[MAX_SOCKETS];
 
 /* --------------------------CPSW CODE----------------------------- */
 
@@ -2245,6 +2263,101 @@ void udp_transmit(uint8_t* frame, uint16_t size, uint16_t src_port, uint16_t des
   ipv4_transmit(frame,size,UDP,dest_ip, dest_mac);
 }
 
+/* --------------------------SOCKETS-------------------------- */
+
+void init_sockets(){
+
+  for(int i = 0; i < MAX_SOCKETS; i++){
+    socket_table[i].free = 1;
+    socket_table[i].pid = 0;
+    socket_table[i].src_port = 0;
+    socket_table[i].dest_port = 0;
+    socket_table[i].dest_ip = 0;
+    socket_table[i].dest_mac = 0;
+    socket_table[i].protocol = 0;
+    socket_table[i].buddy_protocol = 0;
+    socket_table[i].waiting = 0;
+    socket_table[i].data = 0;
+  }
+
+}
+
+int find_free_socket(){
+
+  for (int i = 0; i < MAX_SOCKETS; i++){
+    if(socket_table[i].free) return i;
+  }
+
+  return -1;
+}
+
+/*
+ * Allocates Socket and returns index in socket table
+ *
+ * */
+int socket(uint32_t pid, uint16_t src_port, uint16_t dest_port,uint8_t* dest_mac,uint16_t dest_ip, uint8_t protocol, uint8_t bp){
+
+  int socket_num = find_free_socket();
+
+  if (socket_num == -1) return -1;
+
+  socket_table[socket_num].free = 0;
+
+  socket_table[socket_num].pid = pid;
+  socket_table[socket_num].src_port = src_port;
+  socket_table[socket_num].dest_port = dest_port;
+  socket_table[socket_num].dest_ip = dest_ip;
+  socket_table[socket_num].dest_mac = dest_mac;
+  socket_table[socket_num].protocol = protocol;
+  socket_table[socket_num].buddy_protocol = bp;
+
+  return socket_num;
+
+}
+
+/*
+ * set socket as waiting for data
+ *
+ * */
+void socket_bind(int socket_num){
+
+  socket_table[socket_num].waiting = 1;
+
+}
+
+/*
+ * set socket as not waiting for data
+ *
+ * */
+void socket_unbind(int socket_num){
+
+  socket_table[socket_num].waiting = 0;
+
+}
+
+/*
+ * returns pointer to data 
+ *
+ * */
+uint32_t* socket_recv(int socket_num){
+
+  return socket_table[socket_num].data;
+
+}
+
+void socket_send(int socket_num, uint8_t* frame, int size){
+
+  struct socket soc = socket_table[socket_num];
+
+  switch(soc.protocol){
+    case UDP:
+      {
+        udp_transmit(frame,size,soc.src_port,soc.dest_port,soc.dest_ip,soc.dest_mac);
+      }
+      break;
+  }
+}
+
 /* --------------------------INIT----------------------------- */
 /*
  *
@@ -2258,10 +2371,13 @@ void init_network_stack(){
 
     phy_init();
 
+    init_sockets();
+
     eth_interface.ip_addr = STATIC_IP;
 
     buddy();
 
+    // clear recv cache
     cpsw_recv();
 
     arp_anounce();
@@ -2269,10 +2385,15 @@ void init_network_stack(){
 
     icmp_echo_request(gateway_ip,gateway_mac);
 
+    int soc = socket(0,80,80,gateway_mac,gateway_ip,UDP,0);
+
     while(1){
-       cpsw_recv();
-       //buddy();
-       //icmp_echo_request(gateway_ip,gateway_mac);
+      cpsw_recv();
+      buddy();
+      uint8_t* frame = (uint8_t*) kmalloc(128);
+      socket_send(soc,frame,128);
+      kfree(frame);
+
     }
 
 }
