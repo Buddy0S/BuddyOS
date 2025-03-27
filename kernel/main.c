@@ -114,7 +114,9 @@ int main(){
     init_process(&PROC_TABLE[0], process0, PROC_STACKS[0], MEDIUM);
     init_process(&PROC_TABLE[1], process1, PROC_STACKS[1], MEDIUM);
 
-    uart0_printf("process gonan jump to %x\n", process1);
+#ifdef DEBUG
+    uart0_printf("process gonan jump to %x\n", process0);
+#endif
 
     /* Set the current process to the head of the ready queue */
     current_process = knode_data(list_first(&ready_queue), PCB, sched_node);

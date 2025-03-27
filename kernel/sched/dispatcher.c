@@ -1,9 +1,10 @@
 #include <stdint.h>
-#include "uart.h"
-#include "proc.h"
+#include <uart.h>
+#include <proc.h>
 #include <syscall.h>
 #include <srr_ipc.h>
 #include <memory.h>
+#include <syserr.h>
 
 
 extern uint8_t * KERNEL_STACK_TOP;
@@ -88,8 +89,8 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
         default:
 #ifdef DEBUG
             uart0_printf("unknown/unimplemented\n");
-            args[0] = -ENOSYS;
 #endif
+            args[0] = -ENOSYS;
             break;
     }
 
