@@ -71,17 +71,17 @@ $(BUILD_DIR)kinit.o : kernel/kinit.S | $(BUILD_DIR)
 $(BUILD_DIR)k_vector.o : kernel/interrupt/k_vector.S | $(BUILD_DIR)
 	$(PREFIX)as kernel/interrupt/k_vector.S -o $@
 
-$(BUILD_DIR)context_switch.o : kernel/context_switch.S | $(BUILD_DIR)
-	$(PREFIX)as kernel/context_switch.S -o $@
+$(BUILD_DIR)context_switch.o : kernel/sched/context_switch.S | $(BUILD_DIR)
+	$(PREFIX)as kernel/sched/context_switch.S -o $@
 
 $(BUILD_DIR)k_intr.o : kernel/interrupt/k_intr.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(KCFLAGS) kernel/interrupt/k_intr.c -o $@
 
-$(BUILD_DIR)dispatcher.o: kernel/dispatcher.c
-	$(PREFIX)gcc $(KCFLAGS) kernel/dispatcher.c -o $@
+$(BUILD_DIR)dispatcher.o: kernel/sched/dispatcher.c
+	$(PREFIX)gcc $(KCFLAGS) kernel/sched/dispatcher.c -o $@
 
-$(BUILD_DIR)proc.o: kernel/proc.c
-	$(PREFIX)gcc $(KCFLAGS) kernel/proc.c -o $@
+$(BUILD_DIR)proc.o: kernel/sched/proc.c
+	$(PREFIX)gcc $(KCFLAGS) kernel/sched/proc.c -o $@
 
 $(BUILD_DIR)syscall.o: kernel/syscall.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/syscall.c -o $@

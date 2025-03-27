@@ -122,21 +122,21 @@ int phy_autonegotiate(uint8_t phy_addr){
     phy_writereg(phy_addr, PHY_BCR, data);
 
     // this loop is here if iwant to try multiple times but just gonna break at 1 attempt
-    for (int i = 0; i < 5; i++){
+    for (int i = 0; i < 1; i++){
     
 	    uart0_printf("PHY attempting auto negotiation, this will take a while..\n"); 
       buddy();
 	    if ( phy_get_autoneg_status(phy_addr) ) break;
 
-	    if (i == 1){
+	    if (i == 0){
 	
-	      uart0_printf("AUTO NEG FAILED\n");
+	      uart0_printf("Auto Negotiation Failed\n");
 		
 	      return -1;
 	    }
     }
 
-    uart0_printf("AUTO NEG SUCCESSFUL\n");
+    uart0_printf("Auto Negotiation Successful\n");
 
     data_p = phy_readreg(phy_addr, PHY_PARTNER_CAP);
 
@@ -199,7 +199,7 @@ int phy_init(){
         uart0_printf("Ethernet PHY Alive\n");
     }else {
         uart0_printf("Ethernet PHY Not Alive\n");
-	return -1;
+	    return -1;
     }
 
     phy_autonegotiate(PHY1);

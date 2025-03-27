@@ -141,6 +141,9 @@ int init_network_stack(){
 
     eth_interface.ip_addr = STATIC_IP;
 
+    uart0_printf("Beagle Bones ");
+    print_ip(STATIC_IP);
+
     buddy();
 
     // clear recv cache

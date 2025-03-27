@@ -235,16 +235,12 @@ int get_ale_index(){
     uint8_t et;
 
     for (index = 0; index < MAX_ALE_ENTRIES; index++){
-   
-        uart0_printf("index %d\n",index);       
+         
+	    get_ale_entry(index, ale_entry_buffer);
 
-	get_ale_entry(index, ale_entry_buffer);
+	    et = (((uint8_t*)(&(ale_entry_buffer[1])))[3] & (uint8_t) ALE_ENTRY_TYPE);
 
-	et = (((uint8_t*)(&(ale_entry_buffer[1])))[3] & (uint8_t) ALE_ENTRY_TYPE);
-
-	uart0_printf("ET: %d\n",et);
-
-	if ( et == ALE_ENTRY_FREE) return index;	
+	    if ( et == ALE_ENTRY_FREE) return index;	
     }
 
     return -1;
@@ -264,7 +260,6 @@ int get_ale_index(){
  * */
 void ale_set_entry(uint32_t e_w0, uint32_t e_w1, uint32_t e_w2,int i){
 
-    uart0_printf("writing words\n");	
     REG(TBLW0) = e_w0;
     REG(TBLW1) = e_w1;
     REG(TBLW2) = e_w2;
@@ -351,10 +346,10 @@ void cpsw_create_ale_entries(){
     get_mac();
 
     multicast_ale_entry(MULTICAST_PORTMASK, mc_addr);
-    uart0_printf("multicast entry created\n");
+    //uart0_printf("multicast entry created\n");
 
     unicast_ale_entry(UNICAST_PORTMASK, eth_interface.mac_addr);
-    uart0_printf("unicast entry created\n");
+    //uart0_printf("unicast entry created\n");
 }
 
 /*
@@ -408,8 +403,6 @@ void cpsw_setup_cpdma_descriptors(){
 
     tx_cur = tx_start;
     rx_cur = rx_start;
-
-    uart0_printf("sizeof cpdma_hdp %x\n",sizeof(cpdma_hdp));
 
     /* Create Descriptor Chains */
     for (int i = 0; i < num_descriptors - 1; i++){
@@ -550,22 +543,22 @@ void cpsw_init(){
     uart0_printf("Starting initialization of Common Port Switch\n");
 
     cpsw_select_interface();
-    uart0_printf("GMII/MII Interface Selected\n");
+    //uart0_printf("GMII/MII Interface Selected\n");
 
     cpsw_pin_mux();
-    uart0_printf("CPSW Pins Muxed\n");
+    //uart0_printf("CPSW Pins Muxed\n");
 
     cpsw_enable_clocks();
-    uart0_printf("CPSW Clocks Enabled\n");
+    //uart0_printf("CPSW Clocks Enabled\n");
 
     cpsw_software_reset();
-    uart0_printf("CPSW Finished Software Reset\n");
+    //uart0_printf("CPSW Finished Software Reset\n");
 
     cpsw_init_cpdma_descriptors();
-    uart0_printf("CPDMA Descriptors Initialized\n");
+    //uart0_printf("CPDMA Descriptors Initialized\n");
 
     cpsw_config_ale();
-    uart0_printf("CPSW ALE Configured\n");
+    //uart0_printf("CPSW ALE Configured\n");
 
     uart0_printf("Configuring MDIO this will take some time ...");
     cpsw_config_mdio();
@@ -573,29 +566,26 @@ void cpsw_init(){
     uart0_printf("CPSW MDIO Configured\n");
 
     cpsw_config_stats();
-    uart0_printf("CPSW STATS Configured\n");
+    //uart0_printf("CPSW STATS Configured\n");
 
     cpsw_set_ports_state();
-    uart0_printf("CPSW Ports Set to FORWARD\n");
+    //uart0_printf("CPSW Ports Set to FORWARD\n");
 
     cpsw_create_ale_entries();
-    uart0_printf("CPSW ALE Entries Created for Ports\n");
+    //uart0_printf("CPSW ALE Entries Created for Ports\n");
 
     cpsw_set_port_addrs();
     uart0_printf("CPSW Ports MAC Addresses Set\n");
     print_mac(eth_interface.mac_addr);
 
     cpsw_setup_cpdma_descriptors();
-    uart0_printf("CPDMA Descriptors Setup\n");
+    //uart0_printf("CPDMA Descriptors Setup\n");
 
     cpsw_enable_cpdma_controller();
-    uart0_printf("CPDMA Controller enabled\n");
+    //uart0_printf("CPDMA Controller enabled\n");
 
     cpsw_start_recieption();
     uart0_printf("CPSW Packet Reception Started\n");
-
-    uart0_printf("RX HDP %x\n",REG(RX0_HDP));
-  
 }
 
 /*
