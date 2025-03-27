@@ -1,6 +1,8 @@
 PREFIX = arm-none-eabi-
-CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include
-KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -mno-unaligned-access -O0 -I./include
+CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include\
+				 -I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel 
+KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -mno-unaligned-access -O0 -I./include\
+					-I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel
 
 BUILD_DIR = build/
 BIN_DIR = bin/
@@ -21,38 +23,38 @@ $(BUILD_DIR) :
 $(BIN_DIR) :
 	mkdir -p $(BIN_DIR)
 
-$(BUILD_DIR)vector_table.o : interrupt/vector_table.S | $(BUILD_DIR)
-	$(PREFIX)as interrupt/vector_table.S -o $@
+$(BUILD_DIR)vector_table.o : bootloader/interrupt/vector_table.S | $(BUILD_DIR)
+	$(PREFIX)as bootloader/interrupt/vector_table.S -o $@
 
 $(BUILD_DIR)init.o : bootloader/init.S | $(BUILD_DIR)
 	$(PREFIX)as bootloader/init.S -o $@
 
-$(BUILD_DIR)main.o : bootloader/main.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $(BUILD_DIR)
+$(BUILD_DIR)main.o : bootloader/main.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) bootloader/main.c -o $@
 
 $(BUILD_DIR)drivers.o : drivers/mmc.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) drivers/mmc.c -o $@
 
-$(BUILD_DIR)led.o : peripherals/led.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) peripherals/led.c -o $@
+$(BUILD_DIR)led.o : arch/peripherals/led.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) arch/peripherals/led.c -o $@
 
-$(BUILD_DIR)uart.o :peripherals/uart.c $(INCLUDE)memory_map.h $(INCLUDE)uart.h $(INCLUDE)args.h | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) peripherals/uart.c -o $@
+$(BUILD_DIR)uart.o : arch/peripherals/uart.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) arch/peripherals/uart.c -o $@
 
-$(BUILD_DIR)clock.o :boardinit/clock.c $(INCLUDE)clock.h | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) boardinit/clock.c -o $@
+$(BUILD_DIR)clock.o : arch/boardinit/clock.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) arch/boardinit/clock.c -o $@
 
-$(BUILD_DIR)interrupt.o : interrupt/interrupts.c $(INCLUDE)interrupts.h | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) interrupt/interrupts.c -o $@
+$(BUILD_DIR)interrupt.o : bootloader/interrupt/interrupts.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) bootloader/interrupt/interrupts.c -o $@
 
-$(BUILD_DIR)timer.o : peripherals/timer.c $(INCLUDE)timer.h | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) peripherals/timer.c -o $@
+$(BUILD_DIR)timer.o : arch/peripherals/timer.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) arch/peripherals/timer.c -o $@
 
 $(BUILD_DIR)memcmd.o : misc/memcmd.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) misc/memcmd.c -o $@
 
-$(BUILD_DIR)ddr.o : boardinit/ddr.c | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) boardinit/ddr.c -o $@
+$(BUILD_DIR)ddr.o : arch/boardinit/ddr.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) arch/boardinit/ddr.c -o $@
 
 $(BUILD_DIR)fat12.o : fs/fat12.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) fs/fat12.c -o $@
@@ -72,7 +74,7 @@ $(BUILD_DIR)k_vector.o : kernel/k_vector.S | $(BUILD_DIR)
 $(BUILD_DIR)context_switch.o : kernel/context_switch.S | $(BUILD_DIR)
 	$(PREFIX)as kernel/context_switch.S -o $@
 
-$(BUILD_DIR)k_intr.o : kernel/k_intr.c $(INCLUDE)memory_map.h $(INCLUDE)led.h | $(BUILD_DIR)
+$(BUILD_DIR)k_intr.o : kernel/k_intr.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(KCFLAGS) kernel/k_intr.c -o $@
 
 $(BUILD_DIR)dispatcher.o: kernel/dispatcher.c
