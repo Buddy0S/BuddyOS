@@ -6,7 +6,6 @@
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
 uint32_t PROC_STACKS[MAX_PROCS][STACK_SIZE];
-uint8_t *KERNEL_STACK_TOP = (uint8_t*)0x40300000; 
 
 /* Global variables for current process, kernel process, and the ready queue */
 PCB *current_process;

@@ -6,9 +6,11 @@
 #include <list.h>
 #include <srr_ipc.h>
 
+#define KERNEL_STACK_TOP 0x40300000
+
 #define MAX_PROCS   5
 #define STACK_SIZE  256
-#define KERNEL_STACK_SIZE 1000
+#define KERNEL_STACK_SIZE 128
 #define PROC_QUANTUM 1000
 
 /* Process states */

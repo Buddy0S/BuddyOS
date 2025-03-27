@@ -10,10 +10,6 @@ void timer_net_isr();
 
 uint32_t timer_counter = 1000;
 
-uint32_t test_syscall(int a, int b) {
-    return a + b;
-}
-
 void testprint(PCB* a) {
     uart0_printf("hi guys %x %x\n", a, a->exception_stack_top);
     uart0_printf("hi guys %x %x\n", (*(PCB**)a), (*(PCB**)a)->exception_stack_top);

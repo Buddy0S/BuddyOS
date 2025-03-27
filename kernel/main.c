@@ -12,8 +12,6 @@
 #include "led.h"
 #include "vfs.h"
 
-
-
 /* Process function declarations */
 extern void process0(void);
 extern void process1(void);
@@ -75,17 +73,17 @@ int main(){
     } else {
         uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
     }
-  
+
     /* Initialise all PCBs */
     for (int i = 0; i < MAX_PROCS; i++) {
-    	PROC_TABLE[i].state = DEAD;
+        PROC_TABLE[i].state = DEAD;
     }
 
-  init_network_stack();
+    init_network_stack();
 
-	/* ********* Test File system ********* */
+    /* ********* Test File system ********* */
 
-	uint32_t* buffer = (uint32_t*)kmalloc(128 * sizeof(uint32_t));
+    uint32_t* buffer = (uint32_t*)kmalloc(128 * sizeof(uint32_t));
 	fat12_init(0, buffer);
 	kfree(buffer);
 

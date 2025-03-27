@@ -7,8 +7,6 @@
 #include <syserr.h>
 
 
-extern uint8_t * KERNEL_STACK_TOP;
-
 /* Round-robin yield: switches context to the next process */
 void schedule(void) {
     PCB *current = current_process;
