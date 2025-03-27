@@ -261,9 +261,9 @@ void uart0_printf(const char* str, ...) {
  * UART interrupts */
 char uart0_getch() {
 
-    //LEDoff(LED0); /* Uncommenting this line makes it work for some reason */
+    /* LEDoff(LED0); Uncommenting this line makes it work for some reason */
 
-    while(*(volatile uint8_t*)(UART0_BASE + UART_LSR) & 0x1 == 0x0);
+    while((*(volatile uint8_t*)(UART0_BASE + UART_LSR) & 0x1) == 0x0);
 
     return *(volatile uint8_t*)((volatile char*)UART0_BASE + 0x0);
 
@@ -315,5 +315,5 @@ void uart0_test() {
 	int testInt2 = 0;
 	int testInt3 = -69;
 	uart0_printf("Expected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual testHex = %x\nExpected testChar = B, Actual testChar = %c\nExpected testHex2 = 0x0000000F, Actual testHex2 = %x\nExpected testInt = 42, Actual testInt = %d\nExpected testInt2 = 0, Actual testInt2 = %d\nExpected testInt3 = -69, Actual testInt3 = %d\nExpected %%, Actual = %%\nExpected %?, Actual = %g\n", testString, testHex, testChar, testHex2, testInt, testInt2, testInt3);
-	//uart0_printf("Expected testChar = B, Actual testChar = %c\nExpected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual = testHex = %x\n", testChar, testString, testHex); 
+	/*uart0_printf("Expected testChar = B, Actual testChar = %c\nExpected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual = testHex = %x\n", testChar, testString, testHex);  */
 }

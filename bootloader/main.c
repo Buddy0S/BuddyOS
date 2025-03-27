@@ -19,22 +19,20 @@ void exception_handler(uint32_t exception) {
             uart0_printf("Supervisor Call Exception\n");
             break;
         case 2:  
-	    {
-		uint32_t addr; 
-	        uint32_t status;
+            {
+                uint32_t addr; 
+                uint32_t status;
                 uint32_t reason;
 
                 uart0_printf("Data Abort Exception\n");
 
-                // this whole function is causing some embbeded bs
 
+                asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
 
-		asm volatile ("mrc p15, 0, %0, c6, c0, 0" : "=r" (addr));
+                asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
 
-		asm volatile ("mrc p15, 0, %0, c5, c0, 0" : "=r" (status));
-
-		uart0_printf("Addr: %x \n", addr);
-		uart0_printf("Status: %x \n", status);
+                uart0_printf("Addr: %x \n", addr);
+                uart0_printf("Status: %x \n", status);
 
                 reason = status & 0xF;
 
@@ -45,10 +43,10 @@ void exception_handler(uint32_t exception) {
                     case 0x8: uart0_printf("Permission Fault (Section)\n"); break;
                     case 0x9: uart0_printf("Permission Fault (Page)\n"); break;
                     default: uart0_printf("Unknown Fault\n"); break;
-		}
+                }
 
                 break;
-	    }
+            }
         case 3:  
             uart0_printf("Undefined Instruction Exception\n");
             break;
@@ -105,7 +103,7 @@ void buddy(void) {
 typedef void (*KernelStart)();
 
 int main(void) { 
-	
+
     initClocks();
 
     init_interrupts();
@@ -123,7 +121,7 @@ int main(void) {
 
     mmc.init();
     
-     uint32_t __attribute__((aligned(4))) buffer[256];
+    uint32_t __attribute__((aligned(4))) buffer[256];
 
     uart0_printf("Attempting to init fat12......\n");
     fat12_init(0, buffer);

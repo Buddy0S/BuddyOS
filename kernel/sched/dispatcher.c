@@ -1,10 +1,10 @@
 #include <stdint.h>
-#include "list.h"
-#include "uart.h"
-#include "proc.h"
+#include <uart.h>
+#include <proc.h>
 #include <syscall.h>
 #include <srr_ipc.h>
 #include <memory.h>
+#include <syserr.h>
 
 
 extern uint8_t * KERNEL_STACK_TOP;
@@ -39,13 +39,13 @@ int32_t add_two_numbers(int a, int b) {
 void execute_syscall(uint32_t svc_num, uint32_t* args) {
     /* might refactor this */
     switch (svc_num) {
-        case 0:
+        case SYSCALL_YIELD_NR:
 #ifdef DEBUG
             uart0_printf("yield\n");
 #endif
             schedule();
             break;
-        case 1:
+        case SYSCALL_TEST_2_ARGS_NR:
 #ifdef DEBUG
             uart0_printf("add two numbers together tye shi\n");
 #endif
@@ -98,8 +98,9 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             break;
         default:
 #ifdef DEBUG
-            uart0_printf("unknown\n");
+            uart0_printf("unknown/unimplemented\n");
 #endif
+            args[0] = -ENOSYS;
             break;
     }
 
@@ -130,6 +131,7 @@ void dispatcher(void) {
                 current_process->trap_reason = HANDLED;
                 switch_to_irq(kernel_process, current_process);
             }
+            /* check for handled and kill process */
         } else {
             current_process->started = true;
             switch_to_start(kernel_process, current_process);    

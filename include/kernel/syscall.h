@@ -1,12 +1,15 @@
 #ifndef SYSCALL_H
 #define SYSCALL_H
 
+#include "proc.h"
+
+/* lets us pass a macro to SYSCALL(x) */
 #define STR(x) #x
 
 #define SYSCALL(x)                          \
 ({                                          \
-    register int return_val asm("r0");      \
-    asm volatile (" svc #" STR(x) "  \n\t");    \
+    register int32_t return_val asm("r0");  \
+    asm volatile ("svc #" STR(x) "  \n\t"); \
     return_val;                             \
 })                                          \
 
@@ -27,5 +30,29 @@
 #define SYSCALL_MSG_WAITING_NR  9
 #define SYSCALL_SEND_END        10
 #define SYSCALL_RECEIVE_END     11
+
+/* test function that calls a syscall that takes 2 arguments */
+int __syscalltest(int a, int b);
+
+int __yield(void);
+
+int __send_end(void* reply, uint32_t* rlen);
+
+int __send_start(int pid, struct Mail* mail_in, void* reply, uint32_t* rlen);
+
+int __send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen);
+
+int __receive_end(int* author, void* msg, uint32_t* len);
+
+int __receive_start(int* author, void* msg, uint32_t* len);
+
+int __receive(int* author, void* msg, uint32_t* len);
+
+int __reply(int pid, void* msg, uint32_t len);
+
+int __msg_waiting();
+
+int __fork();
+
 
 #endif

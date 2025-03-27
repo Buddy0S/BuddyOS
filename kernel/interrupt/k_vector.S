@@ -81,8 +81,6 @@ loop:
     bl kexception_handler
     b loop
 
-.extern testprint
-
 
 @ can't use svc in supervisor node
 .global supervisor_call
