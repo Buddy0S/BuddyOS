@@ -14,6 +14,10 @@ int send(int pid, struct Mail* mail_in, void* reply, uint32_t* rlen) {
     uint32_t len = mail_in->len;
     
     /* input and state checking */
+    if (pid == 0) {
+        return -EINVAL;
+    }
+
     if (msg == NULL || reply == NULL ||rlen == NULL) {
         return -EFAULT;
     }

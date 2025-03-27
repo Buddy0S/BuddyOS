@@ -54,7 +54,9 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
     srr_init_mailbox(&p->mailbox);
 
     /* Add this process to the ready queue */
-    list_add_tail(&ready_queue, &p->sched_node);
+    if (prio != LOW) {
+        list_add_tail(&ready_queue, &p->sched_node);
+    }
 }
 
 
@@ -68,22 +70,22 @@ void null_proc(void) {
     }
 }
 
-void process0(void) {
+void process1(void) {
     
     // Call fork and capture its return value.
-    uart0_printf("Process 0\n");
+    uart0_printf("Process 1\n");
     int fork_result = __fork();
 
     // Check the result
     if (fork_result == -1) {
-        uart0_printf("Process 0: fork failed!\n");
+        uart0_printf("Process 1: fork failed!\n");
     } else if (fork_result == 0) {
         // This branch is executed in the child
-        uart0_printf("Process 0 (child): My PID is %d\n", current_process->pid);
+        uart0_printf("Process 1 (child): My PID is %d\n", current_process->pid);
         delay();
     } else {
         // This branch is executed in the paren
-        uart0_printf("Process 0 (parent): fork returned child PID %x\n", fork_result);
+        uart0_printf("Process 1 (parent): fork returned child PID %x\n", fork_result);
     }
 	
     int author;
@@ -111,24 +113,24 @@ void process0(void) {
     }
 }
 
-void process1(void) {
+void process2(void) {
     char message[20] = "Hey buddy";
     char response[20];
     uint32_t rsp_len;
-    int dest = 0;
-    uart0_printf("Process 1\n");
+    int dest = 1;
+    uart0_printf("Process 2\n");
     int fork_result = __fork();
 
     // Check the result
     if (fork_result == -1) {
-        uart0_printf("Process 1: fork failed!\n");
+        uart0_printf("Process 2: fork failed!\n");
     } else if (fork_result == 0) {
         // This branch is executed in the child
-        uart0_printf("Process 1 (child): My PID is %d\n", current_process->pid);
-        dest = 2;
+        uart0_printf("Process 2 (child): My PID is %d\n", current_process->pid);
+        dest = 3;
     } else {
         // This branch is executed in the paren
-        uart0_printf("Process 1 (parent): fork returned child PID %x\n", fork_result);
+        uart0_printf("Process 2 (parent): fork returned child PID %x\n", fork_result);
     }
 
     int pid = current_process->pid;

@@ -13,8 +13,8 @@
 #include "vfs.h"
 
 /* Process function declarations */
-extern void process0(void);
 extern void process1(void);
+extern void process2(void);
 
 /* Function for delay */
 void delay(void) {
@@ -116,15 +116,14 @@ int main(){
     init_ready_queue();
 
     init_process(&PROC_TABLE[0], null_proc, PROC_STACKS[0], LOW);
-    init_process(&PROC_TABLE[1], process0, PROC_STACKS[1], MEDIUM);
-    init_process(&PROC_TABLE[2], process1, PROC_STACKS[2], MEDIUM);
+    init_process(&PROC_TABLE[1], process1, PROC_STACKS[1], MEDIUM);
+    init_process(&PROC_TABLE[2], process2, PROC_STACKS[2], MEDIUM);
 
 #ifdef DEBUG
     uart0_printf("process gonan jump to %x\n", process0);
 #endif
 
-    /* Set the current process to the head of the ready queue */
-    current_process = knode_data(list_first(&ready_queue), PCB, sched_node);
+    /* Set the current process to the head of the null proc for now */
     current_process = &PROC_TABLE[0];
 
     /* Call dispatcher */
