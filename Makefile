@@ -83,6 +83,9 @@ $(BUILD_DIR)dispatcher.o: kernel/dispatcher.c
 $(BUILD_DIR)proc.o: kernel/proc.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/proc.c -o $@
 
+$(BUILD_DIR)syscall.o: kernel/syscall.c
+	$(PREFIX)gcc $(KCFLAGS) kernel/syscall.c -o $@
+
 $(BUILD_DIR)srr_ipc.o: kernel/srr_ipc.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/srr_ipc.c -o $@
 
@@ -134,7 +137,7 @@ $(BUILD_DIR)kernel.o: kernel/main.c
 kernel.elf: kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o\
 $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o\
 $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)net.o\
-$(BUILD_DIR)dispatcher.o $(BUILD_DIR)memcmd.o\
+$(BUILD_DIR)dispatcher.o $(BUILD_DIR)memcmd.o $(BUILD_DIR)syscall.o\
 $(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o $(BUILD_DIR)fs.o $(BUILD_DIR)vfs.o\
 $(BUILD_DIR)srr_ipc.o $(BUILD_DIR)context_switch.o $(BUILD_DIR)proc.o\
 $(BUILD_DIR)cpsw.o $(BUILD_DIR)phy.o $(BUILD_DIR)ethernet.o $(BUILD_DIR)arp.o\

@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include "proc.h"
+#include "syscall.h"
+#include "uart.h"
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
@@ -54,4 +56,92 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
 
     /* Add this process to the ready queue */
     list_add_tail(&ready_queue, &p->sched_node);
+}
+
+
+/*-----------------------TESTPROCS-----------------------*/
+
+void null_proc(void) {
+    while (1) {
+        uart0_printf("null proc going to sleep... zzzzzzz\n");
+        WFI();
+    }
+}
+
+void process0(void) {
+    
+    // Call fork and capture its return value.
+    uart0_printf("Process 0\n");
+    int fork_result = __fork();
+
+    // Check the result
+    if (fork_result == -1) {
+        uart0_printf("Process 0: fork failed!\n");
+    } else if (fork_result == 0) {
+        // This branch is executed in the child
+        uart0_printf("Process 0 (child): My PID is %d\n", current_process->pid);
+        delay();
+    } else {
+        // This branch is executed in the paren
+        uart0_printf("Process 0 (parent): fork returned child PID %x\n", fork_result);
+    }
+	
+    int author;
+    char msg[20];
+    uint32_t len;
+    int pid = current_process->pid;
+
+    len = 20;
+
+    while (1) {
+        uart0_printf("\nProcess %d received 5 + 10 = %d\n", pid, __syscalltest(5, 10));
+        delay();
+        if (__msg_waiting()) {
+            uart0_printf("Proc %d: Theres a message from my buddy!\n", pid);
+        } else {
+            uart0_printf("Proc %d: Theres no message from my buddy yet but thats fine ill wait\n", pid);
+        }
+
+        __receive(&author, msg, &len);
+        uart0_printf("Proc %d: I got my buddy's message!\n", pid);
+        uart0_printf("Proc %d: msg received from %d:\n\t%s\n", pid, author, msg);
+        __reply(author, msg, 19);
+
+        uart0_printf("Proc %d: sent my buddy a reply\n", pid);
+    }
+}
+
+void process1(void) {
+    char message[20] = "Hey buddy";
+    char response[20];
+    uint32_t rsp_len;
+    int dest = 0;
+    uart0_printf("Process 1\n");
+    int fork_result = __fork();
+
+    // Check the result
+    if (fork_result == -1) {
+        uart0_printf("Process 1: fork failed!\n");
+    } else if (fork_result == 0) {
+        // This branch is executed in the child
+        uart0_printf("Process 1 (child): My PID is %d\n", current_process->pid);
+        dest = 2;
+    } else {
+        // This branch is executed in the paren
+        uart0_printf("Process 1 (parent): fork returned child PID %x\n", fork_result);
+    }
+
+    int pid = current_process->pid;
+
+    while (1) {
+        uart0_printf("\nProcess %d is going to sleep\n", pid);
+        delay();
+        WFI();
+        uart0_printf("\nProcess %d has been resurrected\n", pid);
+        uart0_printf("Proc %d: Sending a message to my buddy :)\n", pid);
+        rsp_len = 20;
+        __send(dest, message, 20, response, &rsp_len);
+        uart0_printf("PROC%d: My buddy received my message!!\n", pid);
+        uart0_printf("Proc %d: receiving %s\n", pid, response);
+    }
 }
