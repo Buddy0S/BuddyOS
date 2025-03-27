@@ -242,10 +242,11 @@ int32_t fork(void) {
     child->context = parent->context;
 
     /* get svc stack for child */
-    child->exception_stack_top = (uint32_t*)KERNEL_STACK_TOP - (child_pid * KERNEL_STACK_SIZE);
+    child->exception_stack_top = (uint32_t*)EXCEPTION_STACK_TOP - (child_pid * EXCEPTION_STACK_SIZE);
     child->stack_ptr = child->exception_stack_top - (parent->exception_stack_top - parent->stack_ptr);
     uint32_t *child_args = (child->stack_ptr + (parent->r_args - parent->stack_ptr));
-    kmemcpy(parent->exception_stack_top - KERNEL_STACK_SIZE, child->exception_stack_top - KERNEL_STACK_SIZE, sizeof(uint32_t) * KERNEL_STACK_SIZE);
+    kmemcpy(parent->exception_stack_top - EXCEPTION_STACK_SIZE, 
+            child->exception_stack_top - EXCEPTION_STACK_SIZE, sizeof(uint32_t) * EXCEPTION_STACK_SIZE);
 
     // Initialize child's PCB
     child->pid = child_pid;

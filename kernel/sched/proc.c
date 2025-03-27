@@ -49,7 +49,7 @@ void init_process(PCB *p, void (*func)(void), uint32_t *stack_base, int32_t prio
     /* start all processes with a 100 ms quantum for now */
     p->cpu_time = PROC_QUANTUM;
 
-    p->exception_stack_top = (uint32_t*)KERNEL_STACK_TOP - (p->pid * KERNEL_STACK_SIZE);
+    p->exception_stack_top = (uint32_t*)EXCEPTION_STACK_TOP - (p->pid * EXCEPTION_STACK_SIZE);
 
     srr_init_mailbox(&p->mailbox);
 
