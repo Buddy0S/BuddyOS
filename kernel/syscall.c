@@ -69,4 +69,8 @@ int __fork() {
 	return SYSCALL(SYSCALL_FORK_NR);
 }
 
+void __exit() {
+	SYSCALL(SYSCALL_EXIT_NR);
+}
+
 

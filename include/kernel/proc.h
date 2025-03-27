@@ -109,5 +109,7 @@ extern void switch_to_irq(PCB *from, PCB *to);
 extern void switch_to_start(PCB *from, PCB *to);
 extern void switch_to_dispatch(PCB *from, PCB *to);
 int32_t fork(void);
+int32_t kexit(void);
+void proc_wrapper(void (*func)(void));
 
 #endif /* PROC_H */

@@ -2,7 +2,7 @@ PREFIX = arm-none-eabi-
 CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include\
 				 -I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel 
 KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -mno-unaligned-access -O0 -I./include\
-					-I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel
+					-I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel -DDEBUG
 
 BUILD_DIR = build/
 BIN_DIR = bin/
@@ -70,6 +70,9 @@ $(BUILD_DIR)kinit.o : kernel/kinit.S | $(BUILD_DIR)
 
 $(BUILD_DIR)k_vector.o : kernel/interrupt/k_vector.S | $(BUILD_DIR)
 	$(PREFIX)as kernel/interrupt/k_vector.S -o $@
+
+$(BUILD_DIR)regs.o : kernel/regs.S | $(BUILD_DIR)
+	$(PREFIX)as kernel/regs.S -o $@
 
 $(BUILD_DIR)context_switch.o : kernel/sched/context_switch.S | $(BUILD_DIR)
 	$(PREFIX)as kernel/sched/context_switch.S -o $@
@@ -141,17 +144,27 @@ $(BUILD_DIR)dispatcher.o $(BUILD_DIR)memcmd.o $(BUILD_DIR)syscall.o\
 $(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o $(BUILD_DIR)fs.o $(BUILD_DIR)vfs.o\
 $(BUILD_DIR)srr_ipc.o $(BUILD_DIR)context_switch.o $(BUILD_DIR)proc.o\
 $(BUILD_DIR)cpsw.o $(BUILD_DIR)phy.o $(BUILD_DIR)ethernet.o $(BUILD_DIR)arp.o\
-$(BUILD_DIR)ipv4.o $(BUILD_DIR)icmp.o $(BUILD_DIR)udp.o $(BUILD_DIR)socket.o $(BUILD_DIR)net_functions.o
+$(BUILD_DIR)ipv4.o $(BUILD_DIR)icmp.o $(BUILD_DIR)udp.o $(BUILD_DIR)socket.o $(BUILD_DIR)net_functions.o $(BUILD_DIR)regs.o
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
+
+$(BUILD_DIR)usertest.o: user/test.c
+	$(PREFIX)gcc $(KCFLAGS) user/test.c -fPIC -o $@
+
+usertest.elf: user/user.ld $(BUILD_DIR)usertest.o $(BUILD_DIR)regs.o
+	$(PREFIX)gcc -nostartfiles -flto=all -e main -T $^ -o $@
+
+test.bin: usertest.elf
+	$(PREFIX)objcopy -O binary usertest.elf test.bin
 
 kernel.bin: kernel.elf
 	$(PREFIX)objcopy -O binary kernel.elf kernel.bin
 
-BuddyOS.img: MLO kernel.bin
+BuddyOS.img: MLO kernel.bin test.bin
 	dd if=/dev/zero of=BuddyOS.img bs=512 count=2880
 	mkfs.fat -F 12 BuddyOS.img
 	mcopy -i BuddyOS.img MLO "::MLO"
 	mcopy -i BuddyOS.img kernel.bin "::kernel.bin"
+	mcopy -i BuddyOS.img test.bin "::test.bin"
 
 objdump: BuddyOS.img
 	$(PREFIX)objdump -D -b binary -m arm MLO

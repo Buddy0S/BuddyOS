@@ -79,7 +79,7 @@ int main(){
         PROC_TABLE[i].state = DEAD;
     }
 
-    init_network_stack();
+    //init_network_stack();
 
     /* ********* Test File system ********* */
 
@@ -91,6 +91,7 @@ int main(){
 	vfs_mount("/home", FAT12);
 
 	char buf[64];
+    char __attribute__((aligned(8192))) test[8192 * 2];
 
 	int fd = vfs_open("/home/TEST.TXT", O_READ | O_WRITE);
 	int bytes = vfs_read(fd, buf, 64);
@@ -110,17 +111,24 @@ int main(){
 
 	fd = vfs_open("/home/DIS.TXT", O_WRITE);
 	vfs_close(fd);
+
+    fd = vfs_open("/home/TEST.BIN", O_READ | O_WRITE);
+	bytes = vfs_read(fd, test, 2 * 8192);
+	uart0_printf("%s (%d bytes)\n", test, bytes);
+
     
     
     /* Initialize the ready queue */
     init_ready_queue();
 
     init_process(&PROC_TABLE[0], null_proc, PROC_STACKS[0], LOW);
+    /*
     init_process(&PROC_TABLE[1], process1, PROC_STACKS[1], MEDIUM);
     init_process(&PROC_TABLE[2], process2, PROC_STACKS[2], MEDIUM);
+    */
+    init_process(&PROC_TABLE[3], (void (*)(void))(test + 8), PROC_STACKS[3], MEDIUM);
 
 #ifdef DEBUG
-    uart0_printf("process gonan jump to %x\n", process0);
 #endif
 
     /* Set the current process to the head of the null proc for now */

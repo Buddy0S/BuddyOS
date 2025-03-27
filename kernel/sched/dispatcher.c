@@ -94,6 +94,12 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
 #endif
             args[0] = fork();
             break;
+        case SYSCALL_EXIT_NR:
+#ifdef DEBUG
+            uart0_printf("exit syscall\n");
+#endif
+            kexit();
+            break;
         default:
 #ifdef DEBUG
             uart0_printf("unknown/unimplemented\n");
@@ -112,6 +118,10 @@ void dispatcher(void) {
 #endif
     while (1) {
         if (current_process->started) {
+
+#ifdef DEBUG
+        uart0_printf("jumping to %x for process #%d through ", current_process->context.lr, current_process->pid);
+#endif
             if (current_process->trap_reason == SYSCALL) {
                 /* if the process then returns to the dispatcher without 
                  * going through a syscall or an interrupt then that means it just
@@ -131,6 +141,10 @@ void dispatcher(void) {
             }
             /* check for handled and kill process */
         } else {
+
+#ifdef DEBUG
+        uart0_printf("jumping to %x for process #%d through ", current_process->context.r4, current_process->pid);
+#endif
             current_process->started = true;
             switch_to_start(kernel_process, current_process);    
         }
@@ -175,101 +189,8 @@ void dispatcher(void) {
             current_process->quantum_elapsed = false;
             schedule();
         }
-#ifdef DEBUG
-        uart0_printf("jumping to %x for process #%d through ", current_process->context.lr, current_process->pid);
-#endif
 
     }
 }
 
 
-PCB* get_PCB(int pid) {
-    if (pid >= 0 && pid < MAX_PROCS) {
-        return &PROC_TABLE[pid];
-    }
-
-    return NULL;
-}
-
-void wake_proc(int pid) {
-    PCB* pcb;
-    pcb = get_PCB(pid);
-    if (pcb == NULL) {
-        return;
-    }
-
-    if (pcb->state != READY) {
-        pcb->state = READY;
-        list_add_tail(&ready_queue, &pcb->sched_node);
-    }
-}
-
-void block() {
-    current_process->state = BLOCKED;
-    list_pop(&ready_queue); /* clears the current process out of the queue */
-}
-
-int32_t fork(void) {
-    // Find a free PCB (state == DEAD)
-    int child_pid = -1;
-    for (int i = 0; i < MAX_PROCS; i++) {
-        if (PROC_TABLE[i].state == DEAD) {
-            child_pid = i;
-            break;
-        }
-    }
-
-    PCB *parent = current_process;
-    if (child_pid == -1) return -1; // No free process slot
-
-    PCB *child = &PROC_TABLE[child_pid];
-
-    // Copy parent's stack to child's stack
-    uint32_t *child_stack = PROC_STACKS[child_pid];
-    kmemcpy(parent->stack_base, child_stack, STACK_SIZE * sizeof(uint32_t));
-
-
-    // use the same offset into the child's stack as the parent's saved_sp 
-    // had into the parent's stack.
-    // Set child's stack pointer (same offset as parent)
-    int32_t parent_stack_offset = parent->saved_sp - parent->stack_base;
-    child->saved_sp = child_stack + parent_stack_offset;
-
-    // Keep the saved LR the same as parent's
-    child->saved_lr = parent->saved_lr;
-
-    // Copy parent's saved context (registers r4-r11, lr)
-    child->context = parent->context;
-
-    /* get svc stack for child */
-    child->exception_stack_top = (uint32_t*)EXCEPTION_STACK_TOP - (child_pid * EXCEPTION_STACK_SIZE);
-    child->stack_ptr = child->exception_stack_top - (parent->exception_stack_top - parent->stack_ptr);
-    uint32_t *child_args = (child->stack_ptr + (parent->r_args - parent->stack_ptr));
-    kmemcpy(parent->exception_stack_top - EXCEPTION_STACK_SIZE, 
-            child->exception_stack_top - EXCEPTION_STACK_SIZE, sizeof(uint32_t) * EXCEPTION_STACK_SIZE);
-
-    // Initialize child's PCB
-    child->pid = child_pid;
-    child->ppid = parent->pid;
-    child->state = READY;
-    child->prio = parent->prio;
-    child->stack_base = child_stack;
-    child->started = true; 
-    child->trap_reason = SYSCALL;
-    child->cpu_time = PROC_QUANTUM;
-    child->quantum_elapsed = false;
-    child->r_args = (uint32_t*)child_args;
-    // Adjust child's saved r0 (syscall return value) to 0
-    child->r_args[0] = 0;
-
-    // Initialize child's mail
-    srr_init_mailbox(&child->mailbox);
-
-    // Add child to ready queue hopefully works lol
-    list_add_tail(&ready_queue, &child->sched_node);
-
-#ifdef DEBUG
-    uart0_printf("fork: child PID %d\n", child_pid);
-#endif
-    return child_pid;
-}

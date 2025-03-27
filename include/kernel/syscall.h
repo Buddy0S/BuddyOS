@@ -30,6 +30,7 @@
 #define SYSCALL_MSG_WAITING_NR  9
 #define SYSCALL_SEND_END        10
 #define SYSCALL_RECEIVE_END     11
+#define SYSCALL_EXIT_NR         12
 
 /* test function that calls a syscall that takes 2 arguments */
 int __syscalltest(int a, int b);
@@ -54,5 +55,6 @@ int __msg_waiting();
 
 int __fork();
 
+void __exit();
 
 #endif
