@@ -80,7 +80,12 @@ void UART0_isr(){
 
     char rec = *(volatile uint8_t*)UART0_BASE;
 
-    uart0_putch(rec);
+    if(rec == '\n' || rec == '\r') {
+        uart0_putch('\r');
+        uart0_putch('\n');
+    } else {
+        uart0_putch(rec);
+    }
 }
 
 /* this function somehow doesnt break irq stack frame, should probably cut

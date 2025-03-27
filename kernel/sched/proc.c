@@ -96,7 +96,7 @@ void process1(void) {
     len = 20;
 
     while (1) {
-        uart0_printf("\nProcess %d received 5 + 10 = %d\n", pid, __syscalltest(5, 10));
+        uart0_printf("\nProcess %d was told by its best buddy that 5 + 10 = %d\n", pid, __syscalltest(5, 10));
         delay();
         if (__msg_waiting()) {
             uart0_printf("Proc %d: Theres a message from my buddy!\n", pid);
@@ -106,7 +106,7 @@ void process1(void) {
 
         __receive(&author, msg, &len);
         uart0_printf("Proc %d: I got my buddy's message!\n", pid);
-        uart0_printf("Proc %d: msg received from %d:\n\t%s\n", pid, author, msg);
+        uart0_printf("Proc %d: msg received from %d: %s\n", pid, author, msg);
         __reply(author, msg, 19);
 
         uart0_printf("Proc %d: sent my buddy a reply\n", pid);
@@ -128,6 +128,7 @@ void process2(void) {
         // This branch is executed in the child
         uart0_printf("Process 2 (child): My PID is %d\n", current_process->pid);
         dest = 3;
+        __fork();
     } else {
         // This branch is executed in the paren
         uart0_printf("Process 2 (parent): fork returned child PID %x\n", fork_result);
@@ -139,11 +140,11 @@ void process2(void) {
         uart0_printf("\nProcess %d is going to sleep\n", pid);
         delay();
         WFI();
-        uart0_printf("\nProcess %d has been resurrected\n", pid);
+        uart0_printf("\nProcess %d's alarm went off\n", pid);
         uart0_printf("Proc %d: Sending a message to my buddy :)\n", pid);
         rsp_len = 20;
         __send(dest, message, 20, response, &rsp_len);
         uart0_printf("PROC%d: My buddy received my message!!\n", pid);
-        uart0_printf("Proc %d: receiving %s\n", pid, response);
+        uart0_printf("Proc %d: they responded with: %s\n", pid, response);
     }
 }
