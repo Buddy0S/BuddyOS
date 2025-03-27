@@ -56,8 +56,8 @@ $(BUILD_DIR)memcmd.o : misc/memcmd.c | $(BUILD_DIR)
 $(BUILD_DIR)ddr.o : arch/boardinit/ddr.c | $(BUILD_DIR)
 	$(PREFIX)gcc $(CFLAGS) arch/boardinit/ddr.c -o $@
 
-$(BUILD_DIR)fat12.o : fs/fat12.c | $(BUILD_DIR)
-	$(PREFIX)gcc $(CFLAGS) fs/fat12.c -o $@
+$(BUILD_DIR)fat12.o : filesystem/fat12.c | $(BUILD_DIR)
+	$(PREFIX)gcc $(CFLAGS) filesystem/fat12.c -o $@
 
 $(BIN_DIR)boot.out : boot.ld $(BUILD_DIR)main.o $(BUILD_DIR)led.o $(BUILD_DIR)init.o $(BUILD_DIR)vector_table.o $(BUILD_DIR)interrupt.o $(BUILD_DIR)uart.o $(BUILD_DIR)timer.o $(BUILD_DIR)clock.o $(BUILD_DIR)ddr.o $(BUILD_DIR)memcmd.o $(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o | $(BIN_DIR)
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
@@ -89,11 +89,11 @@ $(BUILD_DIR)syscall.o: kernel/syscall.c
 $(BUILD_DIR)srr_ipc.o: kernel/srr_ipc.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/srr_ipc.c -o $@
 
-$(BUILD_DIR)fs.o: fs/fs.c
-	$(PREFIX)gcc $(CFLAGS) fs/fs.c -o $@
+$(BUILD_DIR)fs.o: filesystem/fs.c
+	$(PREFIX)gcc $(CFLAGS) filesystem/fs.c -o $@
 
-$(BUILD_DIR)vfs.o: $(BUILD_DIR)fs.o fs/vfs.c 
-	$(PREFIX)gcc $(CFLAGS) fs/vfs.c -o $@
+$(BUILD_DIR)vfs.o: $(BUILD_DIR)fs.o filesystem/vfs.c 
+	$(PREFIX)gcc $(CFLAGS) filesystem/vfs.c -o $@
 
 $(BUILD_DIR)memory.o: kernel/memory.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/memory.c -o $@
