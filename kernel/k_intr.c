@@ -5,7 +5,8 @@
 #include "reg.h"
 #include "uart.h"
 #include <stdint.h>
-#include "net.h"
+
+void timer_net_isr();
 
 uint32_t timer_counter = 1000;
 
@@ -78,16 +79,6 @@ void timer_isr(){
 
 }
 
-extern int net_ready;
-
-void timer_net_isr(){
-  if (net_ready){
-    //uart0_printf("NET ISR\n");
-    cpsw_recv();
-    transmit();
-    //uart0_printf("NET IST DONE\n");
-  }
-}
 
 void UART0_isr(){
 

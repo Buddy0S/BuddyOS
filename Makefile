@@ -99,6 +99,30 @@ $(BUILD_DIR)net.o: drivers/net.c
 $(BUILD_DIR)cpsw.o: drivers/cpsw.c
 	$(PREFIX)gcc $(KCFLAGS) drivers/cpsw.c -o $@
 
+$(BUILD_DIR)phy.o: drivers/phy.c
+	$(PREFIX)gcc $(KCFLAGS) drivers/phy.c -o $@
+
+$(BUILD_DIR)ethernet.o: net/ethernet.c
+	$(PREFIX)gcc $(KCFLAGS) net/ethernet.c -o $@
+
+$(BUILD_DIR)arp.o: net/arp.c
+	$(PREFIX)gcc $(KCFLAGS) net/arp.c -o $@
+
+$(BUILD_DIR)ipv4.o: net/ipv4.c
+	$(PREFIX)gcc $(KCFLAGS) net/ipv4.c -o $@
+
+$(BUILD_DIR)icmp.o: net/icmp.c
+	$(PREFIX)gcc $(KCFLAGS) net/icmp.c -o $@
+
+$(BUILD_DIR)udp.o: net/udp.c
+	$(PREFIX)gcc $(KCFLAGS) net/udp.c -o $@
+
+$(BUILD_DIR)socket.o: net/socket.c
+	$(PREFIX)gcc $(KCFLAGS) net/socket.c -o $@
+
+$(BUILD_DIR)net_functions.o: misc/net_functions.c
+	$(PREFIX)gcc $(KCFLAGS) misc/net_functions.c -o $@
+
 $(BUILD_DIR)kernel.o: kernel/main.c
 	$(PREFIX)gcc $(KCFLAGS) kernel/main.c -o $@
 
@@ -107,7 +131,9 @@ $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o\
 $(BUILD_DIR)k_intr.o $(BUILD_DIR)k_vector.o $(BUILD_DIR)net.o\
 $(BUILD_DIR)dispatcher.o $(BUILD_DIR)memcmd.o\
 $(BUILD_DIR)drivers.o $(BUILD_DIR)fat12.o $(BUILD_DIR)fs.o $(BUILD_DIR)vfs.o\
-$(BUILD_DIR)srr_ipc.o $(BUILD_DIR)context_switch.o
+$(BUILD_DIR)srr_ipc.o $(BUILD_DIR)context_switch.o\
+$(BUILD_DIR)cpsw.o $(BUILD_DIR)phy.o $(BUILD_DIR)ethernet.o $(BUILD_DIR)arp.o\
+$(BUILD_DIR)ipv4.o $(BUILD_DIR)icmp.o $(BUILD_DIR)udp.o $(BUILD_DIR)socket.o $(BUILD_DIR)net_functions.o
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 kernel.bin: kernel.elf
