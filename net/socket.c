@@ -126,9 +126,11 @@ int socket(uint32_t pid, uint16_t src_port, uint16_t dest_port,uint8_t* dest_mac
  * set socket as waiting for data
  *
  * */
-void socket_bind(int socket_num){
+int socket_bind(int socket_num){
 
   socket_table[socket_num].waiting = 1;
+
+  return 1;
 
 }
 
@@ -136,9 +138,11 @@ void socket_bind(int socket_num){
  * set socket as not waiting for data
  *
  * */
-void socket_unbind(int socket_num){
+int socket_unbind(int socket_num){
 
   socket_table[socket_num].waiting = 0;
+
+  return 1;
 
 }
 
@@ -146,11 +150,14 @@ void socket_unbind(int socket_num){
  * returns pointer to data 
  *
  * */
-struct payload socket_recv(int socket_num){
+struct payload* socket_recv(int socket_num){
 
   uint8_t data_index = socket_table[socket_num].packets_pending - 1;
 
-  struct payload data = socket_table[socket_num].data[data_index];
+  struct payload *data = (struct payload *) kmalloc(sizeof(struct payload));
+
+  data->data = socket_table[socket_num].data[data_index].data;
+  data->size = socket_table[socket_num].data[data_index].size;
 
   socket_table[socket_num].packets_pending -= 1;
 

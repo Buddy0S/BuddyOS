@@ -3,6 +3,7 @@
 #include "uart.h"
 #include "syscall.h"
 #include "proc.h"
+#include "net.h"
 
 extern PCB pcb;
 extern int current_index;
@@ -67,6 +68,26 @@ int __msg_waiting() {
 
 int __fork() {
 	return SYSCALL(SYSCALL_FORK_NR);
+}
+
+int __socket(struct socket* soc){
+  return SYSCALL(SYSCALL_SOCKET_NR);
+}
+
+int __socket_bind(int soc){
+  return SYSCALL(SYSCALL_SOCKET_BIND_NR);
+}
+
+int __socket_unbind(int soc){
+  return SYSCALL(SYSCALL_SOCKET_UNBIND_NR);
+}
+
+struct payload* __socket_recv(int soc){
+  return (struct payload*) SYSCALL(SYSCALL_SOCKET_RECV_NR);
+}
+
+int __socket_request(int soc, uint8_t* frame, int size){
+  return SYSCALL(SYSCALL_SOCKET_REQUEST_NR);
 }
 
 
