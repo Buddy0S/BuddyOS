@@ -107,7 +107,7 @@ uint32_t fat12_read(file_descriptor* fd, char* read_buffer, int bytes) {
 	}
 	else {
 		
-		if (strncpy(read_buffer, fd->file_buffer + fd->read_offset, bytes)) {
+		kmemcpy(fd->file_buffer + fd->read_offset, read_buffer, bytes);
 			if (fd->read_offset + bytes < fd->file_size) {
 				bytesRead = bytes;
 			}
@@ -116,7 +116,6 @@ uint32_t fat12_read(file_descriptor* fd, char* read_buffer, int bytes) {
 			}
 
 			fd->read_offset += bytesRead;
-		}
 
 		return bytesRead;
 
@@ -135,12 +134,12 @@ uint32_t fat12_write(file_descriptor* fd, char* write_buffer, int bytes) {
 
 		fd->file_buffer = newBuffer;
 
-		strncpy(fd->file_buffer, oldBuffer, fd->file_size);
+		kmemcpy(oldBuffer, fd->file_buffer, fd->file_size);
 
 		kfree(oldBuffer);
 	}
 
-	strncpy(fd->file_buffer + fd->write_offset, write_buffer, bytes);
+	kmemcpy(write_buffer, fd->file_buffer + fd->write_offset, bytes);
 	
 	fd->write_offset += bytes;
 

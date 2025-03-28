@@ -125,7 +125,7 @@ switch_to_start:
 
     ldr sp, [r1, #28]               /* Load new SP from *new_sp */
     add r3, r1, #32                 /* Gets pointer to context */
-    ldmia r3!, {r4-r11, lr}         /* Restore registers and LR from new process stack */
+    ldmia r3!, {r0, r5-r11, lr}     /* Restore registers and LR from new process stack */
 
-    bx lr                           /* Branch to new process (thru restored LR) */
+    b proc_wrapper                  /* Branch to wrapper function */
 

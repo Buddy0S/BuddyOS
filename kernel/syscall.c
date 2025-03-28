@@ -70,6 +70,10 @@ int __fork() {
 	return SYSCALL(SYSCALL_FORK_NR);
 }
 
+void __exit() {
+	SYSCALL(SYSCALL_EXIT_NR);
+}
+
 int __socket(struct socket* soc){
   return SYSCALL(SYSCALL_SOCKET_NR);
 }
