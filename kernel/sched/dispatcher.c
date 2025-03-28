@@ -5,7 +5,7 @@
 #include <srr_ipc.h>
 #include <memory.h>
 #include <syserr.h>
-
+#include "net.h"
 
 /* Round-robin yield: switches context to the next process */
 void schedule(void) {
@@ -101,6 +101,59 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             kexit();
             schedule();
             break;
+        case SYSCALL_SOCKET_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("SOCKET BRO\n");
+#endif
+            struct socket *soc = (struct socket*) args[0];
+
+            args[0] = socket(soc->pid,soc->src_port,soc->dest_port,soc->dest_mac,soc->dest_ip,soc->protocol,soc->buddy_protocol);
+        }
+            break;
+        case SYSCALL_SOCKET_BIND_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("SOCKET BIND BRO\n");
+#endif
+            int soc = (int) args[0];
+
+            args[0] = socket_bind(soc);
+        }
+            break;
+        case SYSCALL_SOCKET_UNBIND_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("SOCKET UNBIND BRO\n");
+#endif
+            int soc = (int) args[0];
+
+            args[0] = socket_unbind(soc);
+        }
+            break;
+        case SYSCALL_SOCKET_RECV_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("SOCKET RECV BRO\n");
+#endif
+            int soc = (int) args[0];
+
+            args[0] = (uint32_t) socket_recv(soc);
+        }
+            break;
+        case SYSCALL_SOCKET_REQUEST_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("SOCKET REQ BRO\n");
+#endif
+            int soc = (int) args[0];
+            uint8_t* frame = (uint8_t*) args[1];
+            int size = (int) args[2];
+
+            args[0] = socket_transmit_request(soc, frame, size);
+        }
+            break;
+
         default:
 #ifdef DEBUG
             uart0_printf("unknown/unimplemented\n");

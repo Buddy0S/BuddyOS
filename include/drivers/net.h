@@ -213,7 +213,7 @@
 //*******************************************************************
 
 #define INTERRUPTC_BASE 0x48200000
-#define INTC_MIR_CLEAR1 (INTERRUPTC_BASE + 0xA8)
+#define INTC_MIR_CLEAR1_ (INTERRUPTC_BASE + 0xA8)
 
 #define TX_INTMASK_SET (CPDMA_BASE + 0x88)
 #define RX_INTMASK_SET (CPDMA_BASE + 0xA8)
@@ -627,9 +627,11 @@ int socket_waiting(int socket_num, uint16_t dest_port, uint16_t bp);
 int socket_store(int socket_num, uint32_t* payload, int size);
 void init_sockets();  
 int socket(uint32_t pid, uint16_t src_port, uint16_t dest_port,uint8_t* dest_mac,uint32_t dest_ip, uint8_t protocol, uint8_t bp);
-void socket_bind(int socket_num);
-void socket_unbind(int socket_num);
-struct payload socket_recv(int socket_num);
+int socket_bind(int socket_num);
+int socket_unbind(int socket_num);
+struct payload* socket_recv(int socket_num);
 void socket_send(int socket_num, uint8_t* frame, int size);
+
+int socket_transmit_request(int soc, uint8_t* frame, int size);
 
 #endif

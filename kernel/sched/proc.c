@@ -3,6 +3,11 @@
 #include "proc.h"
 #include "syscall.h"
 #include "uart.h"
+#include "net.h"
+#include "memory.h"
+
+uint32_t gateway_ip = 0xC0A8010A;
+uint8_t gateway_mac[MAC_ADDR_LEN] = {0xD8,0xBB,0xC1,0xF7,0xD0,0xD3};
 
 /* Global arrays for PCBs and their stacks */
 PCB PROC_TABLE[MAX_PROCS];
@@ -197,6 +202,21 @@ void process1(void) {
     uint32_t len;
     int pid = current_process->pid;
 
+    struct socket soc;
+    int soc_num;
+
+    soc.pid = pid;
+    soc.src_port = 123;
+    soc.dest_port = 123;
+    soc.dest_ip = gateway_ip;
+    soc.dest_mac = gateway_mac;
+    soc.protocol = UDP;
+    soc.buddy_protocol = 0;
+
+    soc_num = __socket(&soc);
+
+    __socket_bind(soc_num); 
+
     len = 20;
 
     while (1) {
@@ -207,6 +227,11 @@ void process1(void) {
         } else {
             uart0_printf("Proc %d: Theres no message from my buddy yet but thats fine ill wait\n", pid);
         }
+
+        uint8_t* frame = (uint8_t*) kmalloc(128);
+    
+        // request handler will free the frame;
+        __socket_request(soc_num,frame,128);
 
         __receive(&author, msg, &len);
         uart0_printf("Proc %d: I got my buddy's message!\n", pid);

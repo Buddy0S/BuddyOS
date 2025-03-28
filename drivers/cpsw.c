@@ -479,7 +479,7 @@ void cpsw_enable_cpdma_controller(){
  * */
 void cpsw_config_interrupts(){
 
-    REG(INTC_MIR_CLEAR1) = CPSW_INTMASK_CLEAR;
+    REG(INTC_MIR_CLEAR1_) = CPSW_INTMASK_CLEAR;
 
     REG(CPDMA_EOI_VECTOR) = EOI_TX | EOI_RX;
 
