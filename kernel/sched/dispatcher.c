@@ -14,7 +14,6 @@ void schedule(void) {
     /* Remove the head node and add it to the tail */
     if (list_empty(&ready_queue)) {
         /* null proc */
-        uart0_printf("going to null proc\n");
         current_process = &PROC_TABLE[0];
         return;
     } else if (current->prio != LOW) {
@@ -99,6 +98,7 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             uart0_printf("exit syscall\n");
 #endif
             kexit();
+            schedule();
             break;
         default:
 #ifdef DEBUG

@@ -85,13 +85,12 @@ int main(){
 
     uint32_t* buffer = (uint32_t*)kmalloc(128 * sizeof(uint32_t));
 	fat12_init(0, buffer);
-	kfree(buffer);
 
 	vfs_mount("/", FAT12);
 	vfs_mount("/home", FAT12);
 
 	char buf[64];
-    char __attribute__((aligned(8192))) test[8192 * 2];
+    char __attribute__((aligned(512))) test[512];
 
 	int fd = vfs_open("/home/TEST.TXT", O_READ | O_WRITE);
 	int bytes = vfs_read(fd, buf, 64);
@@ -112,11 +111,8 @@ int main(){
 	fd = vfs_open("/home/DIS.TXT", O_WRITE);
 	vfs_close(fd);
 
-    fd = vfs_open("/home/TEST.BIN", O_READ | O_WRITE);
-	bytes = vfs_read(fd, test, 2 * 8192);
+	bytes = fat12_read_file("TEST.BIN", (uint32_t *)test, buffer);
 	uart0_printf("%s (%d bytes)\n", test, bytes);
-
-    
     
     /* Initialize the ready queue */
     init_ready_queue();
@@ -126,7 +122,7 @@ int main(){
     init_process(&PROC_TABLE[1], process1, PROC_STACKS[1], MEDIUM);
     init_process(&PROC_TABLE[2], process2, PROC_STACKS[2], MEDIUM);
     */
-    init_process(&PROC_TABLE[3], (void (*)(void))(test + 8), PROC_STACKS[3], MEDIUM);
+    init_process(&PROC_TABLE[3], (void (*)(void))(test), PROC_STACKS[3], MEDIUM);
 
 #ifdef DEBUG
 #endif

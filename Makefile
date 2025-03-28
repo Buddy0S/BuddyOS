@@ -1,8 +1,8 @@
 PREFIX = arm-none-eabi-
 CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include\
 				 -I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel 
-KCFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -mno-unaligned-access -O0 -I./include\
-					-I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel -DDEBUG
+
+USER_CFLAGS = $(CFLAGS) -fPIE -fno-plt -msingle-pic-base 
 
 BUILD_DIR = build/
 BIN_DIR = bin/
@@ -78,19 +78,19 @@ $(BUILD_DIR)context_switch.o : kernel/sched/context_switch.S | $(BUILD_DIR)
 	$(PREFIX)as kernel/sched/context_switch.S -o $@
 
 $(BUILD_DIR)k_intr.o : kernel/interrupt/k_intr.c | $(BUILD_DIR)
-	$(PREFIX)gcc $(KCFLAGS) kernel/interrupt/k_intr.c -o $@
+	$(PREFIX)gcc $(CFLAGS) kernel/interrupt/k_intr.c -o $@
 
 $(BUILD_DIR)dispatcher.o: kernel/sched/dispatcher.c
-	$(PREFIX)gcc $(KCFLAGS) kernel/sched/dispatcher.c -o $@
+	$(PREFIX)gcc $(CFLAGS) kernel/sched/dispatcher.c -o $@
 
 $(BUILD_DIR)proc.o: kernel/sched/proc.c
-	$(PREFIX)gcc $(KCFLAGS) kernel/sched/proc.c -o $@
+	$(PREFIX)gcc $(CFLAGS) kernel/sched/proc.c -o $@
 
 $(BUILD_DIR)syscall.o: kernel/syscall.c
-	$(PREFIX)gcc $(KCFLAGS) kernel/syscall.c -o $@
+	$(PREFIX)gcc $(CFLAGS) kernel/syscall.c -o $@
 
 $(BUILD_DIR)srr_ipc.o: kernel/srr_ipc.c
-	$(PREFIX)gcc $(KCFLAGS) kernel/srr_ipc.c -o $@
+	$(PREFIX)gcc $(CFLAGS) kernel/srr_ipc.c -o $@
 
 $(BUILD_DIR)fs.o: filesystem/fs.c
 	$(PREFIX)gcc $(CFLAGS) filesystem/fs.c -o $@
@@ -99,7 +99,7 @@ $(BUILD_DIR)vfs.o: $(BUILD_DIR)fs.o filesystem/vfs.c
 	$(PREFIX)gcc $(CFLAGS) filesystem/vfs.c -o $@
 
 $(BUILD_DIR)memory.o: kernel/memory.c
-	$(PREFIX)gcc $(KCFLAGS) kernel/memory.c -o $@
+	$(PREFIX)gcc $(CFLAGS) kernel/memory.c -o $@
 
 $(BUILD_DIR)string.o: misc/string.c
 	$(PREFIX)gcc $(CFLAGS) misc/string.c -o $@
@@ -108,34 +108,34 @@ $(BUILD_DIR)net.o: drivers/net.c
 	$(PREFIX)gcc $(CFLAGS) drivers/net.c -o $@
 
 $(BUILD_DIR)cpsw.o: drivers/cpsw.c
-	$(PREFIX)gcc $(KCFLAGS) drivers/cpsw.c -o $@
+	$(PREFIX)gcc $(CFLAGS) drivers/cpsw.c -o $@
 
 $(BUILD_DIR)phy.o: drivers/phy.c
-	$(PREFIX)gcc $(KCFLAGS) drivers/phy.c -o $@
+	$(PREFIX)gcc $(CFLAGS) drivers/phy.c -o $@
 
 $(BUILD_DIR)ethernet.o: net/ethernet.c
-	$(PREFIX)gcc $(KCFLAGS) net/ethernet.c -o $@
+	$(PREFIX)gcc $(CFLAGS) net/ethernet.c -o $@
 
 $(BUILD_DIR)arp.o: net/arp.c
-	$(PREFIX)gcc $(KCFLAGS) net/arp.c -o $@
+	$(PREFIX)gcc $(CFLAGS) net/arp.c -o $@
 
 $(BUILD_DIR)ipv4.o: net/ipv4.c
-	$(PREFIX)gcc $(KCFLAGS) net/ipv4.c -o $@
+	$(PREFIX)gcc $(CFLAGS) net/ipv4.c -o $@
 
 $(BUILD_DIR)icmp.o: net/icmp.c
-	$(PREFIX)gcc $(KCFLAGS) net/icmp.c -o $@
+	$(PREFIX)gcc $(CFLAGS) net/icmp.c -o $@
 
 $(BUILD_DIR)udp.o: net/udp.c
-	$(PREFIX)gcc $(KCFLAGS) net/udp.c -o $@
+	$(PREFIX)gcc $(CFLAGS) net/udp.c -o $@
 
 $(BUILD_DIR)socket.o: net/socket.c
-	$(PREFIX)gcc $(KCFLAGS) net/socket.c -o $@
+	$(PREFIX)gcc $(CFLAGS) net/socket.c -o $@
 
 $(BUILD_DIR)net_functions.o: misc/net_functions.c
-	$(PREFIX)gcc $(KCFLAGS) misc/net_functions.c -o $@
+	$(PREFIX)gcc $(CFLAGS) misc/net_functions.c -o $@
 
 $(BUILD_DIR)kernel.o: kernel/main.c
-	$(PREFIX)gcc $(KCFLAGS) kernel/main.c -o $@
+	$(PREFIX)gcc $(CFLAGS) kernel/main.c -o $@
 
 kernel.elf: kernel/kernel.ld $(BUILD_DIR)kernel.o $(BUILD_DIR)kinit.o\
 $(BUILD_DIR)led.o $(BUILD_DIR)uart.o $(BUILD_DIR)memory.o\
@@ -148,10 +148,10 @@ $(BUILD_DIR)ipv4.o $(BUILD_DIR)icmp.o $(BUILD_DIR)udp.o $(BUILD_DIR)socket.o $(B
 	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 $(BUILD_DIR)usertest.o: user/test.c
-	$(PREFIX)gcc $(KCFLAGS) user/test.c -fPIC -o $@
+	$(PREFIX)gcc $(USER_CFLAGS) user/test.c -o $@
 
 usertest.elf: user/user.ld $(BUILD_DIR)usertest.o $(BUILD_DIR)regs.o
-	$(PREFIX)gcc -nostartfiles -flto=all -e main -T $^ -o $@
+	$(PREFIX)ld -flto=all -e main -T $^ -o $@
 
 test.bin: usertest.elf
 	$(PREFIX)objcopy -O binary usertest.elf test.bin
