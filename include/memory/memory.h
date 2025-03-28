@@ -1,6 +1,8 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
+#include <stdint.h>
+
 #define KERNEL_START        0x80000000
 #define KERNEL_SIZE         0x00400000  /* 4MB */
 #define KERNEL_RESERVED     0x00400000  /* 4MB */
@@ -15,9 +17,9 @@
 #define ALLOC_END           0x8FFFFFFF
 
 int init_alloc(void);
-void *kmalloc(uint32_t);
-int kfree(void*);
-void kmemset32(void*, uint32_t, uint32_t);
-int kmemcpy(void*, void*, uint32_t);
+void *kmalloc(uint32_t bytes);
+int kfree(void* ptr);
+void kmemset32(void* ptr, uint32_t value, uint32_t len);
+int kmemcpy(void* src, void* dest, uint32_t bytes);
 
 #endif

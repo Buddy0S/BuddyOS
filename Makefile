@@ -1,6 +1,6 @@
 PREFIX = arm-none-eabi-
 CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include\
-				 -I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel 
+				 -I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel
 
 USER_CFLAGS = $(CFLAGS) -fPIE -fno-plt -msingle-pic-base 
 
@@ -15,7 +15,7 @@ OUTPUT = BuddyOS.img
 all: $(OUTPUT)
 
 clean:
-	rm -rf $(OUTPUT) MLO kernel.bin build/ bin/ hello.txt kernel.elf
+	rm -rf $(OUTPUT) MLO kernel.bin build/ bin/ hello.txt kernel.elf test.bin usertest.elf
 
 $(BUILD_DIR) :
 	mkdir -p $(BUILD_DIR)
@@ -150,8 +150,8 @@ $(BUILD_DIR)ipv4.o $(BUILD_DIR)icmp.o $(BUILD_DIR)udp.o $(BUILD_DIR)socket.o $(B
 $(BUILD_DIR)usertest.o: user/test.c
 	$(PREFIX)gcc $(USER_CFLAGS) user/test.c -o $@
 
-usertest.elf: user/user.ld $(BUILD_DIR)usertest.o $(BUILD_DIR)regs.o
-	$(PREFIX)ld -flto=all -e main -T $^ -o $@
+usertest.elf: $(BUILD_DIR)usertest.o $(BUILD_DIR)regs.o
+	$(PREFIX)ld -flto=all -e main $^ -o $@
 
 test.bin: usertest.elf
 	$(PREFIX)objcopy -O binary usertest.elf test.bin

@@ -90,6 +90,7 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
         case SYSCALL_FORK_NR:
 #ifdef DEBUG
             uart0_printf("fork syscall\n");
+            uart0_printf("warning: fork will break if process has pointers to data on stack\n");
 #endif
             args[0] = fork();
             break;

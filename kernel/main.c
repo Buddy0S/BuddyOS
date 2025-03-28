@@ -111,7 +111,8 @@ int main(){
 	fd = vfs_open("/home/DIS.TXT", O_WRITE);
 	vfs_close(fd);
 
-	bytes = fat12_read_file("TEST.BIN", (uint32_t *)test, buffer);
+	fd = vfs_open("/home/TEST.BIN", O_READ);
+	bytes = vfs_read(fd, test, 512);
 	uart0_printf("%s (%d bytes)\n", test, bytes);
     
     /* Initialize the ready queue */
