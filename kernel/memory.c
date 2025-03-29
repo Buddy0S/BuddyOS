@@ -3,9 +3,9 @@
 #include "memory.h"
 #include "uart.h"
 
-#define MAX_ORDER 6
+#define MAX_ORDER 10
 #define MIN_BLOCK 64
-#define MAX_BLOCK 2048
+#define MAX_BLOCK (MIN_BLOCK<<(MAX_ORDER-1))
 #define BLOCK_NUM ((KERNEL_DYNAMIC / 2) / MAX_BLOCK)
 #define NULL ((void*)0)
 
