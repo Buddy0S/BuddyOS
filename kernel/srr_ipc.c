@@ -4,6 +4,23 @@
 #include <proc.h>
 #include <memory.h>
 
+/*
+ * Performs the first half of the send system call.
+ *
+ * Responsible for:
+ *      Checking input validity.
+ *      Ensuring the pid entered is a valid receiver.
+ *      Putting the message into the receiver's mailbox.
+ *      Waking up the receiver.
+ *
+ * Args:
+ *      (int) pid: The process ID of the intended receiver.
+ *      (struct Mail*) mail_in: The mail to be sent to the receiver by copying.
+ *      (void*) reply: A memory address to store the reply.
+ *      (uint*) rlen: A pointer which stores the length of the reply buffer.
+ *
+ * Returns an error code if an issue occurs, 0 on success.
+ */
 int send(int pid, struct Mail* mail_in, void* reply, uint32_t* rlen) {
     struct SRRMailbox *r_box, *c_box;
     struct MailEntry* new_mail;
@@ -34,9 +51,9 @@ int send(int pid, struct Mail* mail_in, void* reply, uint32_t* rlen) {
         return -EINVAL;
     }
 
-    /* This would result in both processes waiting for each other */
     r_box = &receiver->mailbox;
     c_box = &current_process->mailbox;
+    /* This would result in both processes waiting for each other */
     if (r_box->sent_to == current_process->pid) {
         return -EDEADLK;
     }
@@ -69,6 +86,21 @@ int send(int pid, struct Mail* mail_in, void* reply, uint32_t* rlen) {
     return 0;
 }
 
+
+/*
+ * Performs the last half of the send system call.
+ *
+ * Responsible for:
+ *      Receiving the reply from the receiver.
+ *      Copying the data back to the user.
+ *      Freeing the the reply in the kernel.
+ *
+ * Args:
+ *      (void*) reply: A memory address to store the reply.
+ *      (uint*) rlen: A pointer which stores the length of the reply buffer.
+ *
+ * Returns an error code if an issue occurs, 0 on success.
+ */
 int send_end(void* reply, uint32_t* rlen){
     uint32_t usable_len;
     struct SRRMailbox *c_box;
@@ -90,6 +122,21 @@ int send_end(void* reply, uint32_t* rlen){
     return 0;
 }
 
+
+/*
+ * Performs the first half of the receive system call.
+ *
+ * Responsible for:
+ *      Checking input validity.
+ *      Checkign if there any messages and blocking if needed.
+ *
+ * Args:
+ *      (int*) author: A pointer where the sender's pid will be placed.
+ *      (void*) msg: A pointer where the message will be copied into.
+ *      (uint*) len: A pointer containing the length of the msg buffer.
+ *
+ *  Returns an error message on failure and 0 on success.
+ */
 int receive(int* author, void* msg, uint32_t* len) {
     struct SRRMailbox* mb;
 
@@ -113,6 +160,24 @@ int receive(int* author, void* msg, uint32_t* len) {
     return 0;
 }
 
+
+/*
+ * Performs the last half of the receive system call.
+ *
+ * Responsible for:
+ *      Copying the received message to the user inputted buffer and
+ *              modifying len accordingly.
+ *      Copying the authors pid over.
+ *      Freeing the message sent in the kernel.
+ *
+ * Args:
+ *      (int*) author: A pointer where the sender's pid will be placed.
+ *      (void*) msg: A pointer where the message will be copied into.
+ *      (uint*) len: A pointer containing the length of the msg buffer will be
+ *              changed to reflect the length of the message in msg.
+ *
+ * Returns an error message on failure and 0 on success.
+ */
 int receive_end(int* author, void* msg, uint32_t* len) {
     struct SRRMailbox* mb;
     uint32_t usable_len;
@@ -139,6 +204,16 @@ int receive_end(int* author, void* msg, uint32_t* len) {
     return 0;
 }
 
+/*
+ * Sends a message back to the provided sender and waking it up.
+ *
+ * Args:
+ *      (int) pid: The ID of the process being replied to.
+ *      (void*) msg: the message being sent back in the reply.
+ *      (uint) len: The length of the message being sent.
+ *
+ *  Returns an error message on failure and 0 on success.
+ */
 int reply(int pid, void* msg, uint32_t len) {
     PCB *sender;
     struct SRRMailbox *s_box, *c_box;
@@ -179,6 +254,11 @@ int reply(int pid, void* msg, uint32_t len) {
     return 0;
 }
 
+
+/*
+ * Returns 1 if there is a message waiting to be
+ * received by the calling process. Else, returns 0.
+ */
 int msg_waiting() {
     return current_process->mailbox.count > 0;
 }
