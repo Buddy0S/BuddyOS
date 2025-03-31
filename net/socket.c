@@ -122,6 +122,21 @@ int socket(uint32_t pid, uint16_t src_port, uint16_t dest_port,uint8_t* dest_mac
 
 }
 
+int socket_free(int socket_num){
+  
+  socket_table[socket_num].free = 1;
+  socket_table[socket_num].pid = 0;
+  socket_table[socket_num].src_port = 0;
+  socket_table[socket_num].dest_port = 0;
+  socket_table[socket_num].dest_ip = 0;
+  socket_table[socket_num].dest_mac = 0;
+  socket_table[socket_num].protocol = 0;
+  socket_table[socket_num].buddy_protocol = 0;
+  socket_table[socket_num].waiting = 0;
+  socket_table[socket_num].packets_pending = 0;
+
+}
+
 /*
  * set socket as waiting for data
  *

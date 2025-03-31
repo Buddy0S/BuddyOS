@@ -136,9 +136,20 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
 #ifdef DEBUG
             uart0_printf("SOCKET RECV BRO\n");
 #endif
-            int soc = (int) args[0];
 
-            args[0] = (uint32_t) socket_recv(soc);
+            // not checking if usr buff is big enough
+            struct payload* payload;
+            int soc = (int) args[0];
+            uint8_t* buff = (uint8_t*) args[1];
+
+            payload = socket_recv(soc);
+
+            net_memcopy(buff, payload->data, payload->size);
+
+            args[0] = payload->size;
+
+            kfree(payload);
+            
         }
             break;
         case SYSCALL_SOCKET_REQUEST_NR:

@@ -70,7 +70,7 @@ int __socket_bind(int soc);
 
 int __socket_unbind(int soc);
 
-struct payload* __socket_recv(int soc);
+int __socket_recv(int soc, uint8_t* buff);
 
 int __socket_request(int soc, uint8_t* frame, int size); 
 

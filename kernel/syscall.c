@@ -86,8 +86,8 @@ int __socket_unbind(int soc){
   return SYSCALL(SYSCALL_SOCKET_UNBIND_NR);
 }
 
-struct payload* __socket_recv(int soc){
-  return (struct payload*) SYSCALL(SYSCALL_SOCKET_RECV_NR);
+int __socket_recv(int soc, uint8_t* buff){
+  return SYSCALL(SYSCALL_SOCKET_RECV_NR);
 }
 
 int __socket_request(int soc, uint8_t* frame, int size){

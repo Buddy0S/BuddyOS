@@ -66,25 +66,25 @@ void buddy(void) {
 
 int main(){
 
-    uart0_printf("Entering Kernel\n");
+  uart0_printf("Entering Kernel\n");
 
-    /* Initialize buddyOS memory allocator */
-    if (init_alloc() >= 0) {
-        uart0_printf("MEMORY ALLOCATOR INIT\n");
-    } else {
-        uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
-    }
+  /* Initialize buddyOS memory allocator */
+  if (init_alloc() >= 0) {
+    uart0_printf("MEMORY ALLOCATOR INIT\n");
+  } else {
+    uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
+  }
 
-    /* Initialise all PCBs */
-    for (int i = 0; i < MAX_PROCS; i++) {
-        PROC_TABLE[i].state = DEAD;
-    }
+  /* Initialise all PCBs */
+  for (int i = 0; i < MAX_PROCS; i++) {
+    PROC_TABLE[i].state = DEAD;
+  }
 
-    //init_network_stack();
+  init_network_stack();
 
-    /* ********* Test File system ********* */
+  /* ********* Test File system ********* */
 
-    uint32_t* buffer = (uint32_t*)kmalloc(128 * sizeof(uint32_t));
+  uint32_t* buffer = (uint32_t*)kmalloc(128 * sizeof(uint32_t));
 	fat12_init(0, buffer);
 
 	vfs_mount("/", FAT12);

@@ -156,7 +156,7 @@ int init_network_stack(){
 
     ping_request(gateway_ip,gateway_mac);
 
-    int soc = socket(0,80,80,gateway_mac,gateway_ip,UDP,0);
+    int soc = socket(0,8888,8888,gateway_mac,gateway_ip,UDP,0);
 
     socket_bind(soc);
     
