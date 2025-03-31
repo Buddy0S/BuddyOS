@@ -196,6 +196,7 @@ int32_t f_exec(char * const path) {
 
     filesize = vfs_getFileSize(fd);
 
+    /* keivn please fix */
     if (filesize < 257) filesize = 257;
 
     program = kmalloc(filesize);
