@@ -25,8 +25,7 @@
 #define INVALID_FD			-9
 
 typedef struct {
-  char file_name[16];
-	uint32_t fs_file_id;
+  	char file_name[16];
 	int mountpoint_id;
 	int flags;
 	int read_offset;

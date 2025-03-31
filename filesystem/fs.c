@@ -40,7 +40,6 @@ file_descriptor* fat12_open(const char* path, int flags) {
 
 		/* Initialize fd fields */
 		strcpy(fdOpen->file_name, path);
-		fdOpen->fs_file_id = dir.firstClusterLow;
 		fdOpen->flags = flags;
 		fdOpen->read_offset = 0;
 		fdOpen->write_offset = 0;
@@ -64,7 +63,6 @@ file_descriptor* fat12_open(const char* path, int flags) {
 
 		/* Initialize fd fields */
 		strcpy(fdOpen->file_name, path);
-		fdOpen->fs_file_id = 5;
 		fdOpen->flags = flags;
 		fdOpen->read_offset = 0;
 		fdOpen->write_offset = 0;
