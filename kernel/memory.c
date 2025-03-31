@@ -5,7 +5,7 @@
 
 #define MAX_ORDER 10
 #define MIN_BLOCK 64
-#define MAX_BLOCK (MIN_BLOCK<<(MAX_ORDER-1))
+#define MAX_BLOCK 32768
 #define BLOCK_NUM ((KERNEL_DYNAMIC / 2) / MAX_BLOCK)
 #define NULL ((void*)0)
 
