@@ -6,6 +6,7 @@
 #include "uart.h"
 #include "net.h"
 #include "memory.h"
+#include "vfs.h"
 
 uint32_t gateway_ip = 0xC0A8010A;
 uint8_t gateway_mac[MAC_ADDR_LEN] = {0xD8,0xBB,0xC1,0xF7,0xD0,0xD3};
@@ -170,6 +171,7 @@ int32_t fork(void) {
 
     // Initialize child's PCB
     child->started = true; 
+    child->text_owner = false;
     child->trap_reason = SYSCALL;
     child->r_args[0] = 0;
 
@@ -179,20 +181,46 @@ int32_t fork(void) {
     return child_pid;
 }
 
-int32_t f_exec(const char * const path) {
+int32_t f_exec(char * const path) {
 
     PCB* child;
-    int child_pid = fork();
+    int fd;
+    char* program;
+    int child_pid;
+    uint32_t filesize;
 
-    if (child_pid < 0) {
+    fd = vfs_open(path, O_READ);
+    if (fd < 0) {
         return -1;
     }
+
+    filesize = vfs_getFileSize(fd);
+
+    if (filesize < 257) filesize = 257;
+
+    program = kmalloc(filesize);
+    if (program == NULL) {
+        vfs_close(fd);
+        return -1;
+    }
+
+    child_pid = create_process();
+    if (child_pid < 0) {
+        kfree(program);
+        vfs_close(fd);
+        return -1;
+    }
+
+    vfs_read(fd, program, filesize);
 
     child = &PROC_TABLE[child_pid];
     child->started = false;
     child->trap_reason = HANDLED;
     child->saved_sp = child->stack_base + STACK_SIZE * sizeof(uint32_t);
-
+    child->text_owner = true;
+    child->text_ptr = (uint32_t)program;
+    child->context.r4 = (int32_t)program;
+    vfs_close(fd);
 
     return 0;
 }
@@ -200,6 +228,9 @@ int32_t f_exec(const char * const path) {
 
 int32_t kexit(void) {
     current_process->state = DEAD;
+    if(current_process->text_owner) {
+        kfree((void*)current_process->text_ptr);
+    }
     list_pop(&ready_queue); /* clears the current process out of the queue */
     return 0;
 }
@@ -213,6 +244,7 @@ void proc_wrapper(void (*func)(void)) {
 /*-----------------------TESTPROCS-----------------------*/
 
 void null_proc(void) {
+    __f_exec("/home/TEST.BIN");
     while (1) {
         uart0_printf("null proc going to sleep... zzzzzzz\n");
         WFI();

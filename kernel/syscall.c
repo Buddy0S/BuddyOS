@@ -95,3 +95,6 @@ int __socket_request(int soc, uint8_t* frame, int size){
 }
 
 
+int __f_exec(char * const path) {
+  return SYSCALL(SYSCALL_F_EXEC_NR);
+}

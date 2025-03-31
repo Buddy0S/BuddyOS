@@ -74,6 +74,8 @@ typedef struct PCB {
     int32_t cpu_time;
     bool started;
     bool quantum_elapsed;
+    uint32_t text_ptr;
+    bool text_owner;
 
     struct KList children;          /* A list of this proc's children */
     struct KList sched_node;        /* Node for the scheduler's ready queue */
@@ -111,5 +113,6 @@ extern void switch_to_dispatch(PCB *from, PCB *to);
 int32_t fork(void);
 int32_t kexit(void);
 void proc_wrapper(void (*func)(void));
+int32_t f_exec(char * const path);
 
 #endif /* PROC_H */

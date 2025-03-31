@@ -154,6 +154,16 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
         }
             break;
 
+
+        case SYSCALL_F_EXEC_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("F EXEC\n");
+#endif
+            args[0] = f_exec((char*)args[0]);
+        }
+            break;
+
         default:
 #ifdef DEBUG
             uart0_printf("unknown/unimplemented\n");

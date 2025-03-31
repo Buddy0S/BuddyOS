@@ -111,19 +111,17 @@ int main(){
 	fd = vfs_open("/home/DIS.TXT", O_WRITE);
 	vfs_close(fd);
 
-	fd = vfs_open("/home/TEST.BIN", O_READ);
-	bytes = vfs_read(fd, test, 512);
-	uart0_printf("%s (%d bytes)\n", test, bytes);
+	//fd = vfs_open("/home/TEST.BIN", O_READ);
+	//bytes = vfs_read(fd, test, 512);
+	//uart0_printf("%s (%d bytes)\n", test, bytes);
     
     /* Initialize the ready queue */
     init_ready_queue();
 
     init_process(&PROC_TABLE[0], null_proc, PROC_STACKS[0], LOW);
-    /*
     init_process(&PROC_TABLE[1], process1, PROC_STACKS[1], MEDIUM);
     init_process(&PROC_TABLE[2], process2, PROC_STACKS[2], MEDIUM);
-    */
-    init_process(&PROC_TABLE[3], (void (*)(void))(test), PROC_STACKS[3], MEDIUM);
+    //init_process(&PROC_TABLE[3], (void (*)(void))(test), PROC_STACKS[3], MEDIUM);
 
 #ifdef DEBUG
 #endif

@@ -192,6 +192,7 @@ void *kmalloc(uint32_t size) {
 
     addr = alloc_block->addr;
 
+    
     kmemset32((void *)addr, 0, block_size);
     //uart0_puts("kmalloc reached return\n");
     order_arr[order]->num_free--;
