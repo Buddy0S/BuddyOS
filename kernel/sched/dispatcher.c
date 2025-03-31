@@ -160,8 +160,14 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             int soc = (int) args[0];
             uint8_t* frame = (uint8_t*) args[1];
             int size = (int) args[2];
+    
+            // not checking if new frame size is bigger then max
+            int new_size = size + ETH_HEADER_SIZE + IPV4_HEADER_SIZE + UDP_HEADER_SIZE;
+            uint8_t* new_frame = (uint8_t*) kmalloc(new_size);
 
-            args[0] = socket_transmit_request(soc, frame, size);
+            net_memcopy(new_frame[ETH_HEADER_SIZE+IPV4_HEADER_SIZE+UDP_HEADER_SIZE+BUDDY_HEADER], frame, size);
+
+            args[0] = socket_transmit_request(soc, new_frame, new_size);
         }
             break;
 
