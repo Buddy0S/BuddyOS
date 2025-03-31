@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdint.h>
 #include "memory.h"
 #include "proc.h"
@@ -91,7 +92,7 @@ void block() {
     list_pop(&ready_queue); /* clears the current process out of the queue */
 }
 
-int32_t fork(void) {
+int32_t create_process(void) {
     // Find a free PCB (state == DEAD)
     int child_pid = -1;
     for (int i = 0; i < MAX_PROCS; i++) {
@@ -108,20 +109,6 @@ int32_t fork(void) {
 
     // Copy parent's stack to child's stack
     uint32_t *child_stack = PROC_STACKS[child_pid];
-    kmemcpy(parent->stack_base, child_stack, STACK_SIZE * sizeof(uint32_t));
-
-
-    // use the same offset into the child's stack as the parent's saved_sp 
-    // had into the parent's stack.
-    // Set child's stack pointer (same offset as parent)
-    int32_t parent_stack_offset = parent->saved_sp - parent->stack_base;
-    child->saved_sp = child_stack + parent_stack_offset;
-
-    // Keep the saved LR the same as parent's
-    child->saved_lr = parent->saved_lr;
-
-    // Copy parent's saved context (registers r4-r11, lr)
-    child->context = parent->context;
 
     /* get svc stack for child */
     child->exception_stack_top = (uint32_t*)EXCEPTION_STACK_TOP - (child_pid * EXCEPTION_STACK_SIZE);
@@ -136,13 +123,9 @@ int32_t fork(void) {
     child->state = READY;
     child->prio = parent->prio;
     child->stack_base = child_stack;
-    child->started = true; 
-    child->trap_reason = SYSCALL;
     child->cpu_time = PROC_QUANTUM;
     child->quantum_elapsed = false;
     child->r_args = (uint32_t*)child_args;
-    // Adjust child's saved r0 (syscall return value) to 0
-    child->r_args[0] = 0;
 
     // Initialize child's mail
     srr_init_mailbox(&child->mailbox);
@@ -154,6 +137,64 @@ int32_t fork(void) {
     uart0_printf("fork: child PID %d\n", child_pid);
 #endif
     return child_pid;
+
+}
+
+int32_t fork(void) {
+
+    PCB* child;
+    PCB *parent = current_process;
+    int child_pid = create_process();
+
+    if (child_pid < 0) {
+        return -1;
+    }
+
+
+    child = &PROC_TABLE[child_pid];
+
+    // Copy parent's stack to child's stack
+    kmemcpy(parent->stack_base, child->stack_base, STACK_SIZE * sizeof(uint32_t));
+
+    // use the same offset into the child's stack as the parent's saved_sp 
+    // had into the parent's stack.
+    // Set child's stack pointer (same offset as parent)
+    int32_t parent_stack_offset = parent->saved_sp - parent->stack_base;
+    child->saved_sp = child->stack_base + parent_stack_offset;
+
+    // Keep the saved LR the same as parent's
+    child->saved_lr = parent->saved_lr;
+
+    // Copy parent's saved context (registers r4-r11, lr)
+    child->context = parent->context;
+
+    // Initialize child's PCB
+    child->started = true; 
+    child->trap_reason = SYSCALL;
+    child->r_args[0] = 0;
+
+#ifdef DEBUG
+    uart0_printf("fork: child PID %d\n", child_pid);
+#endif
+    return child_pid;
+}
+
+int32_t f_exec(const char * const path) {
+
+    PCB* child;
+    int child_pid = fork();
+
+    if (child_pid < 0) {
+        return -1;
+    }
+
+    child = &PROC_TABLE[child_pid];
+    child->started = false;
+    child->trap_reason = HANDLED;
+    child->saved_sp = child->stack_base + STACK_SIZE * sizeof(uint32_t);
+
+
+    return 0;
 }
 
 
