@@ -366,7 +366,7 @@ uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempB
 				
 		loopCluster = fat12_get_next_cluster(loopCluster);
 	}
-	uart0_printf("File read complete\n");
+	uart0_printf("File read complete %d\n", bytesRead);
     return bytesRead;
 
 }

@@ -192,6 +192,10 @@ void *kmalloc(uint32_t size) {
 
     addr = alloc_block->addr;
 
+
+#ifdef DEBUG
+    uart0_printf("allocating block of order %d at address %x\n", order, addr);
+#endif
     
     kmemset32((void *)addr, 0, block_size);
     //uart0_puts("kmalloc reached return\n");
@@ -222,6 +226,9 @@ int kfree(void *ptr) {
     }
     /*uart0_puts("kfree reached return\n"); */
     order_arr[order]->num_free++;
+#ifdef DEBUG
+    uart0_printf("freeing block of order %d at address %x\n", order, ptr);
+#endif
     return 0;
 
 }

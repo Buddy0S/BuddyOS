@@ -27,6 +27,7 @@ file_descriptor* fat12_open(const char* path, int flags) {
 	uint32_t tempBuffer[128];
 	file_descriptor* fdOpen;
 	uint32_t entryIndex;
+    uint32_t alloc_size;
 	DirEntry dir;
 
 	fdOpen = (file_descriptor*) kmalloc(sizeof(file_descriptor));
@@ -44,7 +45,8 @@ file_descriptor* fat12_open(const char* path, int flags) {
 		fdOpen->read_offset = 0;
 		fdOpen->write_offset = 0;
 		fdOpen->file_size = dir.fileSize;
-		fdOpen->file_buffer = (char*)kmalloc(sizeof(char) * dir.fileSize);
+        alloc_size = (((fdOpen->file_size / 512) + 1) * 512);
+		fdOpen->file_buffer = (char*)kmalloc(sizeof(char) * alloc_size);
 
 		if (fdOpen->file_buffer == NULL) {
 			kfree(fdOpen);
