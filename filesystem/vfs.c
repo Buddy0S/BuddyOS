@@ -223,3 +223,20 @@ uint32_t vfs_seek(int fd, int offset, int mode) {
 	}
 
 }
+
+uint32_t vfs_getFileSize(int fd) {
+	
+	if (fd < 0 || fd > MAX_OPENED_FILES - 1) {
+		return INVALID_FD;
+	}
+
+	if (vfs_openFiles[fd] != NULL) {
+		
+		return vfs_openFiles[fd]->file_size;
+
+	}
+	else {
+		return NOT_OPEN; /* File not open */
+	}
+
+}
