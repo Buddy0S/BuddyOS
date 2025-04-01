@@ -40,6 +40,7 @@
 #define SYSCALL_F_EXEC_NR           18
 #define SYSCALL_PRINTF_NR           19
 #define SYSCALL_FGETS_NR            20
+#define SYSCALL_FREE_NR             21
 
 /* test function that calls a syscall that takes 2 arguments */
 int __syscalltest(int a, int b);
@@ -77,10 +78,5 @@ int __recvfrom(int soc, uint8_t* buff);
 int __sendto(int soc, uint8_t* frame, int size, socket_info *soc_info); 
 
 int __f_exec(char * const path);
-
-
-// Defined in stdio.h
-//void printf(const char* str, ...);
-//char * fgets(char *str, int n, int stream);
 
 #endif

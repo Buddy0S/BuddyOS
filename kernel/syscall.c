@@ -106,3 +106,11 @@ void printf(const char* str, ...){
 char *fgets(char *str, int n, int stream){
   return (char *) SYSCALL(SYSCALL_FGETS_NR);
 }
+
+void* malloc(int size){
+  return (void*) SYSCALL(SYSCALL_MALLOC_NR);
+}
+
+void free(void* ptr){
+  SYSCALL(SYSCALL_FREE_NR);
+}

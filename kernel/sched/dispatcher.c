@@ -7,8 +7,6 @@
 #include <syserr.h>
 #include "net.h"
 
-
-
 extern struct socket socket_table[MAX_SOCKETS];
 
 /* Round-robin yield: switches context to the next process */
@@ -208,7 +206,25 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             uart0_printf("FGETS\n");
 #endif
         
-            args[0] = uart0_fgets((char*) args[0], (int) args[1], (int) args[2]);    
+            args[0] = (uint32_t) uart0_fgets((char*) args[0], (int) args[1], (int) args[2]);    
+        }
+            break;
+        case SYSCALL_MALLOC_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("KEVIN MALLOC\n");
+#endif
+        
+            args[0] = (uint32_t) kmalloc(args[0]);    
+        }
+            break;
+        case SYSCALL_FREE_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("KEVIN FREE\n");
+#endif
+        
+            kfree((void *)args[0]);    
         }
             break;
 
