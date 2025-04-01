@@ -1,5 +1,5 @@
 PREFIX = arm-none-eabi-
-CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -I./include\
+CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -nostdlib -ffreestanding -I./include\
 				 -I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel
 
 KCFLAGS = $(CFLAGS) -mno-unaligned-access

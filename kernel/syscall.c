@@ -98,3 +98,7 @@ int __sendto(int soc, uint8_t* frame, int size, socket_info *soc_info){
 int __f_exec(char * const path) {
   return SYSCALL(SYSCALL_F_EXEC_NR);
 }
+
+void printf(const char* str, ...){
+  SYSCALL(SYSCALL_PRINTF_NR);
+}

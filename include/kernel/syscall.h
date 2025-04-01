@@ -38,6 +38,7 @@
 #define SYSCALL_SOCKET_REQUEST_NR   16
 #define SYSCALL_EXIT_NR             17
 #define SYSCALL_F_EXEC_NR           18
+#define SYSCALL_PRINTF_NR           19
 
 /* test function that calls a syscall that takes 2 arguments */
 int __syscalltest(int a, int b);
@@ -75,5 +76,7 @@ int __recvfrom(int soc, uint8_t* buff);
 int __sendto(int soc, uint8_t* frame, int size, socket_info *soc_info); 
 
 int __f_exec(char * const path);
+
+void printf(const char* str, ...);
 
 #endif

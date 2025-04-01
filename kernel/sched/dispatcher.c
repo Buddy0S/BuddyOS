@@ -192,6 +192,14 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             args[0] = f_exec((char*)args[0]);
         }
             break;
+        case SYSCALL_PRINTF_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("PRINTF\n");
+#endif
+            uart0_printf((const char*)args[0], args[1], args[2], args[3]);
+        }
+            break;
 
         default:
 #ifdef DEBUG
