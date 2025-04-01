@@ -33,7 +33,7 @@
 #define SYSCALL_RECEIVE_END         11
 #define SYSCALL_SOCKET_NR           12
 #define SYSCALL_SOCKET_BIND_NR      13
-#define SYSCALL_SOCKET_CLOSE_NR    14
+#define SYSCALL_SOCKET_CLOSE_NR     14
 #define SYSCALL_SOCKET_RECV_NR      15
 #define SYSCALL_SOCKET_REQUEST_NR   16
 #define SYSCALL_EXIT_NR             17

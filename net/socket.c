@@ -105,8 +105,11 @@ int socket(uint32_t pid, uint8_t* dest_mac, uint8_t protocol){
 
   socket_table[socket_num].free = 0;
 
+  uint8_t* copymac = (uint8_t*) kmalloc(MAC_ADDR_LEN);
+  net_memcopy(copymac,dest_mac,MAC_ADDR_LEN);
+
   socket_table[socket_num].pid = pid;
-  socket_table[socket_num].dest_mac = dest_mac;
+  socket_table[socket_num].dest_mac = copymac;
   socket_table[socket_num].protocol = protocol;
 
   return socket_num;
@@ -115,6 +118,8 @@ int socket(uint32_t pid, uint8_t* dest_mac, uint8_t protocol){
 
 int socket_free(int socket_num){
   
+  kfree(socket_table[socket_num].dest_mac);
+
   socket_table[socket_num].free = 1;
   socket_table[socket_num].pid = 0;
   socket_table[socket_num].src_port = 0;
