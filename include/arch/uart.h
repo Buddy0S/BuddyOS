@@ -43,7 +43,7 @@ char* itoa(int num, char* str);
 void uart0_printHex(uint32_t number);
 void uart0_printf(const char* str, ...);
 char uart0_getch();
-void uart0_test();
+char* uart0_fgets(char* str, int n, int stream);
 /*void uart0_printFloat(float num);*/
 
 #endif

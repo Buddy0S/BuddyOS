@@ -102,3 +102,7 @@ int __f_exec(char * const path) {
 void printf(const char* str, ...){
   SYSCALL(SYSCALL_PRINTF_NR);
 }
+
+char *fgets(char *str, int n, int stream){
+  return (char *) SYSCALL(SYSCALL_FGETS_NR);
+}

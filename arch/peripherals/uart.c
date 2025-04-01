@@ -4,6 +4,9 @@
 #include "uart.h"
 #include "reg.h"
 
+#define ENTER		13
+#define BACKSPACE	8
+
 void uart0_init(void) {
     
     uint8_t reg_8;
@@ -269,51 +272,26 @@ char uart0_getch() {
 
 }
 
-void uart0_test() {
-	uart0_putsln("Test 1: Testing single char below: ");
-	const char testSingleChar = 'N';
-	uart0_putch(testSingleChar);
-	uart0_putsln("");
+char* uart0_fgets(char* str, int n, int stream){
 
-	uart0_putsln("Test 2: Testing new line below: ");
-	const char testNewLine = '\n';	
-	uart0_putch(testNewLine);
-	uart0_putsln("");
-	
-	uart0_putsln("Test 3: Testing empty char below: ");
-	const char testEmptyChar = '\0';
-	uart0_putch(testEmptyChar);
-	uart0_putsln("");
+  char userchar = '\0';
+  int charindex = 0;
 
-	uart0_putsln("Test 4: Testing empty string below: ");
-	const char* testEmptyString = "";
-	uart0_putsln(testEmptyString);
-	uart0_putsln("");
+  while (userchar != ENTER && charindex < n - 1){
+    userchar = uart0_getch();
+    if (userchar == BACKSPACE && charindex > 0){
+      charindex--;
+    }else if (userchar != ENTER){
+      str[charindex] = userchar;
+      charindex++;
+    }
+  }
 
-	uart0_putsln("Test 5: Testing uart0_puts with manual \\n below: ");
-	const char* testManualNewLine = "New line\r\n";
-	uart0_puts(testManualNewLine);
+  str[charindex] = '\0';
 
-	uart0_putsln("Test 6: Testing uart0_putsln below: ");
-	const char* testAutoNewLine = "Buddy";
-	uart0_putsln(testAutoNewLine);
+  return str;
 
-	uart0_putsln("Test 7: Testing spaces below: ");
-	const char* testSpaces = "We are so awesome";
-	uart0_putsln(testSpaces);
-
-	uart0_putsln("Test 8: Testing null below: ");
-        const char* testNull = 0;
-	uart0_putsln(testNull);
-
-	uart0_putsln("Test 9: Testing printf format specifiers below: ");
-	const char testChar = 'B';
-	int testInt = 42;
-	const char* testString = "Nuts";
-	uint32_t testHex = 3735928559;
-	uint32_t testHex2 = 15;
-	int testInt2 = 0;
-	int testInt3 = -69;
-	uart0_printf("Expected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual testHex = %x\nExpected testChar = B, Actual testChar = %c\nExpected testHex2 = 0x0000000F, Actual testHex2 = %x\nExpected testInt = 42, Actual testInt = %d\nExpected testInt2 = 0, Actual testInt2 = %d\nExpected testInt3 = -69, Actual testInt3 = %d\nExpected %%, Actual = %%\nExpected %?, Actual = %g\n", testString, testHex, testChar, testHex2, testInt, testInt2, testInt3);
-	/*uart0_printf("Expected testChar = B, Actual testChar = %c\nExpected testString = Nuts, Actual testString = %s\nExpected testHex = 0xDEADBEEF, Actual = testHex = %x\n", testChar, testString, testHex);  */
 }
+
+
+
