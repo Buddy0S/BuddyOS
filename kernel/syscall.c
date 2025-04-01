@@ -74,23 +74,23 @@ void __exit() {
 	SYSCALL(SYSCALL_EXIT_NR);
 }
 
-int __socket(struct socket* soc){
+int __socket(int pid, uint8_t* gateway, uint8_t protocol){
   return SYSCALL(SYSCALL_SOCKET_NR);
 }
 
-int __socket_bind(int soc){
+int __bind(int soc, socket_info *soc_info){
   return SYSCALL(SYSCALL_SOCKET_BIND_NR);
 }
 
-int __socket_unbind(int soc){
-  return SYSCALL(SYSCALL_SOCKET_UNBIND_NR);
+int __closesocket(int soc){
+  return SYSCALL(SYSCALL_SOCKET_CLOSE_NR);
 }
 
-int __socket_recv(int soc, uint8_t* buff){
+int __recvfrom(int soc, uint8_t* buff){
   return SYSCALL(SYSCALL_SOCKET_RECV_NR);
 }
 
-int __socket_request(int soc, uint8_t* frame, int size){
+int __sendto(int soc, uint8_t* frame, int size, socket_info *soc_info){
   return SYSCALL(SYSCALL_SOCKET_REQUEST_NR);
 }
 

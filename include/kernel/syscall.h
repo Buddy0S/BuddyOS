@@ -33,7 +33,7 @@
 #define SYSCALL_RECEIVE_END         11
 #define SYSCALL_SOCKET_NR           12
 #define SYSCALL_SOCKET_BIND_NR      13
-#define SYSCALL_SOCKET_UNBIND_NR    14
+#define SYSCALL_SOCKET_CLOSE_NR    14
 #define SYSCALL_SOCKET_RECV_NR      15
 #define SYSCALL_SOCKET_REQUEST_NR   16
 #define SYSCALL_EXIT_NR             17
@@ -64,15 +64,15 @@ int __fork();
 
 void __exit();
 
-int __socket(struct socket* soc);
+int __socket(int pid, uint8_t* gateway, uint8_t protocol);
 
-int __socket_bind(int soc);
+int __bind(int soc, socket_info *soc_info);
 
-int __socket_unbind(int soc);
+int __closesocket(int soc);
 
-int __socket_recv(int soc, uint8_t* buff);
+int __recvfrom(int soc, uint8_t* buff);
 
-int __socket_request(int soc, uint8_t* frame, int size); 
+int __sendto(int soc, uint8_t* frame, int size, socket_info *soc_info); 
 
 int __f_exec(char * const path);
 

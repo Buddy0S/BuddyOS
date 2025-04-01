@@ -271,22 +271,7 @@ void process1(void) {
     int author;
     char msg[20];
     uint32_t len;
-    int pid = current_process->pid;
-
-    struct socket soc;
-    int soc_num;
-
-    soc.pid = pid;
-    soc.src_port = 123;
-    soc.dest_port = 123;
-    soc.dest_ip = gateway_ip;
-    soc.dest_mac = gateway_mac;
-    soc.protocol = UDP;
-    soc.buddy_protocol = 0;
-
-    soc_num = __socket(&soc);
-
-    __socket_bind(soc_num); 
+    int pid = current_process->pid; 
 
     len = 20;
 
@@ -298,11 +283,6 @@ void process1(void) {
         } else {
             uart0_printf("Proc %d: Theres no message from my buddy yet but thats fine ill wait\n", pid);
         }
-
-        uint8_t* frame = (uint8_t*) kmalloc(128);
-    
-        // request handler will free the frame;
-        __socket_request(soc_num,frame,128);
 
         __receive(&author, msg, &len);
         uart0_printf("Proc %d: I got my buddy's message!\n", pid);

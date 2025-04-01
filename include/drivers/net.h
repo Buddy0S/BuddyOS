@@ -553,17 +553,24 @@ struct socket {
   
   uint8_t free; // is the socket free?
   uint32_t pid;
-  uint16_t src_port;
+  uint16_t src_port; // used for binding and what port to send packet form
   uint16_t dest_port;
   uint32_t dest_ip;
   uint8_t* dest_mac;
   uint8_t protocol;
-  uint16_t buddy_protocol;
   uint8_t waiting; // is it waiting for data?
   struct payload data[MAX_PENDING_PACKETS];
   uint8_t packets_pending;
 
 };
+
+typedef struct socket_info {
+  
+  uint16_t src_port; // used for binding and what port to send packet form
+  uint16_t dest_port;
+  uint32_t dest_ip;
+
+} socket_info;
 
 struct transmit_req {
 
@@ -628,9 +635,9 @@ void udp_transmit(uint8_t* frame, uint16_t size, uint16_t src_port, uint16_t des
 int socket_waiting(int socket_num, uint16_t dest_port, uint16_t bp);
 int socket_store(int socket_num, uint32_t* payload, int size);
 void init_sockets();  
-int socket(uint32_t pid, uint16_t src_port, uint16_t dest_port,uint8_t* dest_mac,uint32_t dest_ip, uint8_t protocol, uint8_t bp);
-int socket_bind(int socket_num);
-int socket_unbind(int socket_num);
+int socket(uint32_t pid, uint8_t* dest_mac, uint8_t protocol);
+int socket_bind(int socket_num, socket_info *soc_info);
+int socket_free(int socket_num);
 struct payload* socket_recv(int socket_num);
 void socket_send(int socket_num, uint8_t* frame, int size);
 

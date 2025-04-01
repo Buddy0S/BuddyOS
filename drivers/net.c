@@ -156,12 +156,5 @@ int init_network_stack(){
 
     ping_request(gateway_ip,gateway_mac);
 
-    int soc = socket(0,8888,8888,gateway_mac,gateway_ip,UDP,0);
-
-    socket_bind(soc);
-    
-    uint8_t* frame = (uint8_t*) kmalloc(128);
-    socket_transmit_request(soc,frame,128);
-
 }
 

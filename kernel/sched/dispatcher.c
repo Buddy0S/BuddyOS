@@ -7,6 +7,8 @@
 #include <syserr.h>
 #include "net.h"
 
+extern struct socket socket_table[MAX_SOCKETS];
+
 /* Round-robin yield: switches context to the next process */
 void schedule(void) {
     PCB *current = current_process;
@@ -106,9 +108,11 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
 #ifdef DEBUG
             uart0_printf("SOCKET BRO\n");
 #endif
-            struct socket *soc = (struct socket*) args[0];
+            int pid = (int) args[0];
+            uint8_t* gateway = (uint8_t*) args[1];
+            uint8_t protocol = (uint8_t) args[2];
 
-            args[0] = socket(soc->pid,soc->src_port,soc->dest_port,soc->dest_mac,soc->dest_ip,soc->protocol,soc->buddy_protocol);
+            args[0] = socket(pid, gateway, protocol);
         }
             break;
         case SYSCALL_SOCKET_BIND_NR:
@@ -117,18 +121,19 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             uart0_printf("SOCKET BIND BRO\n");
 #endif
             int soc = (int) args[0];
+            socket_info* soc_info = (socket_info*)args[1];
 
-            args[0] = socket_bind(soc);
+            args[0] = socket_bind(soc, soc_info);
         }
             break;
-        case SYSCALL_SOCKET_UNBIND_NR:
+        case SYSCALL_SOCKET_CLOSE_NR:
         {
 #ifdef DEBUG
             uart0_printf("SOCKET UNBIND BRO\n");
 #endif
             int soc = (int) args[0];
 
-            args[0] = socket_unbind(soc);
+            args[0] = socket_free(soc);
         }
             break;
         case SYSCALL_SOCKET_RECV_NR:
@@ -160,12 +165,19 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             int soc = (int) args[0];
             uint8_t* frame = (uint8_t*) args[1];
             int size = (int) args[2];
+            socket_info *soc_info = (socket_info*) args[3];
     
             // not checking if new frame size is bigger then max
             int new_size = size + ETH_HEADER_SIZE + IPV4_HEADER_SIZE + UDP_HEADER_SIZE;
             uint8_t* new_frame = (uint8_t*) kmalloc(new_size);
 
-            net_memcopy(new_frame[ETH_HEADER_SIZE+IPV4_HEADER_SIZE+UDP_HEADER_SIZE+BUDDY_HEADER], frame, size);
+            uint8_t payload_start = ETH_HEADER_SIZE+IPV4_HEADER_SIZE+UDP_HEADER_SIZE+BUDDY_HEADER;
+
+            net_memcopy(&(new_frame[payload_start]),frame,size);
+
+            socket_table[soc].src_port = soc_info->src_port;
+            socket_table[soc].dest_port = soc_info->dest_port;
+            socket_table[soc].dest_ip = soc_info->dest_ip;
 
             args[0] = socket_transmit_request(soc, new_frame, new_size);
         }
