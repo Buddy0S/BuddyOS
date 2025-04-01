@@ -38,7 +38,7 @@ int UDP_Socket(){
 
 }
 
-int UDP_Sendto(int socket, int destport, void* destip, char* sendbuf, int sendsize){
+int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsize){
     
   struct sockaddr_in outinfo;
     
@@ -46,7 +46,7 @@ int UDP_Sendto(int socket, int destport, void* destip, char* sendbuf, int sendsi
     
   outinfo.sin_family = AF_INET;
   outinfo.sin_port = htons(destport);
-  outinfo.sin_addr.s_addr = inet_addr((char*)destip);
+  outinfo.sin_addr.s_addr = inet_addr(destip);
     
   return sendto(socket, sendbuf, sendsize, 0, (struct sockaddr *) &outinfo, sizeof(outinfo));
 

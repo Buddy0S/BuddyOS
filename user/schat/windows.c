@@ -58,13 +58,13 @@ int UDP_Socket(){
   return (int) soc;
 }
 
-int UDP_Sendto(int socket, int destport, void* destip, char* sendbuf, int sendsize){
+int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsize){
 
   SOCKADDR_IN outinfo;
 
   outinfo.sin_family = AF_INET;
   outinfo.sin_port = htons(destport);
-  outinfo.sin_addr.s_addr = inet_addr((char*)destip);
+  outinfo.sin_addr.s_addr = inet_addr(destip);
 
   return sendto((SOCKET) socket, sendbuf, sendsize, 0 , (SOCKADDR *) &outinfo, sizeof(outinfo));
 

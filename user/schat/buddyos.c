@@ -24,9 +24,47 @@ int UDP_Socket(){
 
 }
 
-int UDP_Sendto(int socket, int destport, void* destip, char* sendbuf, int sendsize){
+// only works on non negative
+int atoi(char *s) {
+    int sum = 0;
+    while((*s >= '0')&&(*s <= '9')) {
+      sum = sum * 10;
+      sum = sum + (*s - 48);
+      s++;
+    }
+    return (sum);
+}
 
-  uint32_t dest_ip = *((uint32_t*) destip);
+
+uint32_t strtoip(char* ip){
+
+  char buf[5];
+  uint8_t iph[4];
+  int temp = 0;
+  int ip_index = 0;
+
+  for (int i = 0; i < 18; i++){
+    if (ip[i] == '.'){
+      buf[temp] = '\0';
+      temp = 0;
+      iph[ip_index] = (uint8_t) atoi(buf);
+      ip_index++;
+    }else{
+      buf[temp] = ip[i];
+      temp++;
+    }
+
+    if (ip_index == 4) break;
+
+  }
+
+  return (uint32_t) iph;
+
+}
+
+int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsize){
+
+  uint32_t dest_ip = strtoip(destip);
   socket_info soc_info;
 
   soc_info.src_port = SEND_PORT;
