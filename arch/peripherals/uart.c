@@ -289,12 +289,15 @@ char* uart0_fgets(char* str, int n, int stream){
     if (userchar == BACKSPACE && charindex > 0){
       charindex--;
     }else if (userchar != ENTER){
+      uart0_printf("%c",userchar);
       str[charindex] = userchar;
       charindex++;
     }
   }
 
   str[charindex] = '\0';
+
+  uart0_printf("\n");
 
   return str;
 

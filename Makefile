@@ -155,14 +155,17 @@ $(BUILD_DIR)ipv4.o $(BUILD_DIR)icmp.o $(BUILD_DIR)udp.o $(BUILD_DIR)socket.o $(B
 $(BUILD_DIR)usertest.o: user/test.c
 	$(PREFIX)gcc $(USER_CFLAGS) user/test.c -o $@
 
+$(BUILD_DIR)usyscall.o: kernel/syscall.c
+	$(PREFIX)gcc $(USER_CFLAGS) kernel/syscall.c -o $@
+
 $(BUILD_DIR)schat.o: user/schat/schat.c
-	$(PREFIX)gcc $(KCFLAGS) user/schat/schat.c -o $@
+	$(PREFIX)gcc $(USER_CFLAGS) user/schat/schat.c -o $@
 
 $(BUILD_DIR)schatbos.o: user/schat/buddyos.c
-	$(PREFIX)gcc $(KCFLAGS) user/schat/buddyos.c -o $@
+	$(PREFIX)gcc $(USER_CFLAGS) user/schat/buddyos.c -o $@
 
-schat.elf: user/schat/schat.ld $(BUILD_DIR)schat.o $(BUILD_DIR)schatbos.o $(BUILD_DIR)syscall.o
-	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
+schat.elf: $(BUILD_DIR)schat.o $(BUILD_DIR)schatbos.o $(BUILD_DIR)usyscall.o
+	$(PREFIX)ld -flto=all -e main $^ -o $@
 
 schat.bin: schat.elf
 	$(PREFIX)objcopy -O binary schat.elf schat.bin
@@ -190,7 +193,7 @@ objdump: BuddyOS.img
 	$(PREFIX)objdump -D -b binary -m arm MLO
 
 objdumpschat: BuddyOS.img
-	$(PREFIX)objdump -D -b binary -m arm schat.bin
+	$(PREFIX)objdump -D -b binary -m arm schat.elf
 
 verify: BuddyOS.img
 	mdir -i BuddyOS.img ::
