@@ -47,8 +47,41 @@ int atoi(char *s) {
     return (sum);
 }
 
-uint32_t strtoip(char* ip) {
-    
+char str_to_byte(const char* str, int start, int end) {
+    int index, multiplier;
+    char byte;
+
+    multiplier = 1;
+    byte = 0;
+
+    for (index = end; index >= start; index--) {
+        byte += (str[index] - 48) * multiplier;
+        multiplier *= 10;
+    }
+
+    return byte;
+}
+
+uint32_t strtoip(const char* str) {
+    int p1, p2, p3, end;
+    uint32_t ip;
+
+    ip = 0;
+
+    /* 127.127.127.127 */
+
+    /* finding all the periods */
+    for (p1 = 0; str[p1] != '.'; p1++) {}
+    for (p2 = p1+1; str[p2] != '.'; p2++) {}
+    for (p3 = p2+1; str[p3] != '.'; p3++) {}
+    for (end = p3+1; str[end] != '\0'; end++) {}
+
+    ip += (uint32_t)(str_to_byte(str, 0, p1-1)) << 24;
+    ip += (uint32_t)(str_to_byte(str, p1+1, p2-1)) << 16;
+    ip += (uint32_t)(str_to_byte(str, p2+1, p3-1)) << 8;
+    ip += (uint32_t)(str_to_byte(str, p3+1, end -1));
+
+    return ip;
 }
 
 int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsize){
