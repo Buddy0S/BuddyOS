@@ -11,17 +11,6 @@
 
 char username[MAX_USERNAME];
 
-// only works on non negative
-int atoi(char *s) {
-    int sum = 0;
-    while((*s >= '0')&&(*s <= '9')) {
-      sum = sum * 10;
-      sum = sum + (*s - 48);
-      s++;
-    }
-    return (sum);
-}
-
 void net_memcopy(char* dest, char* src, int size){
 
   for (int i = 0; i < size ; i++){

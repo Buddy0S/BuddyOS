@@ -43,7 +43,6 @@ int _atoi(char *s) {
     return (sum);
 }
 
-
 uint32_t strtoip(char* ip){
 
   char buf[5];

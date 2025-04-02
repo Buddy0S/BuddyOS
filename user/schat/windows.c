@@ -1,6 +1,10 @@
+#define _WIN32_WINNT 0x0A00  // Windows 10/11
+
 #include "socketAB.h"
 #include <winsock2.h>
 #include <stdio.h>
+#include <ws2tcpip.h>
+#include <windows.h>
 
 WSADATA wsaData;
 
@@ -95,7 +99,7 @@ int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsi
 
 }
 
-int UDP_Bind(int socket, int port){
+int UDP_Bind(int socket, int port, char* intface){
 
   SOCKADDR_IN srcinfo;
   int status = sizeof(srcinfo);
