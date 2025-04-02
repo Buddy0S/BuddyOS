@@ -5,6 +5,9 @@ int INIT_Sockets();
 int CLOSE_Socket(int socket);
 int CLEANUP_Sockets();
 
+int Poll_Socket(int socket_num);
+int Poll_Stdin();
+
 int UDP_Socket();
 int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsize);
 int UDP_Bind(int socket, int port, char* interface);

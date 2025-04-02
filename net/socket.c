@@ -145,6 +145,18 @@ int socket_bind(int socket_num, socket_info *soc_info){
 
 }
 
+
+// return 0 if not packets
+int socket_poll(int socket_num){
+
+  int stat = socket_table[socket_num].packets_pending;
+
+  if (stat) return 1;
+
+  return 0;
+
+}
+
 /*
  * returns pointer to data 
  *

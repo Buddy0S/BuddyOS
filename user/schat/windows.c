@@ -45,6 +45,31 @@ int CLEANUP_Sockets(){
 
 }
 
+int Poll_Socket(int socket_num){
+
+  WSAPOLLFD pfd;
+  pfd.fd = (SOCKET) socket_num;
+  pfd.events = POLLRDNORM;
+
+  int ret = WSAPoll(&pfd, 1, 100);
+
+  if (ret > 0 && (pfd.revents & POLLRDNORM)) return 1;
+
+  return 0;
+
+}
+
+int Poll_Stdin(){
+
+  HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD dwWaitResult = WaitForSingleObject(hStdin, 100);
+
+  if (dwWaitResult == WAIT_OBJECT_0) return 1;
+
+  return 0;
+
+}
+
 int UDP_Socket(){
 
   SOCKET soc = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);

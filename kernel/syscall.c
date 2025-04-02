@@ -114,3 +114,7 @@ void* malloc(int size){
 void free(void* ptr){
   SYSCALL(SYSCALL_FREE_NR);
 }
+
+int __poll(int file_type, int file_num){
+  return SYSCALL(SYSCALL_POLL_NR);
+}

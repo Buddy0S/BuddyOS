@@ -227,6 +227,24 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             kfree((void *)args[0]);    
         }
             break;
+        case SYSCALL_POLL_NR:
+        {
+#ifdef DEBUG
+            uart0_printf("ANY THING THERE??\n");
+#endif
+            int type = args[0];
+            int filenum = args[1];
+
+            if (type == STD){
+              args[0] = uart0_poll();
+            }
+
+            if (type == SOCKET){
+              args[0] = socket_poll(filenum);
+            }
+            
+        }
+            break;
 
         default:
 #ifdef DEBUG

@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <poll.h>
 
 int INIT_Sockets(){
   return 0;
@@ -36,6 +37,35 @@ int UDP_Socket(){
    
   return soc;
 
+}
+
+int Poll_Socket(int socket_num){
+
+  struct pollfd pfd;
+  
+  pfd.fd = socket_num;
+  pfd.events = POLLIN;
+
+  int ret = poll(&pfd, 1, 100);
+
+  if (ret > 0 && (pfd.revents & POLLIN)) return 1;
+
+  return 0;
+
+}
+
+int Poll_Stdin(){
+
+  struct pollfd pfd;
+
+  pfd.fd = STDIN_FILENO;
+  pfd.events = POLLIN;
+
+  int ret = poll(&pfd, 1, 100);
+
+  if (ret > 0) return 1;
+
+  return 0;
 }
 
 int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsize){

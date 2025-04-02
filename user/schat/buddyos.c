@@ -24,6 +24,14 @@ int UDP_Socket(){
 
 }
 
+int Poll_Socket(int socket_num){
+  return __poll(SOCKET, socket_num);
+}
+
+int Poll_Stdin(){
+  return __poll(STD, STDIN);
+}
+
 // only works on non negative
 int atoi(char *s) {
     int sum = 0;

@@ -272,6 +272,13 @@ char uart0_getch() {
 
 }
 
+// return 0 if nothing
+int uart0_poll(){
+
+  return *(volatile uint8_t*)(UART0_BASE + UART_LSR) & 0x1;
+
+}
+
 char* uart0_fgets(char* str, int n, int stream){
 
   char userchar = '\0';

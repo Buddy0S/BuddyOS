@@ -41,6 +41,11 @@
 #define SYSCALL_PRINTF_NR           19
 #define SYSCALL_FGETS_NR            20
 #define SYSCALL_FREE_NR             21
+#define SYSCALL_POLL_NR             22
+
+#define STD 0
+#define STDIN 0
+#define SOCKET 1
 
 /* test function that calls a syscall that takes 2 arguments */
 int __syscalltest(int a, int b);
@@ -78,5 +83,7 @@ int __recvfrom(int soc, uint8_t* buff);
 int __sendto(int soc, uint8_t* frame, int size, socket_info *soc_info); 
 
 int __f_exec(char * const path);
+
+int __poll(int file_type, int file_num);
 
 #endif

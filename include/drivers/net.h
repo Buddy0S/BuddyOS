@@ -639,6 +639,7 @@ int socket(uint32_t pid, uint8_t* dest_mac, uint8_t protocol);
 int socket_bind(int socket_num, socket_info *soc_info);
 int socket_free(int socket_num);
 struct payload* socket_recv(int socket_num);
+int socket_poll(int socket_num);
 void socket_send(int socket_num, uint8_t* frame, int size);
 
 int socket_transmit_request(int soc, uint8_t* frame, int size);
