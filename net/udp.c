@@ -58,7 +58,7 @@ void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame
   
   for (int i = 0; i < MAX_SOCKETS; i++){
     if (socket_waiting(i,udp.dest_port,0)){
-      socket_store(i,udp.payload,payload_length);
+      socket_store(i, (uint8_t*) udp.payload,payload_length);
     }
   }
 

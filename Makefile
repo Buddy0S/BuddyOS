@@ -2,7 +2,7 @@ PREFIX = arm-none-eabi-
 CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -nostdlib -ffreestanding -I./include\
 				 -I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel
 
-KCFLAGS = $(CFLAGS) -mno-unaligned-access
+KCFLAGS = $(CFLAGS) -mno-unaligned-access -I./include/user
 
 USER_CFLAGS = $(KCFLAGS) -fPIE -fno-plt -msingle-pic-base -I./include/user 
 
@@ -156,13 +156,13 @@ $(BUILD_DIR)usertest.o: user/test.c
 	$(PREFIX)gcc $(USER_CFLAGS) user/test.c -o $@
 
 $(BUILD_DIR)schat.o: user/schat/schat.c
-	$(PREFIX)gcc $(USER_CFLAGS) user/schat/schat.c -o $@
+	$(PREFIX)gcc $(KCFLAGS) user/schat/schat.c -o $@
 
 $(BUILD_DIR)schatbos.o: user/schat/buddyos.c
-	$(PREFIX)gcc $(USER_CFLAGS) user/schat/buddyos.c -o $@
+	$(PREFIX)gcc $(KCFLAGS) user/schat/buddyos.c -o $@
 
-schat.elf: $(BUILD_DIR)schat.o $(BUILD_DIR)schatbos.o $(BUILD_DIR)syscall.o
-	$(PREFIX)ld -flto=all -e main $^ -o $@
+schat.elf: user/schat/schat.ld $(BUILD_DIR)schat.o $(BUILD_DIR)schatbos.o $(BUILD_DIR)syscall.o
+	$(PREFIX)gcc -nostartfiles -flto=all -T $^ -o $@
 
 schat.bin: schat.elf
 	$(PREFIX)objcopy -O binary schat.elf schat.bin
@@ -188,6 +188,9 @@ BuddyOS.img: MLO kernel.bin test.bin schat.bin
 	
 objdump: BuddyOS.img
 	$(PREFIX)objdump -D -b binary -m arm MLO
+
+objdumpschat: BuddyOS.img
+	$(PREFIX)objdump -D -b binary -m arm schat.bin
 
 verify: BuddyOS.img
 	mdir -i BuddyOS.img ::

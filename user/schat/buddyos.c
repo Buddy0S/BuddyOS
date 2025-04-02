@@ -47,30 +47,33 @@ int _atoi(char *s) {
     return (sum);
 }
 
-uint32_t strtoip(char* ip){
+uint32_t strtoip(char* ip) {
+    uint8_t iph[4] = {0};
+    int ip_index = 0;
+    int temp = 0;
+    char buf[4] = {0};  
 
-  char buf[5];
-  uint8_t iph[4];
-  int temp = 0;
-  int ip_index = 0;
-
-  for (int i = 0; i < 18; i++){
-    if (ip[i] == '.'){
-      buf[temp] = '\0';
-      temp = 0;
-      iph[ip_index] = (uint8_t) _atoi(buf);
-      ip_index++;
-    }else{
-      buf[temp] = ip[i];
-      temp++;
+    for (int i = 0; ip[i] != '\0'; i++) {
+        if (ip[i] == '.') {
+            buf[temp] = '\0';
+            iph[ip_index] = (uint8_t) _atoi(buf);
+            ip_index++;
+            temp = 0;
+        } else {
+            buf[temp++] = ip[i];
+        }
     }
 
-    if (ip_index == 4) break;
+    buf[temp] = '\0';
+    if (ip_index < 4) {
+        iph[ip_index] = (uint8_t) _atoi(buf);
+    }
 
-  }
-
-  return (uint32_t) iph;
-
+    uint32_t result = ((uint32_t)iph[0] << 24) |
+                      ((uint32_t)iph[1] << 16) |
+                      ((uint32_t)iph[2] << 8)  |
+                      (uint32_t)iph[3];
+    return result;
 }
 
 int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsize){

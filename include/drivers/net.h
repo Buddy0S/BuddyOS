@@ -633,7 +633,7 @@ void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame
 void udp_transmit(uint8_t* frame, uint16_t size, uint16_t src_port, uint16_t dest_port, uint32_t dest_ip, uint8_t* dest_mac);
 
 int socket_waiting(int socket_num, uint16_t dest_port, uint16_t bp);
-int socket_store(int socket_num, uint32_t* payload, int size);
+int socket_store(int socket_num, uint8_t* payload, int size);
 void init_sockets();  
 int socket(uint32_t pid, uint8_t* dest_mac, uint8_t protocol);
 int socket_bind(int socket_num, socket_info *soc_info);

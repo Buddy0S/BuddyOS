@@ -42,19 +42,22 @@ int socket_waiting(int socket_num, uint16_t dest_port, uint16_t bp){
  * drops packets if pending packet buffer is full
  *
  * */
-int socket_store(int socket_num, uint32_t* payload, int size){
+int socket_store(int socket_num, uint8_t* payload, int size){
 
-  uint32_t* buffer;
+  uint8_t* buffer;
   struct socket soc = socket_table[socket_num];
 
   if (soc.packets_pending >= MAX_PENDING_PACKETS){
     return -1;
   }
 
-  buffer = (uint32_t*) kmalloc(size);
+  // adjusting to regain first 2 bytes of payload
+  payload = (uint8_t*)((uint32_t) payload - sizeof(uint8_t) * 2);
 
-  for (int i = 0; i < (size / sizeof(uint32_t)); i++){
-    buffer[i] = ntohl(payload[i]); 
+  buffer = (uint8_t*) kmalloc(size);
+
+  for (int i = 0; i < size; i++){
+    buffer[i] = payload[i]; 
   }
 
   socket_table[socket_num].data[soc.packets_pending].data = (uint8_t*) buffer;
