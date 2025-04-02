@@ -47,9 +47,9 @@ int atoi(char *s) {
     return (sum);
 }
 
-char str_to_byte(const char* str, int start, int end) {
+uint32_t str_to_byte(const char* str, int start, int end) {
     int index, multiplier;
-    char byte;
+    uint32_t byte;
 
     multiplier = 1;
     byte = 0;
@@ -68,18 +68,16 @@ uint32_t strtoip(const char* str) {
 
     ip = 0;
 
-    /* 127.127.127.127 */
-
     /* finding all the periods */
     for (p1 = 0; str[p1] != '.'; p1++) {}
     for (p2 = p1+1; str[p2] != '.'; p2++) {}
     for (p3 = p2+1; str[p3] != '.'; p3++) {}
     for (end = p3+1; str[end] != '\0'; end++) {}
 
-    ip += (uint32_t)(str_to_byte(str, 0, p1-1)) << 24;
-    ip += (uint32_t)(str_to_byte(str, p1+1, p2-1)) << 16;
-    ip += (uint32_t)(str_to_byte(str, p2+1, p3-1)) << 8;
-    ip += (uint32_t)(str_to_byte(str, p3+1, end -1));
+    ip += str_to_byte(str, 0, p1-1) << 24;
+    ip += str_to_byte(str, p1+1, p2-1) << 16;
+    ip += str_to_byte(str, p2+1, p3-1) << 8;
+    ip += str_to_byte(str, p3+1, end -1);
 
     return ip;
 }
