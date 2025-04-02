@@ -63,14 +63,22 @@ int Poll_Socket(int socket_num){
 
 }
 
+void Clear_Stdin(){
+
+  HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+
+  FlushConsoleInputBuffer(hStdin);
+
+}
+
 int Poll_Stdin(){
 
   HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
-  DWORD dwWaitResult = WaitForSingleObject(hStdin, 100);
+  DWORD numEvents;
+  
+  GetNumberOfConsoleInputEvents(hStdin, &numEvents);
 
-  if (dwWaitResult == WAIT_OBJECT_0) return 1;
-
-  return 0;
+  return numEvents > 0;
 
 }
 
@@ -102,7 +110,7 @@ int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsi
 int UDP_Bind(int socket, int port, char* intface){
 
   SOCKADDR_IN srcinfo;
-  int status = sizeof(srcinfo);
+  int status;
 
   srcinfo.sin_family = AF_INET;
   srcinfo.sin_port = htons(port);
@@ -123,7 +131,7 @@ int UDP_Bind(int socket, int port, char* intface){
 int UDP_Recvfrom(int socket, char* buff, int buffsize){
 
   SOCKADDR_IN srcinfo;
-  int srcinfosize;
+  int srcinfosize = sizeof(srcinfo);
 
   return recvfrom((SOCKET) socket, buff, buffsize, 0,(SOCKADDR *)&srcinfo, &srcinfosize);
 

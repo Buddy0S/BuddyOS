@@ -6,6 +6,8 @@ int CLOSE_Socket(int socket);
 int CLEANUP_Sockets();
 
 int Poll_Socket(int socket_num);
+
+void Clear_Stdin();
 int Poll_Stdin();
 
 int UDP_Socket();

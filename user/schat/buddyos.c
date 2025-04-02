@@ -28,6 +28,10 @@ int Poll_Socket(int socket_num){
   return __poll(SOCKET, socket_num);
 }
 
+void Clear_Stdin(){
+  // do nothing
+}
+
 int Poll_Stdin(){
   return __poll(STD, STDIN);
 }

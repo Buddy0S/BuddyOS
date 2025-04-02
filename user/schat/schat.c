@@ -29,6 +29,15 @@ char *strcopy(char *dest, char *src) {
 	return dest;
 }
 
+void rmnewline(char *str){
+	
+	char *dst = str;
+	
+	while (*dst != '\0') {
+		dst++;
+		if (*dst == '\n') *dst = '\0'; 
+	}
+}
 
 void sendmsg(int send_socket, int dest_port, char* destip){
 
@@ -52,6 +61,8 @@ void sendmsg(int send_socket, int dest_port, char* destip){
 
   free(payload);
 
+  Clear_Stdin();
+
 }
 
 void recvmsg(int recv_socket){
@@ -64,7 +75,7 @@ void recvmsg(int recv_socket){
 
   strcopy(susername, &(buff[2]));
 
-  printf("%s: %s", susername, &(buff[BUDDY_HEADER + MAX_USERNAME]));
+  printf("%s: %s\n", susername, &(buff[BUDDY_HEADER + MAX_USERNAME]));
 
   free(buff);
 
@@ -81,6 +92,7 @@ int main(){
 
   printf("Enter Username: ");
   fgets(username, MAX_USERNAME, stdin);
+  rmnewline(username);
 
   printf("What Port do you want to bind on: ");
   fgets(buf, TEMP_BUF_SIZE, stdin);
@@ -99,6 +111,8 @@ int main(){
   send_socket = UDP_Socket();
 
   UDP_Bind(recv_socket, bind_port, "0.0.0.0");
+
+  Clear_Stdin();
 
   while(1){
 
