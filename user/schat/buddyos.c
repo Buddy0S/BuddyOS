@@ -1,12 +1,12 @@
 #include "socketAB.h"
-#include "syscalls.h"
+#include "syscall.h"
 
 #define SYS_PID 0
 #define SEND_PORT 8888
 
-int INIT_Sockets(
+int INIT_Sockets(){
   return 0;
-)
+}
 
 int CLOSE_Socket(int socket){
   return __closesocket(socket);
@@ -33,7 +33,7 @@ int Poll_Stdin(){
 }
 
 // only works on non negative
-int atoi(char *s) {
+int _atoi(char *s) {
     int sum = 0;
     while((*s >= '0')&&(*s <= '9')) {
       sum = sum * 10;
@@ -55,7 +55,7 @@ uint32_t strtoip(char* ip){
     if (ip[i] == '.'){
       buf[temp] = '\0';
       temp = 0;
-      iph[ip_index] = (uint8_t) atoi(buf);
+      iph[ip_index] = (uint8_t) _atoi(buf);
       ip_index++;
     }else{
       buf[temp] = ip[i];

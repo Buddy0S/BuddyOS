@@ -4,7 +4,7 @@ CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -nostdl
 
 KCFLAGS = $(CFLAGS) -mno-unaligned-access
 
-USER_CFLAGS = $(KCFLAGS) -fPIE -fno-plt -msingle-pic-base 
+USER_CFLAGS = $(KCFLAGS) -fPIE -fno-plt -msingle-pic-base -I./include/user 
 
 BUILD_DIR = build/
 BIN_DIR = bin/
@@ -17,7 +17,7 @@ OUTPUT = BuddyOS.img
 all: $(OUTPUT)
 
 clean:
-	rm -rf $(OUTPUT) MLO kernel.bin build/ bin/ hello.txt kernel.elf test.bin usertest.elf
+	rm -rf $(OUTPUT) MLO build/ bin/ *.bin *.elf
 
 $(BUILD_DIR) :
 	mkdir -p $(BUILD_DIR)
@@ -155,6 +155,18 @@ $(BUILD_DIR)ipv4.o $(BUILD_DIR)icmp.o $(BUILD_DIR)udp.o $(BUILD_DIR)socket.o $(B
 $(BUILD_DIR)usertest.o: user/test.c
 	$(PREFIX)gcc $(USER_CFLAGS) user/test.c -o $@
 
+$(BUILD_DIR)schat.o: user/schat/schat.c
+	$(PREFIX)gcc $(USER_CFLAGS) user/schat/schat.c -o $@
+
+$(BUILD_DIR)schatbos.o: user/schat/buddyos.c
+	$(PREFIX)gcc $(USER_CFLAGS) user/schat/buddyos.c -o $@
+
+schat.elf: $(BUILD_DIR)schat.o $(BUILD_DIR)schatbos.o $(BUILD_DIR)syscall.o
+	$(PREFIX)ld -flto=all -e main $^ -o $@
+
+schat.bin: schat.elf
+	$(PREFIX)objcopy -O binary schat.elf schat.bin
+
 usertest.elf: $(BUILD_DIR)usertest.o $(BUILD_DIR)regs.o
 	$(PREFIX)ld -flto=all -e main $^ -o $@
 
@@ -164,13 +176,14 @@ test.bin: usertest.elf
 kernel.bin: kernel.elf
 	$(PREFIX)objcopy -O binary kernel.elf kernel.bin
 
-BuddyOS.img: MLO kernel.bin test.bin
+BuddyOS.img: MLO kernel.bin test.bin schat.bin
 	dd if=/dev/zero of=BuddyOS.img bs=512 count=2880
 	mkfs.fat -F 12 BuddyOS.img
 	mcopy -i BuddyOS.img MLO "::MLO"
 	mcopy -i BuddyOS.img kernel.bin "::kernel.bin"
 	mcopy -i BuddyOS.img test.bin "::test.bin"
-
+	mcopy -i BuddyOS.img schat.bin "::schat.bin"
+	
 objdump: BuddyOS.img
 	$(PREFIX)objdump -D -b binary -m arm MLO
 

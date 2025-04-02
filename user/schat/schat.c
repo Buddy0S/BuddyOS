@@ -53,9 +53,9 @@ void sendmsg(int send_socket, int dest_port, char* destip){
   payload[0] = (char) 0;
   payload[1] = (char) 0;
 
-  net_memcopy(payload[2],username, MAX_USERNAME);
+  net_memcopy(&(payload[2]),username, MAX_USERNAME);
 
-  net_memcopy(payload[BUDDY_HEADER + MAX_USERNAME], buff, STDIN_BUFF);
+  net_memcopy(&(payload[BUDDY_HEADER + MAX_USERNAME]), buff, STDIN_BUFF);
 
   free(buff);
 
@@ -73,9 +73,9 @@ void recvmsg(int recv_socket){
 
   UDP_Recvfrom(recv_socket, buff, size);
 
-  strcopy(susername, buff[2]);
+  strcopy(susername, &(buff[2]));
 
-  printf("%s: %s", susername, buff[BUDDY_HEADER + MAX_USERNAME]);
+  printf("%s: %s", susername, &(buff[BUDDY_HEADER + MAX_USERNAME]));
 
   free(buff);
 

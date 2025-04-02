@@ -33,7 +33,7 @@ int __send(int pid, void *msg, uint32_t len, void* reply, uint32_t* rlen) {
     };
     result = __send_start(pid, &mail_in, reply, rlen);
     if (result != 0) {
-        uart0_printf("send failed: %d\n", result);
+        //uart0_printf("send failed: %d\n", result);
         return result;
     }
 

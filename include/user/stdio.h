@@ -6,4 +6,4 @@
 void printf(const char* str, ...);
 char* fgets(char* str, int n, int stream);
 
-#endf
+#endif
