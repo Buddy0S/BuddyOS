@@ -93,7 +93,7 @@ int main(){
   //char buf[64];
   //char __attribute__((aligned(512))) test[512];
 
-	//int fd = vfs_open("/home/TEST.TXT", O_READ | O_WRITE);
+	//int fd = vfs_open("/home/test.txt", O_READ | O_WRITE);
 	//int bytes = vfs_read(fd, buf, 64);
 	//uart0_printf("%s (%d bytes)\n", buf, bytes);
 	//bytes = vfs_write(fd, "I ain't reading all that", sizeof("I ain't reading all that"));

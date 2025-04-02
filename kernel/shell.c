@@ -2,6 +2,7 @@
 #include "uart.h"
 #include "memory.h"
 #include "fat12.h"
+#include "vfs.h"
 #include "mmc.h"
 
 #define GREEN 		"\033[0;92m"
@@ -80,6 +81,7 @@ int parseShellCommands(char** tokens) {
 		uart0_printf("exit - exits the shell\n");
 		uart0_printf("ls - displays file system\n");
 		uart0_printf("clear - clears terminal\n");
+		uart0_printf("cat - display contents of file\n");
 		uart0_printf("echo <text> - prints text to terminal\n");
 	} else if (strcmp(tokens[0], "clear") == 0) {
 		uart0_printf("\033[2J\033[H");	
@@ -90,11 +92,13 @@ int parseShellCommands(char** tokens) {
            		 }
         	}
         	uart0_printf("\n");
-	}
-	else if (strcmp(tokens[0], "ls") == 0) {
+	} else if (strcmp(tokens[0], "ls") == 0) {
 		uint32_t buffer[128];
 		uint32_t allFlag = (tokens[1] && strcmp(tokens[1], "-a") == 0);
 		list_dir(buffer, allFlag);
+	} else if (strcmp(tokens[0], "cat") == 0) {
+		cat(tokens[1]);
+		uart0_printf("\n");
 	}
 	return 1;	
 }
@@ -112,7 +116,7 @@ int shell(){
     int shellStatus = 1;
 
     do {
-	    uart0_printf(GREEN "root>" RESET);
+	    uart0_printf(GREEN "root>/home$ " RESET);
 	    userChar = '\0';
 	    charIndex = 0;
 	    tokenCount = 0;
