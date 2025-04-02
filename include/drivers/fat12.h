@@ -69,4 +69,5 @@ uint32_t fat12_create_dir_entry(const char* filename,
 	uint8_t attributes, uint32_t* buffer); 
 uint32_t fat12_write_file(const char* filename, char* data, uint32_t size, 
 	uint32_t* tempBuffer); 
+void list_dir(uint32_t* buffer, uint32_t allFlag);
 #endif

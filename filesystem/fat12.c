@@ -484,3 +484,74 @@ uint32_t fat12_write_file(const char* filename, char* data, uint32_t size,
 
 	return bytesWritten;
 }
+
+char toLower(char c) {
+	if (c >= 'A' && c <= 'Z') {
+		return c + ('a' - 'A');
+	}
+	return c;
+}
+
+void list_dir(uint32_t* buffer, uint32_t allFlag) {
+	uint32_t rootSectorStart = bootSector.reservedSectorCount +
+                (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
+	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
+	DirEntry dirEntry;
+	char extTruncated[4];
+	int extLength = 0;
+
+	for (uint32_t i = rootSectorStart; i < rootSectorStart + numRootSectors; i++) {
+		MMCreadblock(i, buffer);
+
+		char *buf = (char*)buffer;
+		for (int j = 0; j < 16; j++) {
+			dirEntry = *((DirEntry*) &buf[j*32]);
+			extLength = 0;
+			
+			for (int i = 0; i < sizeof(extTruncated); i++) {
+			    extTruncated[i] = '\0';
+			}
+
+			for (int k = 0; k < 8; k++) {
+				if (dirEntry.name[k] == ' ' || dirEntry.name[k] == '\0') {
+					dirEntry.name[k] = '\0';
+					break;
+				}
+				dirEntry.name[k] = toLower(dirEntry.name[k]);
+			}
+			
+			/* Check for directory end */
+			if (dirEntry.name[0] == 0x00) {
+				break; 
+			}
+
+			if (!allFlag && ((dirEntry.attrib & 0x04) || (dirEntry.attrib & 0x02))) {
+				continue;
+			}
+
+			/* Check for valid entry */
+			if (dirEntry.name[0] == 0xE5) {
+				continue;
+			}
+		
+			for (int l = 0; l < 3; l++) {
+				if (dirEntry.ext[l] != ' ' && dirEntry.ext[l] != '\0') {
+					extTruncated[extLength++] = toLower(dirEntry.ext[l]);
+				}	
+			}
+
+			if (dirEntry.attrib == 0x10) {  // Directory attribute in FAT12
+                uart0_printf("[DIR] %s\n", dirEntry.name);
+                // Optionally, you could recursively list the contents of subdirectories here
+                // list_dir(buffer, new_path);  // Recursively list the subdirectory
+            } else {
+                if (extLength > 0) {
+                    uart0_printf("%s.%s\n", dirEntry.name, extTruncated);
+                } else {
+                    uart0_printf("%s\n", dirEntry.name);
+                }
+            }
+
+		}
+	}
+}

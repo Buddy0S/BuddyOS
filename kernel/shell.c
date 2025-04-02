@@ -92,7 +92,9 @@ int parseShellCommands(char** tokens) {
         	uart0_printf("\n");
 	}
 	else if (strcmp(tokens[0], "ls") == 0) {
-	
+		uint32_t buffer[128];
+		uint32_t allFlag = (tokens[1] && strcmp(tokens[1], "-a") == 0);
+		list_dir(buffer, allFlag);
 	}
 	return 1;	
 }
@@ -146,11 +148,7 @@ int shell(){
 		    }
 	    }
 	
-      uart0_printf("%s\n", buffer);
-
-	    for (int j = 0; j < tokenCount; j++) {
-		    uart0_printf("tokens[%d]: = %s\n", j, tokens[j]);
-	    }
+	    uart0_printf("\n");
 
 	    if (tokenCount > 0) {
 		    shellStatus = parseShellCommands(tokens);
