@@ -183,6 +183,8 @@ BuddyOS.img: MLO kernel.bin test.bin schat.bin
 	mcopy -i BuddyOS.img kernel.bin "::kernel.bin"
 	mcopy -i BuddyOS.img test.bin "::test.bin"
 	mcopy -i BuddyOS.img schat.bin "::schat.bin"
+	mattrib -i BuddyOS.img +s "::MLO"
+	mattrib -i BuddyOS.img +s "::kernel.bin"
 	
 objdump: BuddyOS.img
 	$(PREFIX)objdump -D -b binary -m arm MLO

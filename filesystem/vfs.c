@@ -240,15 +240,3 @@ uint32_t vfs_getFileSize(int fd) {
 	}
 }
 
-
-uint32_t cat(char* filename) {
-	char buf[65];
-	int fd = vfs_open(filename, O_READ);
-	int bytes = vfs_read(fd, buf, 64);
-	while (bytes > 0) {
-		buf[64] = '\0';
-		uart0_printf("%s", buf);
-		bytes = vfs_read(fd, buf, 64);
-	}	
-	vfs_close(fd);
-}

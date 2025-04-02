@@ -59,5 +59,4 @@ uint32_t vfs_write(int fd, char* write_buffer, int bytes);
 uint32_t vfs_seek(int fd, int offset, int mode);
 uint32_t vfs_getFileSize(int fd);
 mountpoint *get_mountpoint(char* path);
-uint32_t cat(char* filename);
 #endif

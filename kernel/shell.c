@@ -71,6 +71,38 @@ int strcmp(char *str1, char *str2) {
 	}
 }
 
+void cat(char* filename) {
+	char buf[65];
+	const char prefix[] = "/home/";
+	int prefixLen = 6;
+	int filenameLen = 0;
+
+	while (filename[filenameLen] != '\0') {
+		filenameLen++;
+	}
+
+	char fullpath[prefixLen + filenameLen + 1];
+
+	for (int i = 0; i < prefixLen; i++) {
+		fullpath[i] = prefix[i];
+	}
+
+	for (int j = 0; j < filenameLen; j++) {
+		fullpath[prefixLen + j] = filename[j];
+	}
+
+	fullpath[prefixLen + filenameLen] = '\0';
+
+	int fd = vfs_open(fullpath, O_READ);
+	int bytes = vfs_read(fd, buf, 64);
+	while (bytes > 0) {
+		buf[64] = '\0';
+		uart0_printf("%s", buf);
+		bytes = vfs_read(fd, buf, 64);
+	}	
+	vfs_close(fd);
+}
+
 int parseShellCommands(char** tokens) {
 	if (strcmp(tokens[0], "exit") == 0) {
 		uart0_printf("BuddyOS exiting...");
@@ -102,6 +134,7 @@ int parseShellCommands(char** tokens) {
 	}
 	return 1;	
 }
+
 
 int shell(){
     uart0_printf("Entering Kernel\n");
@@ -166,5 +199,4 @@ int shell(){
     uart0_printf("Exited shell successfully");
     return 0;
 }
-
 
