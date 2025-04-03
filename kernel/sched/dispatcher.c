@@ -171,7 +171,7 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             int new_size = size + ETH_HEADER_SIZE + IPV4_HEADER_SIZE + UDP_HEADER_SIZE;
             uint8_t* new_frame = (uint8_t*) kmalloc(new_size);
 
-            uint8_t payload_start = ETH_HEADER_SIZE+IPV4_HEADER_SIZE+UDP_HEADER_SIZE+BUDDY_HEADER;
+            uint8_t payload_start = ETH_HEADER_SIZE+IPV4_HEADER_SIZE+UDP_HEADER_SIZE;
 
             net_memcopy(&(new_frame[payload_start]),frame,size);
 
