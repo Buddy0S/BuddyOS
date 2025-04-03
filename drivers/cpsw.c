@@ -537,10 +537,10 @@ void cpsw_enable_gmii(){
  * */
 void cpsw_init(){
 
-    uart0_printf("Enabling Power to PHY, this will take some time ...\n");	
+    uart0_printf("Configuring CPSW this will take some time...\n");	
     phy_reset();
 
-    uart0_printf("Starting initialization of Common Port Switch\n");
+    //uart0_printf("Starting initialization of Common Port Switch\n");
 
     cpsw_select_interface();
     //uart0_printf("GMII/MII Interface Selected\n");
@@ -560,10 +560,10 @@ void cpsw_init(){
     cpsw_config_ale();
     //uart0_printf("CPSW ALE Configured\n");
 
-    uart0_printf("Configuring MDIO this will take some time ...");
+    //uart0_printf("Configuring MDIO this will take some time ...");
     cpsw_config_mdio();
     buddy();
-    uart0_printf("CPSW MDIO Configured\n");
+    //uart0_printf("CPSW MDIO Configured\n");
 
     cpsw_config_stats();
     //uart0_printf("CPSW STATS Configured\n");
@@ -575,7 +575,7 @@ void cpsw_init(){
     //uart0_printf("CPSW ALE Entries Created for Ports\n");
 
     cpsw_set_port_addrs();
-    uart0_printf("CPSW Ports MAC Addresses Set\n");
+    uart0_printf("BeagleBones MAC addr: ");
     print_mac(eth_interface.mac_addr);
 
     cpsw_setup_cpdma_descriptors();
@@ -585,7 +585,7 @@ void cpsw_init(){
     //uart0_printf("CPDMA Controller enabled\n");
 
     cpsw_start_recieption();
-    uart0_printf("CPSW Packet Reception Started\n");
+    //uart0_printf("CPSW Packet Reception Started\n");
 }
 
 /*

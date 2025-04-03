@@ -212,7 +212,7 @@ int phy_init(){
     }
 
     cpsw_enable_gmii();
-    uart0_printf("Enabling Frame Sending and Recieving\n"); 
+    //uart0_printf("Enabling Frame Sending and Recieving\n"); 
 
     return 0;
 }

@@ -304,7 +304,7 @@ uint16_t fat12_find_free_cluster() {
 
 /* //wiki.osdev.org/FAT#FAT_12 */
 uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempBuffer) {
-	uart0_printf("Entered read file\n");
+	//uart0_printf("Entered read file\n");
 	uint32_t sectorRead; /* sector to start reading from */
 	uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
@@ -341,7 +341,7 @@ uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempB
 				
 		loopCluster = fat12_get_next_cluster(loopCluster);
 	}
-	uart0_printf("File read complete %d\n", bytesRead);
+	//uart0_printf("File read complete %d\n", bytesRead);
     return bytesRead;
 
 }

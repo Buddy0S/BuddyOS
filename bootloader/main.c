@@ -104,49 +104,41 @@ typedef void (*KernelStart)();
 
 int main(void) { 
 
-    initClocks();
+  initClocks();
 
-    init_interrupts();
+  init_interrupts();
 
-    init_ddr();
+  init_ddr();
 
-    initLED();
+  initLED();
 
-    uart0_init();
+  uart0_init();
 
-    uart0_printf("INITING\n");
-    initTimer();
+  uart0_printf("Bootloader Started\n");
+  initTimer();
 
-    enable_interrupts();
+  enable_interrupts();
 
-    mmc.init();
+  mmc.init();
     
-    uint32_t __attribute__((aligned(4))) buffer[256];
+  uint32_t __attribute__((aligned(4))) buffer[256];
 
-    uart0_printf("Attempting to init fat12......\n");
-    fat12_init(0, buffer);
-
-	fat12_create_dir_entry("test.txt", 0x20, buffer);
-
-	fat12_write_file("test.txt","The quick brown fox jumps over the lazy dog near the riverbank every morning without fail. This simple sentence has been used for years to test typewriters, keyboards, and fonts because it contains every letter of the alphabet at least once, making it a perfect tool for such purposes. Beyond that, it tells a brief story of a fox and a dog, two animals living their daily lives in a peaceful coexistence by the water's edge. Imagine the scene: the sun is just rising, casting a golden glow over the rippling river, while the fox, full of energy, leaps gracefully over the resting dog, who barely stirs from his slumber. This little tale could go on, exploring their adventures, their friendship, or even the other creatures they meet, like the birds chirping overhead or the fish swimming below. It’s a small snapshot of nature, painted with words, that stretches just far enough to fill the space we need.", 909, buffer);
-
-    fat12_read_file("test.txt", buffer, buffer);
-
-	uart0_printf("Read from test.txt - %s", buffer);
-
+  uart0_printf("Attempting to load Kernel......\n");
+  fat12_init(0, buffer);
+	
 	fat12_read_file("KERNEL.BIN", (uint32_t *)0x80000000, buffer);
 
-    /*jump to kernel*/
-    uint32_t* kernel = (uint32_t*)0x80000000;
-    KernelStart kernelStart = (KernelStart)kernel;
+  /*jump to kernel*/
+  uint32_t* kernel = (uint32_t*)0x80000000;
+  KernelStart kernelStart = (KernelStart)kernel;
 
-    uart0_printf("Jumping to kernel \n");
+  uart0_printf("Jumping to kernel \n");
 
-    kernelStart();
+  kernelStart();
 
-    uart0_printf("Kernel Exited\n"); 
+  uart0_printf("Kernel Exited\n"); 
 
-    while (1);
+  while (1);
 }
 
 

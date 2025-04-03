@@ -70,7 +70,7 @@ int main(){
 
   /* Initialize buddyOS memory allocator */
   if (init_alloc() >= 0) {
-    uart0_printf("MEMORY ALLOCATOR INIT\n");
+    //uart0_printf("MEMORY ALLOCATOR INIT\n");
   } else {
     uart0_printf("MEMORY ALLOCATOR FAILED TO INIT\n");
   }
@@ -122,10 +122,10 @@ int main(){
   init_ready_queue();
 
   init_process(&PROC_TABLE[0], null_proc, PROC_STACKS[0], LOW);
-  //init_process(&PROC_TABLE[1], shell, PROC_STACKS[1], HIGH);
+  init_process(&PROC_TABLE[1], shell, PROC_STACKS[1], HIGH);
   //init_process(&PROC_TABLE[1], process1, PROC_STACKS[1], MEDIUM);
   //init_process(&PROC_TABLE[2], process2, PROC_STACKS[2], MEDIUM);
-  init_process(&PROC_TABLE[1], (void (*)(void))(0x85000000), PROC_STACKS[1], HIGH);
+  //init_process(&PROC_TABLE[1], (void (*)(void))(0x85000000), PROC_STACKS[1], HIGH);
 
   /* Set the current process to the head of the null proc for now */
   current_process = &PROC_TABLE[0];

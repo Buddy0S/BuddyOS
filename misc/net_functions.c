@@ -82,7 +82,7 @@ void get_mac(){
 void print_mac(uint8_t* mac_addr){
 
     get_mac();
-    uart0_printf("MAC ADDR: %x:%x:%x:%x:%x:%x\n",
+    uart0_printf("%x:%x:%x:%x:%x:%x\n",
 		    mac_addr[0],
 		    mac_addr[1],
 		    mac_addr[2],
