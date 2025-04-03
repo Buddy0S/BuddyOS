@@ -91,7 +91,6 @@ int UDP_Sendto(int socket, int destport, char* destip, char* sendbuf, int sendsi
   soc_info.dest_port = destport;
   soc_info.dest_ip = dest_ip;
 
-  printf("udp send to soc num %d\n", socket);
   return __sendto(socket, sendbuf, sendsize, &soc_info);
 
 }

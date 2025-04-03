@@ -70,8 +70,6 @@ void handle_transmit_request(struct transmit_req* req){
 
   int req_type = req->req_type;
 
-  uart0_printf("handling transmit_req %d\n", req_type);
-
   switch (req_type) {
 
     case PING_REQ:
@@ -83,7 +81,6 @@ void handle_transmit_request(struct transmit_req* req){
 
     case SOCKET_REQ:
       {
-        uart0_printf("socket here \n");
         socket_send(req->socket_num,req->frame,req->size);
         kfree(req->frame);
       }
@@ -101,8 +98,6 @@ int transmit(){
   if (req_pending == 0){
     return 0;
   }
-
-  uart0_printf("transmiting brah\n");
 
   while ( req_pending > 0){
     index = req_pending - 1;

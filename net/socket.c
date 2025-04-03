@@ -181,16 +181,11 @@ struct payload* socket_recv(int socket_num){
 
 void socket_send(int socket_num, uint8_t* frame, int size){
 
-  uart0_printf("soc num %d\n", socket_num);
-
   struct socket soc = socket_table[socket_num];
-
-  uart0_printf("soc protocol %d\n", soc.protocol);
 
   switch(soc.protocol){
     case UDP:
       {
-        uart0_printf("doing udp socket send rn \n");
         udp_transmit(frame,size,soc.src_port,soc.dest_port,soc.dest_ip,soc.dest_mac);
       }
       break;

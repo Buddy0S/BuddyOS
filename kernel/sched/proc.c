@@ -194,9 +194,8 @@ int32_t f_exec(char * const path) {
         return -1;
     }
 
+    // add the 512 cause the mmc was reading more then the allocated buffer
     filesize = vfs_getFileSize(fd) + 512;
-
-    uart0_printf("vfs filesize %d\n", filesize);
 
     program = kmalloc(filesize);
     if (program == NULL) {
@@ -212,8 +211,6 @@ int32_t f_exec(char * const path) {
             break;
         }
     }
-
-    uart0_printf("exec pid %d\n",child_pid);
 
     if (child_pid < 0) {
         kfree(program);
