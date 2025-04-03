@@ -109,7 +109,7 @@ int arp_reply(arp_header arp_request){
 
     if (arp_request.dest_ip != STATIC_IP) return -1;
 
-    uart0_printf("\nReplying to Arp Request\n");
+    //uart0_printf("\nReplying to Arp Request\n");
     arp_transmit(packet,128,arp_request.src_mac,arp_request.src_mac,arp_request.src_ip,ARP_REPLY);
 
     kfree(packet);

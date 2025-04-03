@@ -65,7 +65,7 @@ int socket_store(int socket_num, uint8_t* payload, int size){
 
   socket_table[socket_num].packets_pending += 1; 
   
-  uart0_printf("Socket %d Recieved Packet\n", socket_num);
+  //uart0_printf("Socket %d Recieved Packet\n", socket_num);
 
   return 1;
 

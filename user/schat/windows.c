@@ -49,18 +49,20 @@ int CLEANUP_Sockets(){
 
 }
 
-int Poll_Socket(int socket_num){
+int Poll_Socket(int socket_num) {
+  fd_set readfds;
+  struct timeval timeout;
+  FD_ZERO(&readfds);
+  FD_SET((SOCKET) socket_num, &readfds);
 
-  WSAPOLLFD pfd;
-  pfd.fd = (SOCKET) socket_num;
-  pfd.events = POLLRDNORM;
+  // Set timeout to 100 ms.
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 100000;
 
-  int ret = WSAPoll(&pfd, 1, 100);
-
-  if (ret > 0 && (pfd.revents & POLLRDNORM)) return 1;
+  int ret = select(0, &readfds, NULL, NULL, &timeout);
+  if (ret > 0 && FD_ISSET(socket_num, &readfds)) return 1;
 
   return 0;
-
 }
 
 void Clear_Stdin(){
@@ -74,12 +76,33 @@ void Clear_Stdin(){
 int Poll_Stdin(){
 
   HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
-  DWORD numEvents;
+  DWORD numEvents = 0;
+
+  if (!GetNumberOfConsoleInputEvents(hStdin, &numEvents) || numEvents == 0) {
+    return 0;
+  }
+
   
-  GetNumberOfConsoleInputEvents(hStdin, &numEvents);
+  INPUT_RECORD *inputBuffer = (INPUT_RECORD *)malloc(numEvents * sizeof(INPUT_RECORD));
 
-  return numEvents > 0;
+  DWORD numRead = 0;
+  
+  if (!PeekConsoleInput(hStdin, inputBuffer, numEvents, &numRead)) {
+    free(inputBuffer);
+    return 0;
+  }
 
+  int keyboardEventFound = 0;
+  
+  for (DWORD i = 0; i < numRead; i++){
+    if (inputBuffer[i].EventType == KEY_EVENT) {
+      keyboardEventFound = 1;
+      break;
+    }
+  }
+
+  free(inputBuffer);
+  return keyboardEventFound;
 }
 
 int UDP_Socket(){
@@ -114,7 +137,7 @@ int UDP_Bind(int socket, int port, char* intface){
 
   srcinfo.sin_family = AF_INET;
   srcinfo.sin_port = htons(port);
-  srcinfo.sin_addr.s_addr = htonl(INADDR_ANY);
+  srcinfo.sin_addr.s_addr = htonl(INADDR_ANY); 
 
   status = bind((SOCKET) socket, (SOCKADDR *) &srcinfo, sizeof(srcinfo));
 

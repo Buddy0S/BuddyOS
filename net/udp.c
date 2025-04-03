@@ -69,10 +69,7 @@ void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame
  * */
 uint16_t udp_checksum(uint8_t* frame, uint32_t src_ip, uint32_t dest_ip, uint16_t size, uint16_t src_port, uint16_t dest_port){
 
-  uart0_printf("UDP CHECKSUM: SIZE %d\n", size);
   uint16_t pseudo_len = size;
-
-  uart0_printf("UDP CHECKSUM: PSUEDO SIZE %d\n", pseudo_len);
 
   uint8_t* pseudo_packet = (uint8_t*)kmalloc(pseudo_len);
 

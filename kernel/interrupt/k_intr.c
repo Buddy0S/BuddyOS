@@ -109,9 +109,10 @@ void interrupt_handler(uint32_t args[]) {
         timer_counter -= 1;
         *(volatile uint32_t*)((volatile char*)INTERRUPTC_BASE + INTC_CONTROL) = 0x1;
  
+        timer_net_isr();
+
         if (timer_counter <= 0) {
-            timer_isr();
-            timer_net_isr();
+            timer_isr(); 
             timer_counter = 1000;
         }
 
