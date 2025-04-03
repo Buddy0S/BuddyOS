@@ -2,7 +2,7 @@ PREFIX = arm-none-eabi-
 CFLAGS = -c -fno-stack-protector -fomit-frame-pointer -march=armv7-a -O0 -nostdlib -ffreestanding -I./include\
 				 -I./include/arch -I./include/misc -I./include/memory -I./include/drivers -I./include/kernel
 
-KCFLAGS = $(CFLAGS) -mno-unaligned-access -I./include/user
+KCFLAGS = $(CFLAGS) -mno-unaligned-access -I./include/user 
 
 USER_CFLAGS = $(KCFLAGS) -fPIE -fno-plt -msingle-pic-base -I./include/user 
 
@@ -192,10 +192,10 @@ kernel.bin: kernel.elf
 	$(PREFIX)objcopy -O binary kernel.elf kernel.bin
 
 process1.bin: process1.elf
-	$(PREFIX)objcopy -O binary process1.elf process1.bin
+	$(PREFIX)objcopy -O binary process1.elf bud.bin
 
 process2.bin: process2.elf
-	$(PREFIX)objcopy -O binary process2.elf process2.bin
+	$(PREFIX)objcopy -O binary process2.elf ipc.bin
 
 BuddyOS.img: MLO kernel.bin test.bin schat.bin process1.bin process2.bin
 	dd if=/dev/zero of=BuddyOS.img bs=512 count=2880
@@ -204,8 +204,8 @@ BuddyOS.img: MLO kernel.bin test.bin schat.bin process1.bin process2.bin
 	mcopy -i BuddyOS.img kernel.bin "::kernel.bin"
 	mcopy -i BuddyOS.img test.bin "::test.bin"
 	mcopy -i BuddyOS.img schat.bin "::schat.bin"
-	mcopy -i BuddyOS.img schat.bin "::process1.bin"
-	mcopy -i BuddyOS.img schat.bin "::process2.bin"
+	mcopy -i BuddyOS.img bud.bin "::bud.bin"
+	mcopy -i BuddyOS.img ipc.bin "::ipc.bin"
 	mattrib -i BuddyOS.img +s "::MLO"
 	mattrib -i BuddyOS.img +s "::kernel.bin"
 	

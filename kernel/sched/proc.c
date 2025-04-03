@@ -178,9 +178,6 @@ int32_t fork(void) {
     child->trap_reason = SYSCALL;
     child->r_args[0] = 0;
 
-#ifdef DEBUG
-    uart0_printf("fork: child PID %d\n", child_pid);
-#endif
     return child_pid;
 }
 
@@ -202,6 +199,7 @@ int32_t f_exec(char * const path) {
     program = kmalloc(filesize);
     if (program == NULL) {
         vfs_close(fd);
+        uart0_printf("hi kmalloc fail\n");
         return -1;
     }
 
@@ -223,7 +221,7 @@ int32_t f_exec(char * const path) {
     child->context.r4 = (int32_t)program;
     vfs_close(fd);
 
-    if (current_process->pid == 1) {
+    if (child->ppid == 1) {
         block();
     }
 
