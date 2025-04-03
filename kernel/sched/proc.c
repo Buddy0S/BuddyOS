@@ -233,11 +233,14 @@ int32_t f_exec(char * const path) {
 }
 
 int32_t kexit(void) {
+    int shell_pid = 1;
+
     current_process->state = DEAD;
     if(current_process->text_owner) {
         kfree((void*)current_process->text_ptr);
     }
     list_pop(&ready_queue); /* clears the current process out of the queue */
+    wake_proc(shell_pid);
     return 0;
 }
 
@@ -250,7 +253,7 @@ void proc_wrapper(void (*func)(void)) {
 
 void null_proc(void) {
     while (1) {
-        uart0_printf("null proc going to sleep... zzzzzzz\n");
+        //uart0_printf("null proc going to sleep... zzzzzzz\n");
         WFI();
         delay();
     }
