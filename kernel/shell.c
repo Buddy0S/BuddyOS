@@ -134,6 +134,33 @@ void exec(char* filename) {
 	
 }
 
+int write(char* filename) {
+	char buf[65];
+	const char prefix[] = "/home/";
+	int prefixLen = 6;
+	int filenameLen = 0;
+
+	while (filename[filenameLen] != '\0') {
+		filenameLen++;
+	}
+
+	char fullpath[prefixLen + filenameLen + 1];
+
+	for (int i = 0; i < prefixLen; i++) {
+		fullpath[i] = prefix[i];
+	}
+
+	for (int j = 0; j < filenameLen; j++) {
+		fullpath[prefixLen + j] = filename[j];
+	}
+
+	fullpath[prefixLen + filenameLen] = '\0';
+	
+	int fd = vfs_open(fullpath, O_WRITE);
+	return fd;
+
+}
+
 int parseShellCommands(char** tokens) {
 	if (strcmp(tokens[0], "exit") == 0) {
 		uart0_printf("BuddyOS exiting...");
@@ -155,6 +182,18 @@ int parseShellCommands(char** tokens) {
            		 }
         	}
         	uart0_printf("\n");
+	} else if (strcmp(tokens[0], "write") == 0) {
+		int fd = write(tokens[1]);
+		uart0_printf("tokens[0] = %s", tokens[0]);
+		uart0_printf("tokens[1] = %s", tokens[1]);
+		if (tokens[2] != 0) {
+			for (int i = 2; tokens[i] && tokens[i][0] != '\0'; i++) {
+				uart0_printf("tokens[%d] = %s", i, tokens[i]);
+			        tokens[i][sizeof(tokens[i])-1] = ' ';	
+				vfs_write(fd, tokens[i], sizeof(tokens[i]));
+			}
+		}
+		vfs_close(fd);
 	} else if (strcmp(tokens[0], "ls") == 0) {
 		uint32_t buffer[128];
 		uint32_t allFlag = (tokens[1] && strcmp(tokens[1], "-a") == 0);
