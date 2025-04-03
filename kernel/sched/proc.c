@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "list.h"
 #include "memory.h"
 #include "proc.h"
 #include "syscall.h"
@@ -131,6 +132,8 @@ int32_t create_process(void) {
     // Initialize child's mail
     srr_init_mailbox(&child->mailbox);
 
+    list_init(&child->children);
+
     // Add child to ready queue hopefully works lol
     list_add_tail(&ready_queue, &child->sched_node);
 
@@ -194,8 +197,7 @@ int32_t f_exec(char * const path) {
         return -1;
     }
 
-    // add the 512 cause the mmc was reading more then the allocated buffer
-    filesize = vfs_getFileSize(fd) + 512;
+    filesize = vfs_getFileSize(fd);
 
     program = kmalloc(filesize);
     if (program == NULL) {
@@ -203,15 +205,7 @@ int32_t f_exec(char * const path) {
         return -1;
     }
 
-    // Find a free PCB (state == DEAD)
-    child_pid = -1;
-    for (int i = 0; i < MAX_PROCS; i++) {
-        if (PROC_TABLE[i].state == DEAD) {
-            child_pid = i;
-            break;
-        }
-    }
-
+    child_pid = create_process();
     if (child_pid < 0) {
         kfree(program);
         vfs_close(fd);
@@ -220,14 +214,22 @@ int32_t f_exec(char * const path) {
 
     vfs_read(fd, program, filesize);
 
-    init_process(&PROC_TABLE[child_pid], program, PROC_STACKS[child_pid], HIGH);
-
+    child = &PROC_TABLE[child_pid];
+    child->started = false;
+    child->trap_reason = HANDLED;
+    child->stack_ptr = child->stack_base + STACK_SIZE;
+    child->text_owner = true;
+    child->text_ptr = (uint32_t)program;
+    child->context.r4 = (int32_t)program;
     vfs_close(fd);
 
-    block();
+    if (current_process->pid == 1) {
+        block();
+    }
 
-    return 0;
+    return child_pid;
 }
+
 
 int32_t kexit(void) {
     int shell_pid = 1;
@@ -237,7 +239,9 @@ int32_t kexit(void) {
         kfree((void*)current_process->text_ptr);
     }
     list_pop(&ready_queue); /* clears the current process out of the queue */
-    wake_proc(shell_pid);
+    if (current_process->ppid == 1) {
+        wake_proc(shell_pid);
+    }
     return 0;
 }
 

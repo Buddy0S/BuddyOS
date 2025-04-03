@@ -4,6 +4,7 @@
 #include "timer.h"
 #include "reg.h"
 #include "uart.h"
+#include "syscall.h"
 #include <stdint.h>
 
 void timer_net_isr();
@@ -83,6 +84,12 @@ void UART0_isr(){
     if(rec == '\n' || rec == '\r') {
         uart0_putch('\r');
         uart0_putch('\n');
+    } else if (rec == 3) {
+        if (current_process->pid != 1) {
+            current_process->saved_lr = (uint32_t)__exit;
+        } else {
+            uart0_printf("Ctrl+C\n");
+        }
     } else {
         uart0_putch(rec);
     }

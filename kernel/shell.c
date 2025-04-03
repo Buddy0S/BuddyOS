@@ -128,9 +128,9 @@ void exec(char* filename) {
 
 	fullpath[prefixLen + filenameLen] = '\0';
 
-  uart0_printf("%s",fullpath);
+    uart0_printf("%s",fullpath);
 
-  __f_exec(fullpath);
+    __f_exec(fullpath);
 	
 }
 
