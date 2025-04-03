@@ -167,6 +167,18 @@ $(BUILD_DIR)schatbos.o: user/schat/buddyos.c
 schat.elf: $(BUILD_DIR)schat.o $(BUILD_DIR)schatbos.o $(BUILD_DIR)usyscall.o
 	$(PREFIX)ld -flto=all -e main $^ -o $@
 
+$(BUILD_DIR)process1.o: user/process1.c
+	$(PREFIX)gcc $(USER_CFLAGS) user/process1.c -o $@
+
+$(BUILD_DIR)process2.o: user/process2.c
+	$(PREFIX)gcc $(USER_CFLAGS) user/process2.c -o $@
+
+process1.elf: $(BUILD_DIR)process1.o $(BUILD_DIR)usyscall.o
+	$(PREFIX)ld -flto=all -e main $^ -o $@
+
+process2.elf: $(BUILD_DIR)process2.o $(BUILD_DIR)usyscall.o
+	$(PREFIX)ld -flto=all -e main $^ -o $@
+
 schat.bin: schat.elf
 	$(PREFIX)objcopy -O binary schat.elf schat.bin
 
@@ -179,13 +191,21 @@ test.bin: usertest.elf
 kernel.bin: kernel.elf
 	$(PREFIX)objcopy -O binary kernel.elf kernel.bin
 
-BuddyOS.img: MLO kernel.bin test.bin schat.bin
+process1.bin: process1.elf
+	$(PREFIX)objcopy -O binary process1.elf process1.bin
+
+process2.bin: process2.elf
+	$(PREFIX)objcopy -O binary process2.elf process2.bin
+
+BuddyOS.img: MLO kernel.bin test.bin schat.bin process1.bin process2.bin
 	dd if=/dev/zero of=BuddyOS.img bs=512 count=2880
 	mkfs.fat -F 12 BuddyOS.img
 	mcopy -i BuddyOS.img MLO "::MLO"
 	mcopy -i BuddyOS.img kernel.bin "::kernel.bin"
 	mcopy -i BuddyOS.img test.bin "::test.bin"
 	mcopy -i BuddyOS.img schat.bin "::schat.bin"
+	mcopy -i BuddyOS.img schat.bin "::process1.bin"
+	mcopy -i BuddyOS.img schat.bin "::process2.bin"
 	mattrib -i BuddyOS.img +s "::MLO"
 	mattrib -i BuddyOS.img +s "::kernel.bin"
 	
