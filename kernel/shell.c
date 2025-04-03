@@ -7,6 +7,7 @@
 #include "net.h"
 #include "proc.h"
 #include "syscall.h"
+#include "string.h"
 
 #define GREEN 		"\033[0;92m"
 #define RESET  		"\e[0m"
@@ -58,6 +59,7 @@ int drawInitialized() {
 	return 0;
 }
 
+/*
 int strcmp(char *str1, char *str2) {
 	int i = 0;
 	while (str1[i] == str2[i]) {
@@ -73,6 +75,7 @@ int strcmp(char *str1, char *str2) {
 		return str1[i] - str2[i];
 	}
 }
+*/
 
 void cat(char* filename) {
 	char buf[65];
@@ -128,7 +131,7 @@ void exec(char* filename) {
 
 	fullpath[prefixLen + filenameLen] = '\0';
 
-    uart0_printf("%s",fullpath);
+    uart0_printf("%s\n",fullpath);
 
     __f_exec(fullpath);
 	
@@ -173,6 +176,7 @@ int parseShellCommands(char** tokens) {
 		uart0_printf("clear - clears terminal\n");
 		uart0_printf("cat - display contents of file\n");
 		uart0_printf("echo <text> - prints text to terminal\n");
+		uart0_printf("write <filename> <text> - writes to file\n");
 	} else if (strcmp(tokens[0], "clear") == 0) {
 		uart0_printf("\033[2J\033[H");	
 	} else if (strcmp(tokens[0], "echo") == 0) {
@@ -184,13 +188,10 @@ int parseShellCommands(char** tokens) {
         	uart0_printf("\n");
 	} else if (strcmp(tokens[0], "write") == 0) {
 		int fd = write(tokens[1]);
-		uart0_printf("tokens[0] = %s", tokens[0]);
-		uart0_printf("tokens[1] = %s", tokens[1]);
 		if (tokens[2] != 0) {
 			for (int i = 2; tokens[i] && tokens[i][0] != '\0'; i++) {
-				uart0_printf("tokens[%d] = %s", i, tokens[i]);
-			        tokens[i][sizeof(tokens[i])-1] = ' ';	
-				vfs_write(fd, tokens[i], sizeof(tokens[i]));
+				vfs_write(fd, tokens[i], strlen(tokens[i]));
+				vfs_write(fd, " ", 1);
 			}
 		}
 		vfs_close(fd);
@@ -223,7 +224,8 @@ int parseShellCommands(char** tokens) {
 
 int shell(){
     uart0_printf("Entering Kernel\n");
-    drawInitialized();   
+    uart0_printf("\033[2J\033[H");
+	drawInitialized();   
     static char buffer[SHELL_BUFFER_SIZE];
     char userChar;
     int charIndex;
