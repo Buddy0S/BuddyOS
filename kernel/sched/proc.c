@@ -240,7 +240,6 @@ void proc_wrapper(void (*func)(void)) {
 /*-----------------------TESTPROCS-----------------------*/
 
 void null_proc(void) {
-    __f_exec("/home/TEST.BIN");
     while (1) {
         uart0_printf("null proc going to sleep... zzzzzzz\n");
         WFI();

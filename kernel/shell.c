@@ -4,6 +4,8 @@
 #include "fat12.h"
 #include "vfs.h"
 #include "mmc.h"
+#include "net.h"
+#include "proc.h"
 
 #define GREEN 		"\033[0;92m"
 #define RESET  		"\e[0m"
@@ -131,7 +133,19 @@ int parseShellCommands(char** tokens) {
 	} else if (strcmp(tokens[0], "cat") == 0) {
 		cat(tokens[1]);
 		uart0_printf("\n");
-	}
+	} else if (strcmp(tokens[0], "ping") == 0) {
+		
+    uint32_t ip = strtoip(tokens[1]);
+  
+    uint8_t gateway_mac[MAC_ADDR_LEN] = {0xD8,0xBB,0xC1,0xF7,0xD0,0xD3};
+
+    icmp_echo_request(ip, gateway_mac);
+
+    delay();
+
+		uart0_printf("\n");
+  }
+
 	return 1;	
 }
 

@@ -600,6 +600,7 @@ uint32_t ntohl(uint32_t net);
 void get_mac();
 void print_ip(uint32_t ip);
 void print_mac(uint8_t* mac_addr);
+uint32_t strtoip(const char* str);
 
 int init_network_stack();
 

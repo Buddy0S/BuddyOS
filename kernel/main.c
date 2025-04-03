@@ -116,8 +116,6 @@ int main(){
 	//bytes = vfs_read(fd, test, 512);
 	//uart0_printf("%s (%d bytes)\n", test, bytes);
 
-  fat12_read_file("SCHAT.BIN", (uint32_t *)0x85000000, buffer);
-
   /* Initialize the ready queue */
   init_ready_queue();
 
