@@ -167,6 +167,8 @@ void execute_syscall(uint32_t svc_num, uint32_t* args) {
             int size = (int) args[2];
             socket_info *soc_info = (socket_info*) args[3];
     
+            uart0_printf("soc num for syscall %d\n", soc);
+
             // not checking if new frame size is bigger then max
             int new_size = size + ETH_HEADER_SIZE + IPV4_HEADER_SIZE + UDP_HEADER_SIZE;
             uint8_t* new_frame = (uint8_t*) kmalloc(new_size);

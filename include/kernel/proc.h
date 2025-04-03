@@ -9,8 +9,8 @@
 #define EXCEPTION_STACK_TOP 0x40300000
 
 #define MAX_PROCS   10
-#define STACK_SIZE  256
-#define EXCEPTION_STACK_SIZE 128
+#define STACK_SIZE  2056
+#define EXCEPTION_STACK_SIZE 1028
 #define PROC_QUANTUM 1000
 
 /* Process states */

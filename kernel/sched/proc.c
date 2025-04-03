@@ -194,7 +194,9 @@ int32_t f_exec(char * const path) {
         return -1;
     }
 
-    filesize = vfs_getFileSize(fd);
+    filesize = vfs_getFileSize(fd) + 512;
+
+    uart0_printf("vfs filesize %d\n", filesize);
 
     program = kmalloc(filesize);
     if (program == NULL) {
@@ -202,7 +204,17 @@ int32_t f_exec(char * const path) {
         return -1;
     }
 
-    child_pid = create_process();
+    // Find a free PCB (state == DEAD)
+    child_pid = -1;
+    for (int i = 0; i < MAX_PROCS; i++) {
+        if (PROC_TABLE[i].state == DEAD) {
+            child_pid = i;
+            break;
+        }
+    }
+
+    uart0_printf("exec pid %d\n",child_pid);
+
     if (child_pid < 0) {
         kfree(program);
         vfs_close(fd);
@@ -211,14 +223,11 @@ int32_t f_exec(char * const path) {
 
     vfs_read(fd, program, filesize);
 
-    child = &PROC_TABLE[child_pid];
-    child->started = false;
-    child->trap_reason = HANDLED;
-    child->saved_sp = child->stack_base + STACK_SIZE * sizeof(uint32_t);
-    child->text_owner = true;
-    child->text_ptr = (uint32_t)program;
-    child->context.r4 = (int32_t)program;
+    init_process(&PROC_TABLE[child_pid], program, PROC_STACKS[child_pid], HIGH);
+
     vfs_close(fd);
+
+    block();
 
     return 0;
 }

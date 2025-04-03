@@ -6,6 +6,7 @@
 #include "mmc.h"
 #include "net.h"
 #include "proc.h"
+#include "syscall.h"
 
 #define GREEN 		"\033[0;92m"
 #define RESET  		"\e[0m"
@@ -105,6 +106,34 @@ void cat(char* filename) {
 	vfs_close(fd);
 }
 
+void exec(char* filename) {
+	char buf[65];
+	const char prefix[] = "/home/";
+	int prefixLen = 6;
+	int filenameLen = 0;
+
+	while (filename[filenameLen] != '\0') {
+		filenameLen++;
+	}
+
+	char fullpath[prefixLen + filenameLen + 1];
+
+	for (int i = 0; i < prefixLen; i++) {
+		fullpath[i] = prefix[i];
+	}
+
+	for (int j = 0; j < filenameLen; j++) {
+		fullpath[prefixLen + j] = filename[j];
+	}
+
+	fullpath[prefixLen + filenameLen] = '\0';
+
+  uart0_printf("%s",fullpath);
+
+  __f_exec(fullpath);
+	
+}
+
 int parseShellCommands(char** tokens) {
 	if (strcmp(tokens[0], "exit") == 0) {
 		uart0_printf("BuddyOS exiting...");
@@ -143,6 +172,9 @@ int parseShellCommands(char** tokens) {
 
     delay();
 
+		uart0_printf("\n");
+  }else if (strcmp(tokens[0], "exec") == 0) {
+		exec(tokens[1]);
 		uart0_printf("\n");
   }
 

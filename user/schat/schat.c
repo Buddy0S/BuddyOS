@@ -45,13 +45,18 @@ int main(){
   recv_socket = UDP_Socket();
   send_socket = UDP_Socket();
 
+  printf("schat socs r: %d s: %d\n", recv_socket, send_socket);
+
   UDP_Bind(recv_socket, bind_port, "0.0.0.0");
+
+  printf("after bind soc num %d\n",send_socket);
 
   Clear_Stdin();
 
   while(1){
 
     if(Poll_Stdin()){
+      printf("before send msg soc num %d\n",send_socket);
       sendmsg(send_socket, dest_port, ip);
     }
 
@@ -116,6 +121,7 @@ void sendmsg(int send_socket, int dest_port, char* destip){
 
   free(buff);
 
+  printf("in sendmsg soc num %d\n", send_socket);
   UDP_Sendto(send_socket, dest_port, destip, payload, size);
 
   free(payload);
