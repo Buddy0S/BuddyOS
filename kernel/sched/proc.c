@@ -223,7 +223,6 @@ int32_t f_exec(char * const path) {
     return 0;
 }
 
-
 int32_t kexit(void) {
     current_process->state = DEAD;
     if(current_process->text_owner) {
@@ -238,7 +237,6 @@ void proc_wrapper(void (*func)(void)) {
     __exit();
 }
 
-
 /*-----------------------TESTPROCS-----------------------*/
 
 void null_proc(void) {
@@ -251,80 +249,71 @@ void null_proc(void) {
 }
 
 void process1(void) {
-    
-    // Call fork and capture its return value.
-    uart0_printf("Process 1\n");
-    int fork_result = __fork();
-
-    // Check the result
-    if (fork_result == -1) {
-        uart0_printf("Process 1: fork failed!\n");
-    } else if (fork_result == 0) {
-        // This branch is executed in the child
-        uart0_printf("Process 1 (child): My PID is %d\n", current_process->pid);
-        delay();
-    } else {
-        // This branch is executed in the paren
-        uart0_printf("Process 1 (parent): fork returned child PID %x\n", fork_result);
-    }
-	
-    int author;
+    int sender_pid;
     char msg[20];
     uint32_t len;
     int pid = current_process->pid; 
 
-    len = 20;
+    uart0_printf("Process 1 (Consumer) started. PID: %d\n", pid);
 
     while (1) {
-        uart0_printf("\nProcess %d was told by its best buddy that 5 + 10 = %d\n", pid, __syscalltest(5, 10));
-        delay();
-        if (__msg_waiting()) {
-            uart0_printf("Proc %d: Theres a message from my buddy!\n", pid);
+        uart0_printf("\nConsumer PID %d: Waiting for a message...\n", pid);
+        len = 20;  // reset length before each receive
+
+        if (__receive(&sender_pid, msg, &len) == 0) {
+            uart0_printf("Consumer PID %d: Received '%s' from sender PID %d\n", 
+                         pid, msg, sender_pid);
+            if (__reply(sender_pid, "ACK", 4) == 0) {
+                uart0_printf("Consumer PID %d: Replied 'ACK' to sender PID %d\n", 
+                             pid, sender_pid);
+            } else {
+                uart0_printf("Consumer PID %d: Failed to reply to sender PID %d\n", 
+                             pid, sender_pid);
+            }
         } else {
-            uart0_printf("Proc %d: Theres no message from my buddy yet but thats fine ill wait\n", pid);
+            uart0_printf("Consumer PID %d: Error receiving message\n", pid);
         }
-
-        __receive(&author, msg, &len);
-        uart0_printf("Proc %d: I got my buddy's message!\n", pid);
-        uart0_printf("Proc %d: msg received from %d: %s\n", pid, author, msg);
-        __reply(author, msg, 19);
-
-        uart0_printf("Proc %d: sent my buddy a reply\n", pid);
+        /* Im use a longer delay to simulate a slow consumer */
+        delay();
+        delay();
     }
 }
+
 
 void process2(void) {
-    char message[20] = "Hey buddy";
+    char message1[20] = "Hello buddy #1";
+    char message2[20] = "Hello buddy #2";
     char response[20];
     uint32_t rsp_len;
-    int dest = 1;
-    uart0_printf("Process 2\n");
-    int fork_result = __fork();
-
-    // Check the result
-    if (fork_result == -1) {
-        uart0_printf("Process 2: fork failed!\n");
-    } else if (fork_result == 0) {
-        // This branch is executed in the child
-        uart0_printf("Process 2 (child): My PID is %d\n", current_process->pid);
-        dest = 3;
-        __fork();
-    } else {
-        // This branch is executed in the paren
-        uart0_printf("Process 2 (parent): fork returned child PID %x\n", fork_result);
-    }
-
+    int consumer_pid = 1;  // process 1 pid better be 1 man
     int pid = current_process->pid;
 
+    uart0_printf("Process 2 (Producer) started. PID: %d\n", pid);
+
     while (1) {
-        uart0_printf("\nProcess %d is going to sleep\n", pid);
-        delay();
-        WFI();
-        uart0_printf("\nProcess %d's alarm went off\n", pid);
-        uart0_printf("Proc %d: Sending a message to my buddy :)\n", pid);
+        uart0_printf("\nProducer PID %d: Preparing to send messages to Consumer PID %d\n",
+                     pid, consumer_pid);
+
+        /* Send first message */
         rsp_len = 20;
-        __send(dest, message, 20, response, &rsp_len);
-        uart0_printf("PROC%d: My buddy received my message!!\n", pid);
-        uart0_printf("Proc %d: they responded with: %s\n", pid, response);
+        uart0_printf("Producer PID %d: Sending: '%s'\n", pid, message1);
+        if (__send(consumer_pid, message1, 20, response, &rsp_len) == 0) {
+            uart0_printf("Producer PID %d: Received reply: '%s'\n", pid, response);
+        } else {
+            uart0_printf("Producer PID %d: Failed to send message 1\n", pid);
+        }
+
+        /* Send second message immediately after the first */
+        rsp_len = 20;
+        uart0_printf("Producer PID %d: Sending: '%s'\n", pid, message2);
+        if (__send(consumer_pid, message2, 20, response, &rsp_len) == 0) {
+            uart0_printf("Producer PID %d: Received reply: '%s'\n", pid, response);
+        } else {
+            uart0_printf("Producer PID %d: Failed to send message 2\n", pid);
+        }
+
+        /* Short delay between the bursts of two messages */
+        delay();
     }
 }
+
