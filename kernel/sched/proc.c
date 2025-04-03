@@ -199,7 +199,6 @@ int32_t f_exec(char * const path) {
     program = kmalloc(filesize);
     if (program == NULL) {
         vfs_close(fd);
-        uart0_printf("hi kmalloc fail\n");
         return -1;
     }
 
@@ -221,7 +220,7 @@ int32_t f_exec(char * const path) {
     child->context.r4 = (int32_t)program;
     vfs_close(fd);
 
-    if (child->ppid == 1) {
+    if (current_process->pid == 1) {
         block();
     }
 
@@ -237,7 +236,7 @@ int32_t kexit(void) {
         kfree((void*)current_process->text_ptr);
     }
     list_pop(&ready_queue); /* clears the current process out of the queue */
-    if (current_process->ppid == 1) {
+    if (current_process->ppid == shell_pid) {
         wake_proc(shell_pid);
     }
     return 0;

@@ -12,11 +12,11 @@ void process1(void) {
     int sender_pid;
     char msg[20];
     uint32_t len;
-    int pid = 1; 
+    int pid = 3; 
 
     printf("Process 1 (Consumer) started. PID: %d\n", pid);
 
-    while (1) {
+    for (int i = 0; i < 10; ++i) {
         printf("\nConsumer PID %d: Waiting for a message...\n", pid);
         len = 20;  // reset length before each receive
 

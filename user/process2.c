@@ -16,12 +16,12 @@ void process2(void) {
     char message2[20] = "Hello buddy #2";
     char response[20];
     uint32_t rsp_len;
-    int consumer_pid = __f_exec("home/PROCESS1.BIN");  // process 1 pid better be 1 man
+    int consumer_pid = __f_exec("/home/BUD.BIN");  // process 1 pid better be 1 man
     int pid = 2;
 
     printf("Process 2 (Producer) started. PID: %d\n", pid);
 
-    while (1) {
+    for (int i = 0; i < 5; ++i) {
         printf("\nProducer PID %d: Preparing to send messages to Consumer PID %d\n",
                      pid, consumer_pid);
 
