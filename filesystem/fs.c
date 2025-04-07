@@ -23,6 +23,17 @@ fs_ops fat12_ops = {
 
 extern file_descriptor vfs_openFiles[MAX_OPENED_FILES]; 
 
+
+/*
+ * Opens a file on the FAT12 filesystem or creates it if it does not exist
+ *
+ * Args:
+ *      const char* path: Path of the file to open or create
+ *      int flags: Flags specifying the file access mode (ex. O_READ|O_WRITE)
+ *
+ * Returns a pointer to a file_descriptor on success
+ * Returns NULL if there was an error creating or opening the file
+ */
 file_descriptor* fat12_open(const char* path, int flags) {
 	uint32_t tempBuffer[128];
 	file_descriptor* fdOpen;
@@ -83,6 +94,16 @@ file_descriptor* fat12_open(const char* path, int flags) {
 	return NULL;
 }
 
+
+/*
+ * Closes a file on the FAT12 filesystem and writes the data bufferred in memory
+ * back to disk
+ *
+ * Args:
+ *      file_descriptor* fd: Pointer to the file descriptor of the file to close
+ *
+ * Returns 0 on success
+ */
 int fat12_close(file_descriptor* fd) {
 	uint32_t tempBuffer[128];
 	int bytes;
@@ -98,6 +119,18 @@ int fat12_close(file_descriptor* fd) {
 
 }
 
+
+/*
+ * Reads data from a file in the FAT12 filesystem into the provided buffer
+ *
+ * Args:
+ *      file_descriptor* fd: Pointer to the file descriptor of the file to
+ *                           read from
+ *      char* read_buffer: Buffer where the data will be read into
+ *      int bytes: Number of bytes to read
+ *
+ * Returns the number of bytes read on success.
+ */
 uint32_t fat12_read(file_descriptor* fd, char* read_buffer, int bytes) {
 	
 	int bytesRead = 0;
@@ -123,6 +156,18 @@ uint32_t fat12_read(file_descriptor* fd, char* read_buffer, int bytes) {
 
 }
 
+
+/*
+ * Write data to a file in the FAT12 filesystem from the passed in buffer
+ *
+ * Args:
+ *      file_descriptor* fd: Pointer to the file descriptor of the file to
+ *                           write to
+ *      char* write_buffer: Buffer containing the data to be written
+ *      int bytes: Number of bytes to write
+ *
+ * Returns the number of bytes written on success.
+ */
 uint32_t fat12_write(file_descriptor* fd, char* write_buffer, int bytes) {
 	
 	char *oldBuffer, *newBuffer;
@@ -151,6 +196,18 @@ uint32_t fat12_write(file_descriptor* fd, char* write_buffer, int bytes) {
 
 }
 
+
+/*
+ * Moves the read or write offset of a file in the FAT12 filesystem
+ *
+ * Args:
+ *      file_descriptor* fd: Pointer to the file descriptor of the file
+ *      int offset: The new offset value
+ *      int mode: Indicates whether to adjust the read and/or write head
+ *                (O_READ or O_WRITE)
+ *
+ * Returns the new offset after the seek operation.
+ */
 uint32_t fat12_seek(file_descriptor* fd, int offset, int mode) {
 	
 	int newOffset = 0;

@@ -278,7 +278,7 @@ uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
  * 
  * Args:
  *     int fd: File descriptor of the file to seek in
- *     int offset: Offset to seek to from the current location within the file
+ *     int offset: Offset to seek to
  *     int mode: Head to seek (O_READ and/or O_WRITE)
  *
  * Returns the new offset within the file on success
