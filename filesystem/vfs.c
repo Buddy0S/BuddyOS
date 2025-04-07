@@ -14,6 +14,15 @@ int openCount = 0;
 
 extern fs_ops fat12_ops;
 
+/*
+ * Gets the most appropriate mountpoint based on passed in path
+ *
+ * Args:
+ *     char* path: Path for which the mountpoint needs to be retrieved
+ *
+ * Returns a pointer to the mountpoint structure that best matches the path.
+ * Returns NULL if a match was not found 
+ */
 mountpoint *get_mountpoint(char* path) {
 	
 	mountpoint* mntPnt = NULL;
@@ -35,6 +44,18 @@ mountpoint *get_mountpoint(char* path) {
 	return mntPnt;
 }
 
+
+/*
+ * Mounts a filesystem at the specified target path
+ * 
+ * Args:
+ *     char* target: Path at which the filesystem should be mounted
+ *     int type: Type of the filesystem to mount (ex. FAT12)
+ *
+ * Returns 0 on successful mount
+ * Returns MAX_REACHED if the maximum number of mountpoints is reached
+ * Returns MEM_ERROR if there was an error copying the mountpoint path
+ */
 int vfs_mount(char* target, int type) {
 
 	int i = 0;
@@ -58,6 +79,20 @@ int vfs_mount(char* target, int type) {
 	return 0;
 }
 
+
+/*
+ * Opens a file at the specified path with the given flags
+ * 
+ * Args:
+ *     char* path: Path of the file to open
+ *     int flags: Flags specifying file access mode (ex. O_READ | O_WRITE)
+ *
+ * Returns a file descriptor number on success
+ * Returns MAX_REACHED if the maximum number of file are already open
+ * Returns ALREADY_OPEN if the file is already open
+ * Returns NOT_FOUND if the file was not found
+ * Returns INVALID_MOUNTPOINT if no valid mountpoint was found for the path
+ */
 int vfs_open(char* path, int flags) {
 
 	mountpoint *mnt = get_mountpoint(path);
@@ -105,6 +140,18 @@ int vfs_open(char* path, int flags) {
 	}
 }
 
+
+/*
+ * Closes a file associated with the passed in file descriptor
+ * 
+ * Args:
+ *     int fd: File descriptor of the file to be closed
+ *
+ * Returns 0 on successful close
+ * Returns INVALID_FD if the file descriptor is out of the accepted range
+ * Returns NOT_OPEN if the file is not open
+ * Returns CLOSE_ERROR if the filesystem function failed to close the file
+ */
 int vfs_close(int fd) {
 	
 	mountpoint mnt;
@@ -138,7 +185,20 @@ int vfs_close(int fd) {
 
 }
 
-/* add checks for file open flags */
+
+/*
+ * Returns data from an open file into the provied buffer
+ * 
+ * Args:
+ *     int fd: File descriptor of the file to read from
+ *     char* read_buffer: Buffer into which the file data will be read
+ *     int bytes: Number of bytes to read
+ *
+ * Returns the number of bytes read on success
+ * Returns INVALID_FD if the file descriptor is out of the accepted range
+ * Returns NOT_OPEN if the file is not open
+ * Returns INCORRECT_MODE if the file is not opened in read mode
+ */
 uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 
 	int mountpoint_id;
@@ -168,6 +228,20 @@ uint32_t vfs_read(int fd, char* read_buffer, int bytes) {
 	}
 }
 
+
+/*
+ * Writes data into an open file from the provied buffer
+ * 
+ * Args:
+ *     int fd: File descriptor of the file to write to
+ *     char* write_buffer: Buffer containing the data to write
+ *     int bytes: Number of bytes to write
+ *
+ * Returns the number of bytes written on success
+ * Returns INVALID_FD if the file descriptor is out of the accepted range
+ * Returns NOT_OPEN if the file is not open
+ * Returns INCORRECT_MODE if the file is not opened in write mode
+ */
 uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
 	
 	int mountpoint_id;
@@ -198,6 +272,19 @@ uint32_t vfs_write(int fd, char* write_buffer, int bytes) {
 
 }
 
+
+/*
+ * Moves the appropriate file pointer based on the passed in mode
+ * 
+ * Args:
+ *     int fd: File descriptor of the file to seek in
+ *     int offset: Offset to seek to from the current location within the file
+ *     int mode: Head to seek (O_READ and/or O_WRITE)
+ *
+ * Returns the new offset within the file on success
+ * Returns INVALID_FD if the file descriptor is out of the accepted range
+ * Returns NOT_OPEN if the file is not open
+ */
 uint32_t vfs_seek(int fd, int offset, int mode) {
 	
 	int mountpoint_id;
@@ -224,6 +311,17 @@ uint32_t vfs_seek(int fd, int offset, int mode) {
 
 }
 
+
+/*
+ * Retrieves the size of the file based on the passed in file descriptor
+ * 
+ * Args:
+ *     int fd: File descriptor of the file
+ *
+ * Returns the size of the file on success
+ * Returns INVALID_FD if the file descriptor is out of the accepted range
+ * Returns NOT_OPEN if the file is not open
+ */
 uint32_t vfs_getFileSize(int fd) {
 	
 	if (fd < 0 || fd > MAX_OPENED_FILES - 1) {
