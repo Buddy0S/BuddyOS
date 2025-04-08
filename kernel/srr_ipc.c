@@ -117,7 +117,6 @@ int send_end(void* reply, uint32_t* rlen){
 
     kfree(c_box->reply.msg);
     c_box->reply.msg = NULL;
-    c_box->sent_to = 0;
     
     return 0;
 }
@@ -248,6 +247,7 @@ int reply(int pid, void* msg, uint32_t len) {
     kmemcpy(msg, reply, len);
     s_box->reply.msg = reply;
     s_box->reply.len = len;
+    s_box->sent_to = 0;
 
     wake_proc(pid);
 
