@@ -8,6 +8,17 @@
 fat_bs_t bootSector;
 fat12_ebs_t extendedBootRecord;
 
+
+/*
+ * Compares a FAT12 directory entry's name and extension with a given filename
+ *
+ * Args:
+ *      DirEntry* entry: Pointer to the directory entry to compare
+ *      const char* fileName: filename string in the format "NAME.EXT"
+ *
+ * Returns 1 if the directory entry matches the filename
+ * Returns 0 otherwise
+ */
 int compareFileNames(DirEntry *entry, const char* fileName) {
     
     int i, j;
@@ -32,6 +43,18 @@ int compareFileNames(DirEntry *entry, const char* fileName) {
 
 }
 
+
+/*
+ * Splits a filename string in the format "NAME.EXT" into two separate parts:
+ * an 8-character filename and a 3-character extension, both padded with spaces
+ *
+ * Args:
+ *      const char* input: String representing the full filename
+ *      char* filename: Output buffer for the 8-character filename
+ *      char* extension: Output buffer for the 3-character extension
+ *
+ * The extracted filename and extention are stored in the passed in buffers
+ */
 void splitFilename(const char* input, char* filename, char* extension) {
 	
 	int i = 0;
@@ -86,6 +109,35 @@ void splitFilename(const char* input, char* filename, char* extension) {
 
 }
 
+
+/*
+ * Converts an uppercase ASCII character to lowercase
+ *
+ * Args:
+ *     char c: The character to convert
+ *
+ * Returns:
+ *     char: The lowercase equivalent of the passed in character
+ */
+char toLower(char c) {
+	if (c >= 'A' && c <= 'Z') {
+		return c + ('a' - 'A');
+	}
+	return c;
+}
+
+
+/*
+ * Initializes the FAT12 filesystem by reading and parsing the boot sector
+ *
+ * Args:
+ *      unsigned int startSector: The starting sector of the FAT12 filesystem
+ *      uint32_t* buffer: A buffer for temporary storage of the boot sector data
+ *
+ * Assumptions:
+ *      - Passed in buffer is at least 512 bytes in size
+ *      - "bootSector" and "extendedBootRecord" structures are gloabally defined
+ */
 void fat12_init(unsigned int startSector, uint32_t* buffer) {
 	MMCreadblock(startSector, buffer);
 
@@ -109,8 +161,10 @@ void fat12_init(unsigned int startSector, uint32_t* buffer) {
 	bootSector.sectorsPerFATTable = buf[22] | (buf[23] << 8);
 	bootSector.sectorsPerTrack = buf[24] | (buf[25] << 8);
 	bootSector.headCountOnMedia = buf[26] | (buf[27] << 8);
-	bootSector.hiddenSectorCount = buf[28] | (buf[29] << 8) | (buf[30] << 16) | (buf[31] << 24);
-	bootSector.largeSectorCount = buf[32] | (buf[33] << 8) | (buf[34] << 16) | (buf[35] << 24);
+	bootSector.hiddenSectorCount = buf[28] | (buf[29] << 8) | (buf[30] << 16) |
+                                   (buf[31] << 24);
+	bootSector.largeSectorCount = buf[32] | (buf[33] << 8) | (buf[34] << 16) |
+                                  (buf[35] << 24);
 
 	for (int i = 0; i < 54; i++) {
 		bootSector.extendedBootRecord[i] = buf[36 + i];
@@ -120,19 +174,38 @@ void fat12_init(unsigned int startSector, uint32_t* buffer) {
 	extendedBootRecord.reserved1 = bootSector.extendedBootRecord[1];
 	extendedBootRecord.bootSignature = bootSector.extendedBootRecord[2];
 	extendedBootRecord.volumeID = bootSector.extendedBootRecord[3] | 
-		(bootSector.extendedBootRecord[4] << 8) | 
-		(bootSector.extendedBootRecord[5] << 16) | 										(bootSector.extendedBootRecord[6] << 24);
+		(bootSector.extendedBootRecord[4] << 8) |
+		(bootSector.extendedBootRecord[5] << 16) |
+		(bootSector.extendedBootRecord[6] << 24);
 
 	for (int i = 0; i < 11; i++) {
-		extendedBootRecord.volumeLabel[i] = bootSector.extendedBootRecord[7 + i];
+		extendedBootRecord.volumeLabel[i] = bootSector.extendedBootRecord[7+i];
 	}
 		
 	for (int i = 0; i < 8; i++) {
-		extendedBootRecord.FATTypeLabel[i] = bootSector.extendedBootRecord[18 + i];
+		extendedBootRecord.FATTypeLabel[i] = bootSector.extendedBootRecord[18+i];
 	}
 }
 
-/* Return Dir Sector that file is in */
+
+/*
+ * Searches the root directory of the FAT12 filesystem for a file by name
+ *
+ * Args:
+ *     const char* filename: The name of the file to search for (8.3 format)
+ *     uint32_t* buffer: A buffer for reading sectors
+ *     uint32_t* entryIndex: Pointer to an integer where the index of the
+ *                           matching directory entry will be stored
+ *
+ * Assumptions:
+ *     - Passed in buffer is large enough to hold one sector (512 bytes)
+ *
+ * Returns:
+ *     - The sector number containing the matching directory entry
+ *       if the file is found
+ *     - 0 if the file is not found
+ *
+ */
 int fat12_find(const char* filename, uint32_t* buffer, uint32_t* entryIndex) {
 
     uint32_t rootSectorStart = bootSector.reservedSectorCount +
@@ -180,12 +253,21 @@ int fat12_find(const char* filename, uint32_t* buffer, uint32_t* entryIndex) {
     return 0;
 }
 
-/* //wiki.osdev.org/FAT#FAT_12 */
 
+/*
+ * Retrieves the next cluster number in the FAT12 cluster chain
+ *
+ * Args:
+ *     uint16_t cluster: The current cluster number whose next cluster
+ *                       needs to be retrieved
+ *
+ * Returns:
+ *     The next cluster number in the chain
+ */
 uint16_t fat12_get_next_cluster(uint16_t cluster) {
 	uint16_t nextCluster;
 	
-	uint8_t FATTable[bootSector.bytesPerSector * 2]; /*may need to straddle a sector due to 12 bits */
+	uint8_t FATTable[bootSector.bytesPerSector * 2];
 	uint32_t fatStart = bootSector.reservedSectorCount;
 	uint32_t fatOffset = cluster + (cluster / 2); /*1.5 bytes per entry */
 	uint32_t fatSector = fatStart + (fatOffset / bootSector.bytesPerSector);
@@ -194,45 +276,58 @@ uint16_t fat12_get_next_cluster(uint16_t cluster) {
 	MMCreadblock(fatSector, (uint32_t*)FATTable);
 
 	if (cluster % 2 == 0) {
-		nextCluster = (FATTable[fatByteOffset] | ((FATTable[fatByteOffset + 1]) << 8)) & 0xFFF;
+		nextCluster = (FATTable[fatByteOffset] |
+           ((FATTable[fatByteOffset + 1]) << 8)) & 0xFFF;
 	} else {
-		nextCluster = ((FATTable[fatByteOffset] >> 4) | (FATTable[fatByteOffset + 1] << 4)) & 0xFFF;
+		nextCluster = ((FATTable[fatByteOffset] >> 4) |
+           (FATTable[fatByteOffset + 1] << 4)) & 0xFFF;
 	}
 
 
 	return nextCluster;
 }
 
+
+/*
+ * Sets the next cluster in the FAT12 table for a passed in cluster
+ *
+ * Args:
+ *     uint16_t cluster: The cluster number whose FAT entry should be updated
+ *     uint16_t nextCluster: The cluster number to set as the next in the chain
+ */
 void fat12_set_next_cluster(uint16_t cluster, uint16_t nextCluster) {
 	
-	uint8_t FATTable[bootSector.bytesPerSector * 2]; /* May need to straddle a sector due to 12 bits */
+	uint8_t FATTable[bootSector.bytesPerSector * 2];
     uint32_t fatStart = bootSector.reservedSectorCount;
-
-    // Calculate the correct FAT offset for the cluster
-    uint32_t fatOffset = cluster + (cluster / 2); // Equivalent to (cluster * 3) / 2
-
-    // Calculate the sector and byte offset within the sector
+    uint32_t fatOffset = cluster + (cluster / 2);
     uint32_t fatSector = fatStart + (fatOffset / bootSector.bytesPerSector);
     uint32_t fatByteOffset = fatOffset % bootSector.bytesPerSector;
 
-    // Read the FAT sector(s) into memory
     MMCreadblock(fatSector, (uint32_t*)FATTable);
 
-    // Modify the FAT entry for the cluster
     if (cluster % 2 == 0) {
-        // Even cluster: lower 12 bits of the 16-bit word
+        /* Even cluster = lower 12 bits of the 16-bit entry */
         FATTable[fatByteOffset] = nextCluster & 0xFF;
-        FATTable[fatByteOffset + 1] = (FATTable[fatByteOffset + 1] & 0xF0) | ((nextCluster >> 8) & 0x0F);
+        FATTable[fatByteOffset + 1] = (FATTable[fatByteOffset + 1] & 0xF0) |
+		                              ((nextCluster >> 8) & 0x0F);
     } else {
-        // Odd cluster: upper 12 bits of the 16-bit word
-        FATTable[fatByteOffset] = (FATTable[fatByteOffset] & 0x0F) | ((nextCluster << 4) & 0xF0);
+        /* Odd cluster = upper 12 bits of the 16-bit entry */
+        FATTable[fatByteOffset] = (FATTable[fatByteOffset] & 0x0F) |
+		                          ((nextCluster << 4) & 0xF0);
         FATTable[fatByteOffset + 1] = (nextCluster >> 4) & 0xFF;
     }
 
-    // Write the modified FAT sector(s) back to the storage device
     MMCwriteblock(fatSector, (uint32_t*)FATTable);
 }
 
+
+/*
+ * Prints the cluster chain for a file starting from a passed in cluster
+ *
+ * Args:
+ *     uint16_t firstCluster: The first cluster of the file whose
+ *                            chain is to be printed.
+ */
 void fat12_print_cluster_chain(uint16_t firstCluster) {
     uint16_t cluster = firstCluster;
     uint16_t nextCluster;
@@ -242,10 +337,10 @@ void fat12_print_cluster_chain(uint16_t firstCluster) {
     while (cluster < FAT12_EOF_MIN || cluster > FAT12_EOF_MAX) {
         uart0_printf("%d -> ", cluster);
 
-        // Get the next cluster in the chain
+        /* Get the next cluster in the chain */
         nextCluster = fat12_get_next_cluster(cluster);
 
-        // Check for invalid cluster or end of chain
+        /* Check for invalid cluster or end of chain */
         if (nextCluster == 0xFFFF || nextCluster >= FAT12_EOF_MIN) {
             uart0_printf("%d\n", nextCluster);
             break;
@@ -259,14 +354,26 @@ void fat12_print_cluster_chain(uint16_t firstCluster) {
     }
 }
 
+
+/*
+ * Finds the first free cluster in the FAT12 filesystem
+ *
+ * Args:
+ *     None
+ *
+ * Returns:
+ *     uint16_t: The cluster number of the first free cluster
+ *               or 0xFFFF if no free clusters are found
+ */
 uint16_t fat12_find_free_cluster() {
 	
-	uint16_t cluster = 2;	/* clusters 0 and 1 are reserved **/
-	uint8_t FATTable[bootSector.bytesPerSector * 2]; /*may need to straddle a sector due to 12 bits */
+	uint16_t cluster = 2;	/* clusters 0 and 1 are reserved */
+	uint8_t FATTable[bootSector.bytesPerSector * 2];
 	uint32_t fatSector = bootSector.reservedSectorCount;
 	uint32_t fatByteOffset = 0;
 
-	for (uint32_t sector = 0; sector < bootSector.sectorsPerFATTable; sector++) {
+	/* Iterate through all sectors */
+	for (uint32_t sector=0; sector < bootSector.sectorsPerFATTable; sector++) {
 		
 		MMCreadblock(fatSector + sector, (uint32_t*)FATTable);
 
@@ -274,8 +381,10 @@ uint16_t fat12_find_free_cluster() {
         for (fatByteOffset = 0; fatByteOffset < bootSector.bytesPerSector; fatByteOffset += 3) {
             
 			/* Read two 12 bit FAT entries */
-            uint16_t entry1 = (FATTable[fatByteOffset] | (FATTable[fatByteOffset + 1] << 8)) & 0xFFF;
-            uint16_t entry2 = ((FATTable[fatByteOffset + 1] >> 4) | (FATTable[fatByteOffset + 2] << 4)) & 0xFFF;
+            uint16_t entry1 = (FATTable[fatByteOffset] |
+			                  (FATTable[fatByteOffset + 1] << 8)) & 0xFFF;
+            uint16_t entry2 = ((FATTable[fatByteOffset + 1] >> 4) |
+			                  (FATTable[fatByteOffset + 2] << 4)) & 0xFFF;
 
             /* Check if the first entry is free */
             if (entry1 == FAT12_UNUSED) {
@@ -302,9 +411,24 @@ uint16_t fat12_find_free_cluster() {
 
 }
 
-/* //wiki.osdev.org/FAT#FAT_12 */
+
+/*
+ * Reads the contents of a file from the FAT12 filesystem into a buffer
+ *
+ * Args:
+ *     const char* filename: The name of the file to be read
+ *     uint32_t* buffer: A buffer where the file data will be stored
+ *     uint32_t* tempBuffer: A temporary buffer used for reading sectors
+ *
+ * Assumptions:
+ *      - Passed in tempBuffer is at least 512 bytes in size
+ *
+ * Returns:
+ *     uint32_t: The number of bytes read from the file
+ *               or -1 if the file is not found
+ */
 uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempBuffer) {
-	//uart0_printf("Entered read file\n");
+	
 	uint32_t sectorRead; /* sector to start reading from */
 	uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
@@ -322,12 +446,11 @@ uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempB
 	uint16_t loopCluster = dirEntry.firstClusterLow;
 	uint32_t fileSize = dirEntry.fileSize;
 
-	/*fat12_print_cluster_chain(loopCluster);*/
-
 	/* read until EOF marker */
 	while (loopCluster < FAT12_EOF_MIN) {
 		/* reads from first data sector available */
-		sectorRead = rootSectorStart + numRootSectors + ((loopCluster-2) * bootSector.sectorsPerCluster);
+		sectorRead = rootSectorStart + numRootSectors +
+		             ((loopCluster-2) * bootSector.sectorsPerCluster);
 		
 		/* need to divide bytesRead/4 to convert to pointer index */
 		MMCreadblock(sectorRead, buffer + bytesRead / 4);
@@ -341,86 +464,121 @@ uint32_t fat12_read_file(const char* filename, uint32_t* buffer, uint32_t* tempB
 				
 		loopCluster = fat12_get_next_cluster(loopCluster);
 	}
-	//uart0_printf("File read complete %d\n", bytesRead);
-    return bytesRead;
-
+    
+	return bytesRead;
 }
 
-uint32_t fat12_create_dir_entry(const char* filename,
-  uint8_t attributes, uint32_t* buffer) {
+
+/*
+ * Creates a new directory entry for a file in the FAT12 root directory
+ *
+ * Args:
+ *     const char* filename: The name of the file to create
+ *     uint8_t attributes: File attributes to assign
+ *     uint32_t* buffer: A buffer for reading and writing sectors
+ *
+ * Assumptions:
+ *      - Passed in buffer is at least 512 bytes in size
+ *
+ * Returns:
+ *     uint32_t: The first cluster allocated to the new file
+ *               or -1 if no free entry is found.
+ */
+uint32_t fat12_create_dir_entry(const char* filename, uint8_t attributes, uint32_t* buffer) {
   
-  uint32_t rootSectorStart = bootSector.reservedSectorCount +
+	uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
 
-  uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
+  	uint32_t numRootSectors = (bootSector.rootEntryCount * 32) / 512;
 
-	char* buf = (char*)buffer; /* CHANGE TO MALLOC'D ARRAY WHEN POSSIBLE */
+  	char* buf = (char*)buffer;
 
-  DirEntry *dirEntry;
+  	DirEntry *dirEntry;
   
-  for (uint32_t i = rootSectorStart; i < rootSectorStart + numRootSectors;
+  	for (uint32_t i = rootSectorStart; i < rootSectorStart + numRootSectors;
         i++) {
-    MMCreadblock(i, (uint32_t*)buf);
+    	
+		MMCreadblock(i, (uint32_t*)buf);
     
-    /* In FAT12, each sector has 16 directory entries */
-    for (int j = 0; j < 16; j++) {
+    	/* In FAT12, each sector has 16 directory entries */
+    	for (int j = 0; j < 16; j++) {
     
-    	/* Each directory entry in FAT 12 is 32 bytes long */
-    	/* See DirEntry struct for fields in directory entry */
-    	dirEntry = (DirEntry*) &buf[j * 32];
+    		/* Each directory entry in FAT 12 is 32 bytes long */
+    		/* See DirEntry struct for fields in directory entry */
+    		dirEntry = (DirEntry*) &buf[j * 32];
     
-    	/* Check for directory end */
-    	if (dirEntry->name[0] == 0x00 || dirEntry->name[0] == 0xE5) {
+    		/* Check for directory end */
+    		if (dirEntry->name[0] == 0x00 || dirEntry->name[0] == 0xE5) {
     		
-    		splitFilename(filename, dirEntry->name, dirEntry->ext);			
-    		dirEntry->firstClusterLow = fat12_find_free_cluster();
-    		fat12_set_next_cluster(dirEntry->firstClusterLow, FAT12_EOF_MAX);
-    		dirEntry->attrib = attributes;
-    		dirEntry->fileSize = 0;
+    			splitFilename(filename, dirEntry->name, dirEntry->ext);			
+    			dirEntry->firstClusterLow = fat12_find_free_cluster();
+    			fat12_set_next_cluster(dirEntry->firstClusterLow, FAT12_EOF_MAX);
+    			dirEntry->attrib = attributes;
+    			dirEntry->fileSize = 0;
     
-    		fat12_get_next_cluster(dirEntry->firstClusterLow);
+    			fat12_get_next_cluster(dirEntry->firstClusterLow);
     
-    		MMCwriteblock(i, (uint32_t*)buf);
-    		return dirEntry->firstClusterLow;
+    			MMCwriteblock(i, (uint32_t*)buf);
+    			return dirEntry->firstClusterLow;
+    		}
     	}
-    }
-  }
+  	}
 
 	return -1;
 
 }
 
-uint32_t fat12_write_file(const char* filename, char* data, uint32_t size, 
-	uint32_t* tempBuffer) {
+
+/*
+ * Writes data to a file in the FAT12 file system. If the file does not exists,
+ * a new file is created
+ *
+ * Args:
+ *     const char* filename: The name of the file to write to
+ *     char* data: Data to be written
+ *     uint32_t size: Number of bytes to write
+ *     uint32_t* tempBuffer: Buffer used for sector reads/writes
+ *
+ * Assumptions:
+ *      - Passed in tempBuffer is at least 512 bytes in size
+ *
+ * Returns:
+ *     uint32_t: The number of bytes written
+ *               or -1 if the file was not found and a new entry was created
+ */
+uint32_t fat12_write_file(const char* filename, char* data, uint32_t size, uint32_t* tempBuffer) {
 
 	DirEntry *fileEntry;
 	uint16_t cluster, prevCluster, k; 
 	uint32_t bytesWritten = 0;
 	uint32_t sector, entryIndex;
+	
+	/* Look for the file */
 	uint32_t dirSector = fat12_find(filename, tempBuffer, &entryIndex);
+
 	uint32_t firstDataSector = bootSector.reservedSectorCount +
 		(bootSector.FATTableCount * bootSector.sectorsPerFATTable) +
 		((bootSector.rootEntryCount * 32) / bootSector.bytesPerSector);
-  uint32_t rootSectorStart = bootSector.reservedSectorCount +
+	uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
 
 	char temp[32];
 
-	/* File not found */
+	/* File not found, create a new entry */
 	if (dirSector == 0) {
-    uart0_printf("Not found - Creating new \n");
-    fat12_create_dir_entry(filename, 0x20, tempBuffer);
-    return -1;
+    	uart0_printf("Not found - Creating new \n");
+    	fat12_create_dir_entry(filename, 0x20, tempBuffer);
+    	return -1;
 	}
 
+	/* Read directory sector and get file entry */
 	MMCreadblock(dirSector, tempBuffer);
-
 	fileEntry = &((DirEntry*)tempBuffer)[entryIndex];
 
 	cluster = fileEntry->firstClusterLow;
-
 	k = cluster;
 
+	/* Write to file */
 	while (bytesWritten < size) {
 
 		if (cluster >= FAT12_EOF_MIN && cluster <= FAT12_EOF_MAX) {
@@ -440,22 +598,24 @@ uint32_t fat12_write_file(const char* filename, char* data, uint32_t size,
 
 	}
 
-	/*fat12_print_cluster_chain(k);*/
-
+	/* Update file size in dir entry */
 	fileEntry->fileSize = size;
-
 	MMCwriteblock(dirSector, tempBuffer);
 
 	return bytesWritten;
 }
 
-char toLower(char c) {
-	if (c >= 'A' && c <= 'Z') {
-		return c + ('a' - 'A');
-	}
-	return c;
-}
 
+/*
+ * Lists the contents of the root directory in a FAT12 filesystem
+ *
+ * Args:
+ *     uint32_t* buffer: A temporary buffer used to read sectors
+ *     uint32_t allFlag: If non-zero, includes all entries
+ *                       otherwise, filters out hidden/system files
+ * Assumptions:
+ *      - Passed in buffer is at least 512 bytes in size
+ */
 void list_dir(uint32_t* buffer, uint32_t allFlag) {
 	uint32_t rootSectorStart = bootSector.reservedSectorCount +
                 (bootSector.FATTableCount * bootSector.sectorsPerFATTable);
@@ -504,10 +664,8 @@ void list_dir(uint32_t* buffer, uint32_t allFlag) {
 				}	
 			}
 
-			if (dirEntry.attrib == 0x10) {  // Directory attribute in FAT12
+			if (dirEntry.attrib == 0x10) {
                 uart0_printf("[DIR] %s\n", dirEntry.name);
-                // Optionally, you could recursively list the contents of subdirectories here
-                // list_dir(buffer, new_path);  // Recursively list the subdirectory
             } else {
                 if (extLength > 0) {
                     uart0_printf("%s.%s\n", dirEntry.name, extTruncated);
@@ -515,7 +673,6 @@ void list_dir(uint32_t* buffer, uint32_t allFlag) {
                     uart0_printf("%s\n", dirEntry.name);
                 }
             }
-
 		}
 	}
 }
