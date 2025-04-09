@@ -24,6 +24,10 @@ extern ethernet_interface eth_interface;
 /*
  * https://tools.ietf.org/html/rfc1071
  * modified to work for 4 byte aligned Access
+ *
+ * ipv4_checksum()
+ *  - computes checksum given a header
+ *
  * */
 uint16_t ipv4_checksum(uint8_t* ipv4_header, int size){
 
@@ -46,6 +50,8 @@ uint16_t ipv4_checksum(uint8_t* ipv4_header, int size){
 }
 
 /*
+ * ipv4-recv()
+ *  - extracts ipv4 header from frame
  *
  * */
 void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* frame_ptr){
@@ -135,6 +141,8 @@ void ipv4_recv(ethernet_header frame_header,uint32_t* frame, int size, uint8_t* 
 }
 
 /*
+ * ipv4_transmit()
+ *  - adds ipv4 header to frame
  *
  * */
 void ipv4_transmit(uint8_t* frame, uint16_t size, uint8_t protocol, uint32_t dest_ip, uint8_t* dest_mac){

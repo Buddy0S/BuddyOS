@@ -22,6 +22,11 @@ extern struct socket socket_table[MAX_SOCKETS];
 
 /* --------------------------SOCKETS-------------------------- */
 
+/*
+ * socket_waiting()
+ * - checks if a socket is waiting for packets on a port
+ *
+ * */
 int socket_waiting(int socket_num, uint16_t dest_port, uint16_t bp){
 
   struct socket soc = socket_table[socket_num];
@@ -39,7 +44,9 @@ int socket_waiting(int socket_num, uint16_t dest_port, uint16_t bp){
 }
 
 /*
- * drops packets if pending packet buffer is full
+ * socket_store()
+ *  - stores packet in sockets recv queue
+ *  - drops packets if pending packet buffer is full
  *
  * */
 int socket_store(int socket_num, uint8_t* payload, int size){
@@ -71,6 +78,10 @@ int socket_store(int socket_num, uint8_t* payload, int size){
 
 }
 
+/*
+ * init socket table
+ *
+ * */
 void init_sockets(){
 
   for(int i = 0; i < MAX_SOCKETS; i++){
@@ -87,6 +98,10 @@ void init_sockets(){
 
 }
 
+/*
+ * finds free socket in socket table
+ *
+ * */
 int find_free_socket(){
 
   for (int i = 0; i < MAX_SOCKETS; i++){
@@ -119,6 +134,11 @@ int socket(uint32_t pid, uint8_t* dest_mac, uint8_t protocol){
 
 }
 
+
+/*
+ * frees socket in socket table
+ *
+ * */
 int socket_free(int socket_num){
   
   kfree(socket_table[socket_num].dest_mac);
@@ -136,7 +156,7 @@ int socket_free(int socket_num){
 }
 
 /*
- * set socket as waiting for data
+ * set socket as waiting for data on a port
  *
  * */
 int socket_bind(int socket_num, socket_info *soc_info){
@@ -148,8 +168,10 @@ int socket_bind(int socket_num, socket_info *soc_info){
 
 }
 
-
-// return 0 if not packets
+/*
+ * checks to see if socket has a pending packet
+ *
+ * */
 int socket_poll(int socket_num){
 
   int stat = socket_table[socket_num].packets_pending;
@@ -161,7 +183,7 @@ int socket_poll(int socket_num){
 }
 
 /*
- * returns pointer to data 
+ * returns pointer first payload in sockets recv queue
  *
  * */
 struct payload* socket_recv(int socket_num){
@@ -179,6 +201,10 @@ struct payload* socket_recv(int socket_num){
 
 }
 
+/*
+ * uses socket info to transmit a packet
+ *
+ * */
 void socket_send(int socket_num, uint8_t* frame, int size){
 
   struct socket soc = socket_table[socket_num];

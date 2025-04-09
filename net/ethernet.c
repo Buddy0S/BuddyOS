@@ -23,8 +23,7 @@ extern ethernet_interface eth_interface;
 
 /*
  * eth_transmit()
- *  - takes in packet and adds ethernet frame header
- *  - first 14 bytes of buffer must be free for header to be added
+ *  - Adds Ethernet II header to frame
  *
  * */
 void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
@@ -63,7 +62,7 @@ void eth_transmit(uint8_t* frame, int size, uint8_t* dest, uint16_t type){
 
 /*
  * eth_recv()
- *  - takes raw frame and extracts ethernet header
+ *  - takes raw frame and extracts Ethernet II header
  *  
  * */
 void eth_recv(uint32_t* frame, int size){

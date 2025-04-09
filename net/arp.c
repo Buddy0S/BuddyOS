@@ -16,12 +16,13 @@
  * */
 
 
-
 extern ethernet_interface eth_interface;
 
 /* --------------------------ARP----------------------------- */
 
 /*
+ * arp_transmit()
+ * - adds ARP header to frame
  *
  * */
 void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint8_t* dether_mac, uint32_t dest_ip, uint16_t opcode){
@@ -67,6 +68,8 @@ void arp_transmit(uint8_t* frame, int size, uint8_t* dest_mac, uint8_t* dether_m
 }
 
 /*
+ * arp_anounce()
+ *  - abstraction that transmits an arp broadcast packet
  *
  * */
 void arp_anounce(){
@@ -85,6 +88,8 @@ void arp_anounce(){
 }
 
 /*
+ * arp_garp()
+ * - abstraction that transmits and ARP gratuitous packet
  *
  * */
 void arp_garp(){
@@ -101,6 +106,8 @@ void arp_garp(){
 }
 
 /*
+ * arp_reply()
+ *  - transmits an arp reply given an arp request has been recieved
  *
  * */
 int arp_reply(arp_header arp_request){
@@ -117,8 +124,9 @@ int arp_reply(arp_header arp_request){
 }
 
 /*
- * arp_recv
- *  - pass in frame with ethernet header removed + 2 bytes for align
+ * arp_recv()
+ * - extracts ARP header from frame
+ *  
  * */
 void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
 
@@ -198,7 +206,7 @@ void arp_recv(ethernet_header frame_header, uint32_t* frame, int size){
 
 	    case ARP_REPLY:
 	    {
-	    
+	      // TODO: Create an ARP Table
 	    }
 	    break;
 

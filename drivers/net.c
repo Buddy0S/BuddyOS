@@ -50,12 +50,19 @@ int transmit_request(uint8_t* frame, int size, int req_type, int socket_num, uin
 
 }
 
+/*
+ * abstraction to create a socket transmit request
+ *
+ * */
 int socket_transmit_request(int socket_num, uint8_t* frame, int size){
 
   return transmit_request(frame, size, SOCKET_REQ, socket_num, 0, 0);
 
 }
 
+/*
+ * abstraction to create "icmp echo request" request
+ * */
 int ping_request(uint32_t ip, uint8_t* mac){
 
   uint8_t* mac_copy = (uint8_t*) kmalloc(MAC_ADDR_LEN);
@@ -66,6 +73,10 @@ int ping_request(uint32_t ip, uint8_t* mac){
 
 }
 
+/*
+ * handles request based on request type
+ *
+ * */
 void handle_transmit_request(struct transmit_req* req){
 
   int req_type = req->req_type;
@@ -89,6 +100,10 @@ void handle_transmit_request(struct transmit_req* req){
 
 }
 
+/*
+ * processes transmit request queue
+ *
+ * */
 int transmit(){
 
   int index;
@@ -128,8 +143,9 @@ void timer_net_isr(){
  * */
 int init_network_stack(){
 
+    // 192.168.1.10
     uint32_t gateway_ip = 0xC0A8010A;
-    uint8_t gateway_mac[MAC_ADDR_LEN] = {0xD8,0xBB,0xC1,0xF7,0xD0,0xD3};
+    uint8_t gateway_mac[MAC_ADDR_LEN] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 
     cpsw_init();
 
@@ -139,6 +155,7 @@ int init_network_stack(){
 
     transmit_que.req_pending = 0;
 
+    // 192.168.1.20
     eth_interface.ip_addr = STATIC_IP;
 
     uart0_printf("Beagle Bones ");

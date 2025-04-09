@@ -18,7 +18,7 @@ int CLEANUP_Sockets(){
 
 int UDP_Socket(){
 
-  uint8_t gateway_mac[MAC_ADDR_LEN] = {0xD8,0xBB,0xC1,0xF7,0xD0,0xD3};
+  uint8_t gateway_mac[MAC_ADDR_LEN] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 
   return __socket(SYS_PID, gateway_mac, UDP);
 

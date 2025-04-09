@@ -21,6 +21,11 @@ extern ethernet_interface eth_interface;
 
 /* --------------------------ICMP----------------------------- */
 
+/*
+ * icmp_recv()
+ * - extracts icmp header from frame
+ *
+ * */
 void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size, uint8_t* frame_ptr){
  
   icmp_header icmp;
@@ -71,6 +76,11 @@ void icmp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* fram
 
 }
 
+/*
+ * icmp_transmit()
+ *  - adds icmp header to frame
+ *
+ * */
 void icmp_transmit(uint8_t* frame, int size, uint8_t type, uint8_t code, uint32_t data, uint32_t dest_ip, uint8_t* dest_mac){
 
   uint16_t checksum = 0;
@@ -95,6 +105,11 @@ void icmp_transmit(uint8_t* frame, int size, uint8_t type, uint8_t code, uint32_
 
 }
 
+/*
+ * icmp_echo_reply()
+ * - abstraction to transmit an icmp echo reply
+ *
+ * */
 void icmp_echo_reply(ethernet_header eth_header, ipv4_header ip_header, icmp_header icmp ,uint8_t* frame, int size){
 
   size = size + IPV4_HEADER_SIZE + ETH_HEADER_SIZE;
@@ -103,6 +118,11 @@ void icmp_echo_reply(ethernet_header eth_header, ipv4_header ip_header, icmp_hea
 
 }
 
+/*
+ * icmp_echo_request()
+ *  - abstraction to transmit icmp echo request
+ *
+ * */
 void icmp_echo_request(uint32_t ip, uint8_t* mac){
 
   uint8_t* packet = (uint8_t*) kmalloc(ICMP_PACKET_SIZE);

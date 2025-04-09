@@ -21,6 +21,11 @@ extern ethernet_interface eth_interface;
 
 /* --------------------------UDP------------------------------ */
 
+/*
+ * udp_recv()
+ *  - extracts udp header from frame
+ *
+ * */
 void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame, int size){
 
   udp_header udp;
@@ -39,8 +44,6 @@ void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame
 
   udp.src_port = word1 & 0x0000FFFF;
   udp.dest_port = (word2 & 0xFFFF0000) >> 16;
-
-  //uart0_printf("Source port: %d | Destination port %d\n",udp.src_port,udp.dest_port);
 
   udp.length = word2 & 0x0000FFFF;
   udp.checksum = (word3 & 0xFFFF0000 ) >> 16;
@@ -66,6 +69,9 @@ void udp_recv(ethernet_header eth_header, ipv4_header ip_header, uint32_t* frame
 
 /*
  * udp checksum uses pseudo header to compute checksum
+ * udp_checksum()
+ * - computes checksum for udp header
+ *
  * */
 uint16_t udp_checksum(uint8_t* frame, uint32_t src_ip, uint32_t dest_ip, uint16_t size, uint16_t src_port, uint16_t dest_port){
 
@@ -106,6 +112,11 @@ uint16_t udp_checksum(uint8_t* frame, uint32_t src_ip, uint32_t dest_ip, uint16_
   return ipv4_checksum(pseudo_packet, pseudo_len);
 }
 
+/*
+ * udp_transmit()
+ * - adds udp header to frame
+ *
+ * */
 void udp_transmit(uint8_t* frame, uint16_t size, uint16_t src_port, uint16_t dest_port, uint32_t dest_ip, uint8_t* dest_mac){
 
   uint16_t length = size - ETH_HEADER_SIZE - IPV4_HEADER_SIZE;
