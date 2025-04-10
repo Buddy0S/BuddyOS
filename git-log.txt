@@ -1,0 +1,3733 @@
+/* CMPT432 - ImplementationTeam00 */
+
+commit 65717008ebf0d3ba8b2285fce27f723808cc948c
+Author: alexeidoell <alexeidoell@gmail.com>
+Date:   Wed Apr 9 22:24:51 2025 -0600
+
+    makefile comment
+
+commit e622e2379a43a5a75db47762a5ce9cad2bec72f3
+Author: alexeidoell <alexeidoell@gmail.com>
+Date:   Wed Apr 9 22:23:52 2025 -0600
+
+    comments
+
+commit 95e92218624e1f1433490c2268752c908c839323
+Author: Diego Cabrera Pell (efm473) <efm473@mail.usask.ca>
+Date:   Wed Apr 9 22:23:39 2025 -0600
+
+    Added team name to file
+
+commit 734d8172abb7ce47cf99ce63a89744a91ca203aa
+Author: Aaron DSouza (aad921) <aad921@mail.usask.ca>
+Date:   Wed Apr 9 22:23:36 2025 -0600
+
+    Edit vfs.c
+
+commit 91344cf76bd922cd8684df927e7ed5d9ab34454e
+Author: Aaron DSouza (aad921) <aad921@mail.usask.ca>
+Date:   Wed Apr 9 22:22:58 2025 -0600
+
+    Edit fs.c
+
+commit 35452d02f7c44bb9b6e4cf007f9f0257985546d0
+Author: Aaron DSouza (aad921) <aad921@mail.usask.ca>
+Date:   Wed Apr 9 22:22:33 2025 -0600
+
+    Edit fat12.c
+
+commit a438b62a4ad0dfe086d79627f01c94091d49c79b
+Author: Abdullah Abdullah (kan728) <kan728@mail.usask.ca>
+Date:   Wed Apr 9 22:22:10 2025 -0600
+
+    Added team name
+
+commit 6ffc98e7590c129797e44c1cdd158d5fe8073c68
+Author: Noah Phonsavath (nop028) <noah.phonsavath@usask.ca>
+Date:   Wed Apr 9 22:20:39 2025 -0600
+
+    Edit string.c
+
+commit c4698983eb7cdfe8ec510423c90f2df1281103f9
+Author: Abdullah Abdullah (kan728) <kan728@mail.usask.ca>
+Date:   Wed Apr 9 22:20:30 2025 -0600
+
+    Added team names
+
+commit aaad3d410e055ff8480e380b58a265958dada417
+Author: Noah Phonsavath (nop028) <noah.phonsavath@usask.ca>
+Date:   Wed Apr 9 22:20:20 2025 -0600
+
+    Edit net_functions.c
+
+commit e749382841c80dc87b5bb47c0c2d593f43963008
+Author: Noah Phonsavath (nop028) <noah.phonsavath@usask.ca>
+Date:   Wed Apr 9 22:19:53 2025 -0600
+
+    Edit memcmd.c
+
+commit 109a628f86895e3169288aa6ce4bd38688503551
+Author: alexeidoell <alexeidoell@gmail.com>
+Date:   Wed Apr 9 22:19:41 2025 -0600
+
+    remove dunused code
+
+commit a06d3294c44ee8a9cea7a363fdc91c2abffd8a09
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Apr 9 22:16:40 2025 -0600
+
+    Added group name comments
+
+commit 651237d486aa9b055d348f59fcb5963fc607c69b
+Author: Abdullah Abdullah (kan728) <kan728@mail.usask.ca>
+Date:   Wed Apr 9 22:15:50 2025 -0600
+
+    Added team names
+
+commit b61a1d0d2124767979d7c62cc26fccc1bef2d80f
+Author: alexeidoell <alexeidoell@gmail.com>
+Date:   Wed Apr 9 22:15:18 2025 -0600
+
+    unused
+
+commit 7fef9cd1ca6d8c054ab5e8eed4bd39f5a0bce5df
+Author: Noah Phonsavath (nop028) <noah.phonsavath@usask.ca>
+Date:   Wed Apr 9 22:14:54 2025 -0600
+
+    Edit phy.c
+
+commit 3e2bb620a0f0ae73be466aab6d32ee28f4a1f52e
+Author: Noah Phonsavath (nop028) <noah.phonsavath@usask.ca>
+Date:   Wed Apr 9 22:14:06 2025 -0600
+
+    Edit net.c
+
+commit d1b109d35458f0f5559a0b821b3983dc50d7a061
+Author: Noah Phonsavath (nop028) <noah.phonsavath@usask.ca>
+Date:   Wed Apr 9 22:13:46 2025 -0600
+
+    Edit mmc.c
+
+commit ec1346f7c0abe518969739355936425281ec1b5c
+Author: Noah Phonsavath (nop028) <noah.phonsavath@usask.ca>
+Date:   Wed Apr 9 22:13:20 2025 -0600
+
+    Edit cpsw.c
+
+commit 44e42d35f9893ed6229f25a633a793e6349701e3
+Author: Diego Cabrera Pell (efm473) <efm473@mail.usask.ca>
+Date:   Wed Apr 9 22:10:59 2025 -0600
+
+    Added ocmment
+
+commit b169f87586d18b14dcb2afe7a444d6a74c1c99ed
+Author: Abdullah Abdullah (kan728) <kan728@mail.usask.ca>
+Date:   Wed Apr 9 21:44:16 2025 -0600
+
+    Presentation slides
+
+commit f9b681da00ff5ab813da62e5fe958c0b3c05c85b
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Apr 8 20:46:47 2025 -0600
+
+    added function docs for netowrk stuff
+
+commit d3adbfdcba1cdc3600e537f72a5331e30d45ed9f
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Tue Apr 8 11:43:02 2025 -0600
+
+    fixed a bug that could have caused a memory leak via repeat replies if the 
+repkying process spammed enough replies and if the replying process was 
+rescheduled multiple times
+
+commit 505a11b7487580d71ed3fd35482b11377de6c44c
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Mon Apr 7 20:58:01 2025 -0600
+
+    Did docs for fat12 driver functions
+
+commit adfc82a6a586c7ff29cf5214b9f6d1fdea988daf
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Mon Apr 7 15:27:17 2025 -0600
+
+    updated fs function docs
+
+commit aa816de387b9de92116548e1aa1aaf3bd0674345
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Mon Apr 7 15:09:18 2025 -0600
+
+    added docs for vfs functions
+
+commit c35e8ac4a143469467413621c6bb3fb0b39d60e9
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Apr 3 15:50:32 2025 -0600
+
+    Last minute.
+
+commit 0a87bdb9790c5673ec89ed541041fcc73b36ce16
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Apr 3 15:40:41 2025 -0600
+
+    exit works
+
+commit c976740d2f1bf9e8e3f982adcdf8e7818c3937bc
+Author: Noah Phonsavath <nop028@usask.ca>
+Date:   Thu Apr 3 15:18:57 2025 -0600
+
+    added write. -NP
+
+commit e655a9de06d7ecc06cbb31ec240799067025676b
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Apr 3 15:14:19 2025 -0600
+
+    how can i be like ...
+
+commit 9f8e65ab429924740840e24a3beba673c511befc
+Author: kan728 <kan728@usask.ca>
+Date:   Thu Apr 3 14:39:28 2025 -0600
+
+    FUCK YOU ABDULLAH
+
+commit 80b4a8df03ebc2d10ccb333f613af6bd4516d2df
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Apr 3 14:34:09 2025 -0600
+
+    frick you marwan
+
+commit cc1482223ddafdf72f8d638e8b30999e54754a4b
+Author: boolah <kan728@usask.ca>
+Date:   Thu Apr 3 13:22:18 2025 -0600
+
+    ipc user
+
+commit c3b5834108e419142fe412c09a9dc21873acd217
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Apr 3 02:46:45 2025 -0600
+
+    removing my debug slop
+
+commit dfee8a9f8dc27d02c6df35f1a88eeaa4b3433bf4
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Apr 3 02:25:26 2025 -0600
+
+    exec command done gotta remove debug statments rn
+
+commit 9a2f517cae69f564c60088f1633c491b97da0325
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Apr 3 02:15:58 2025 -0600
+
+    man why did i have to find this bug
+
+commit db6151cf3fbedf5264b96e000917b2dfeff57b72
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Apr 3 00:05:21 2025 -0600
+
+    ping commad done
+
+commit 37de8c9ef5ffbe7bd57053dbf1c78a8b739301bb
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Apr 2 23:38:36 2025 -0600
+
+    Clean up time
+
+commit 87232a935c23c4be8049b4b25e52e08292477612
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Apr 2 22:58:01 2025 -0600
+
+    I HATE WINDOWS
+
+commit 533ce8d115b4c5e87696e64c9c8073b0ec775370
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Apr 2 22:37:00 2025 -0600
+
+    cooked
+
+commit d694b8f90eaaefc247a3858dff98ece4e977ed3b
+Author: kan728 <kan728@usask.ca>
+Date:   Wed Apr 2 18:05:08 2025 -0600
+
+    prodcons
+
+commit 66108d898eb28aa1b5e7ea91b7220954f1d6ba03
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Wed Apr 2 16:46:41 2025 -0600
+
+    fixed bug in strtoip
+
+commit 4d24f5653028702f658c103a0b5f98d63c374fe1
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Wed Apr 2 15:23:32 2025 -0600
+
+    added a string to ip function
+
+commit dab62547ed585c060dd960735e96a321459c7ead
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Apr 2 14:36:40 2025 -0600
+
+    nice bro
+
+commit 10d183f41de319487d075f1041d51a6eb6234362
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Apr 2 11:37:51 2025 -0600
+
+    schat works but not as a .bin gonna try loading it the same way as kernel
+
+commit 4bfed97f72dba64506cc82a364771431c340d656
+Author: Noah Phonsavath <nop028@usask.ca>
+Date:   Wed Apr 2 10:42:01 2025 -0600
+
+    Fixed system file in ls. -NP
+
+commit 5554b25d945c218e2abba7b6151b6d16de049dcd
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Apr 2 02:05:46 2025 -0600
+
+    got schat working on windows, not supporting linux due to wsl 2 sockets not 
+working as intended
+
+commit 0b6008123e43b96571f68ac62d6bfd9038c9a804
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Wed Apr 2 00:09:40 2025 -0600
+
+    Added cat and removed various prints. -NP
+
+commit 9d4c5ad030891f893065bbb2f48989bde40f57fe
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Apr 2 00:07:31 2025 -0600
+
+    schat compiles on windows and linux
+
+commit a22feda1132b6acf6bb570116d985f4fbe8edc62
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Apr 1 23:23:41 2025 -0600
+
+    schat compiles for buddyos
+
+commit b38ec250c5037cfc4e83320db8876cbd31d88e7e
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Tue Apr 1 23:20:37 2025 -0600
+
+    Fixed ls. -NP
+
+commit be4bfdbd1536930df0030a98364f585af03ce063
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Apr 1 23:03:16 2025 -0600
+
+    schat implmented time to test it
+
+commit 23f9e0bc27b56ebb853379a298c5a999d7847c51
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Apr 1 22:11:36 2025 -0600
+
+    added polling functionality
+
+commit a5acb9fa9bd5e8089eb4925f2584d11b761e169e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Apr 1 16:20:46 2025 -0600
+
+    str ip to hex ip, i hope this works
+
+commit e8080aa544a0e1d6224a787429cabf61bf91b8dd
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Apr 1 15:50:21 2025 -0600
+
+    starting schat
+
+commit d2525b06860e0fa37c03abbb9c73dfcf27e6b457
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Apr 1 15:19:59 2025 -0600
+
+    user headers done, stdio, stdlib, socketAB
+
+commit 832079deef5e3e5a73df4af3ac24b2bc4f5d60d1
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Apr 1 15:09:25 2025 -0600
+
+    user fgets and stdio implmented
+
+commit 58afc335b540d69c2be216877b950f11b456ffe7
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Apr 1 14:37:12 2025 -0600
+
+    user printf
+
+commit 6979831698c548a40d2813e91cf1728f4490fb55
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 31 22:50:47 2025 -0600
+
+    created socket abstraction libary for cross comp of schat between linux 
+windows and buddyos
+
+commit 15ddd986c709d76215f57c37ec527f41b1fbb3d6
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 31 22:17:50 2025 -0600
+
+    updated socket api to be closer to linux and windows
+
+commit 0d664ad0f6c3a7ea4347c1da1034b8a63d122832
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 31 17:07:01 2025 -0600
+
+    adjusted socket request syscall to only require user to allocate space for 
+payload buffer
+
+commit 6b15015b3c5d08d682daa2155bca7e61ba92d022
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 31 16:51:06 2025 -0600
+
+    updated socket recv syscall
+
+commit 3b8c7f75c0e95ebee721df81325300ee81649e34
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 31 14:03:59 2025 -0600
+
+    Noah Shell ported and started as proc
+
+commit 8d9d9cbc33bde02c05b9d226fc32d23da764cf2e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 31 13:53:07 2025 -0600
+
+    added noah shell, and fixed all legacy errors
+
+commit 503e6f2f0e26253b792ec713f2e4b875bcc3e57a
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 31 13:15:41 2025 -0600
+
+    it all works
+
+commit 349d5cfcfc958ff90696dd5b22d3fd8839e6e897
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Mon Mar 31 12:41:01 2025 -0600
+
+    added fuction strings to IPC functions
+
+commit dfca3980a18f9a023be19e644e86d63c24331649
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 31 11:41:55 2025 -0600
+
+    zichang please fix
+
+commit 1d466a91a457dff3e7544882cde9a3b65490947c
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 31 11:40:21 2025 -0600
+
+    kevin please fix
+
+commit 80683cd0c3e71673a6f056a14a2234f31beb91ac
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Mon Mar 31 11:19:43 2025 -0600
+
+    fixes maybe
+
+commit 755e5fb1f70127b19650e23706e2667d1572381e
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 31 10:09:20 2025 -0600
+
+    working on fexec
+
+commit 526659dec2cb256251a5f69a6272eecbbdfb3ab6
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Mon Mar 31 10:05:19 2025 -0600
+
+    implemented vfs_getFileSize()
+
+commit 72d6f4f92718eed9d7d62e41167382bc4caa3b62
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Mon Mar 31 09:56:19 2025 -0600
+
+    got rid of file id from fd
+
+commit 5fabc7fdc4cba0c8914573de48b4d34e54830371
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Mon Mar 31 00:37:17 2025 -0600
+
+    added function docs to list functions
+
+commit 839a4041040bfae6453f3e61b2851925e174cbf8
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Sat Mar 29 13:59:21 2025 -0600
+
+    whoopsie
+
+commit 7b99d7efec5c1f5d305d64da445968c2054c0b96
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Sat Mar 29 13:50:05 2025 -0600
+
+    64 whole ass mega byrtes
+
+commit 1e0bbefe1c38ca184c02f599f1fd6d0e8e220c04
+Merge: 99b08a5 5bf547b
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Fri Mar 28 11:24:52 2025 -0600
+
+    Merge branch 'userproc' into 'main'
+    
+    Userproc
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+19
+
+commit 5bf547bc3657f9e955332c4cee534b721538b722
+Merge: aebf656 99b08a5
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 28 11:24:18 2025 -0600
+
+    Merge remote-tracking branch 'origin/main' into userproc
+
+commit aebf656bbfe60a8ff202e82f7c3fc0575761f88b
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 28 11:20:15 2025 -0600
+
+    user processes work
+
+commit 258a1f537c7564a730c5f75a9f38217979d63133
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 28 09:24:43 2025 -0600
+
+    pie works, vfs doesnt :(
+
+commit 99b08a57c5ae48a0ee838f97dbd6eec9df05504a
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 15:48:50 2025 -0600
+
+    socket syscalls done and working
+
+commit 21248b81c32db4cfd67878e63140568cd7fd0e7f
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 27 15:17:50 2025 -0600
+
+    idk man
+
+commit ac108ea61c131b998f418d50e51127df37fd5c95
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 27 10:53:15 2025 -0600
+
+    carriage return
+
+commit f22f069dfecce623a832b685fe41bf61a86e264e
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 27 10:12:06 2025 -0600
+
+    oops
+
+commit 1fc64ce7bdd7de29796ab9c9c030da2509681cf1
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 27 09:44:49 2025 -0600
+
+    renamed macrog=
+
+commit 21b428ab38eda35dafdff02c04be92e6c44af092
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 27 09:36:05 2025 -0600
+
+    nullproc should be good to go
+
+commit b72c16e208d695fee99d8969e0cd80ab861fab3e
+Merge: d2d8132 fd8531e
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 27 08:59:01 2025 -0600
+
+    merge
+
+commit fd8531e789d1167f1c501a1f3582f3abf97581de
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 27 08:46:10 2025 -0600
+
+    small formatting changes:
+
+commit 50b317f20cff9a527e58da420c4aea56ec9bb859
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Thu Mar 27 06:03:17 2025 -0600
+
+    Delete .gitignore, make sure to add .gitignore in your gitignore
+
+commit 22147e2cad0a4932b897e1e5cfa4d391cc09d91a
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 06:02:17 2025 -0600
+
+    finishing touches, can i delete the gitignore?
+
+commit f7982455de18b611124a839fd09eb706ef8d5ea2
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 05:58:14 2025 -0600
+
+    removing documents/precompile dir, i have them saved if we want them back
+
+commit 0bd9b79c9d595221eb298952444127157edff6de
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 05:50:40 2025 -0600
+
+    Repo Refactored
+
+commit 18746b6709507c406210c7f2cd854b72ee36a794
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 04:00:03 2025 -0600
+
+    Repo Refactored
+
+commit 8938fb87807f32729873af09d72c49e0d5fad97c
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 03:44:28 2025 -0600
+
+    what was the point of syscall.c
+
+commit cebcbd4f2aaba36d7d6dacaa26423af0e951ddf5
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 03:21:15 2025 -0600
+
+    Kernel main.c is cooked
+
+commit 991a42afdbb67f8de48d32124ab7adf66b214c63
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 03:01:52 2025 -0600
+
+    forgot these to
+
+commit 99c2ecae539594b11585e3859782cf85fa2f3778
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 02:58:29 2025 -0600
+
+    repo refactor, includes should be done in better way tho
+
+commit af3da71b3e035b5eff1796eb0de1bc71847e4787
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 27 02:21:47 2025 -0600
+
+    Network Refactor
+
+commit b69a1c53a3b24f4af8a98b953dbb1fdd9dc7b846
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 26 13:01:23 2025 -0600
+
+    Network integrated into kernel, thanks Alexei
+
+commit 9c5c4a7081dbdfd6ae039f96c4eb846e0ad87053
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 26 05:54:59 2025 -0600
+
+    Alexei i am requesting asistance, all i did was add to the timer isr, it 
+works a couple times and the data aborts, i print before and after the isr and 
+it exists the isr, so its not an issue with transmit or recv
+
+commit 2beaf85bc706737cb4e34f1d162f238ed364e391
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 26 04:07:13 2025 -0600
+
+    Manually copying net.c to resolve merge
+
+commit dcef2b39d71a7a54450a07fd5bb92a00ceac5f19
+Merge: e86aeb6 641876a
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Wed Mar 26 04:03:49 2025 -0600
+
+    Merge branch 'Netw' into 'main'
+    
+    Network
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+18
+
+commit 641876ad91bb65b204f58777b766fe3ba72251b1
+Merge: 478d010 e86aeb6
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Wed Mar 26 04:03:41 2025 -0600
+
+    Merge branch 'main' into 'Netw'
+    
+    # Conflicts:
+    #   drivers/net.c
+
+commit 478d010192cb4bc79837ce9467ee0b02fa0c2354
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 26 04:01:15 2025 -0600
+
+    prep for fusing ethernet into main
+
+commit b9e91cf5157d36b32553546a5c39df5d6800cf88
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 26 03:59:36 2025 -0600
+
+    transmit queue idea working
+
+commit 32f6954b356ebe1fb677a6e47ad42e96ba2ce452
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 26 03:02:15 2025 -0600
+
+    Network Stack Finished
+
+commit 6551285dd3eb5aa3e3f2a443bf19d5f87eaa2103
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 26 01:56:20 2025 -0600
+
+    UDP done and working
+
+commit f6ce84081b2d410272aa629bded234250cdf5d48
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 25 20:08:53 2025 -0600
+
+    sockets done ready to test
+
+commit 39d953e738c8140fe34d4c0592e39f394bc3a2dd
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 25 16:23:26 2025 -0600
+
+    udp checksum done, time for testing
+
+commit e86aeb6f255ab8d65007a40de84a21da9e3f7e9b
+Merge: c6efede 7021dbf
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Tue Mar 25 15:36:30 2025 -0600
+
+    Merge branch 'formatting' into 'main'
+    
+    Formatting
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+17
+
+commit f3793f0206f72f33356bd5e9d6b564fddec7d3a8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 25 15:31:16 2025 -0600
+
+    UDP transmit done, just gotta do the check sum calculaitons which will be 
+hard
+
+commit 6785fed68fdb81a96eb817282563b17abea96188
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 25 15:02:26 2025 -0600
+
+    UDP recv done
+
+commit d2d81328793119e53a61d612cb988def1b540ebc
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 25 14:53:57 2025 -0600
+
+    null process works
+
+commit 7021dbfdc8bc1232e424e3dedab08f1d23edc45c
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 25 14:29:06 2025 -0600
+
+    offset comments
+
+commit 27a8985a4724b3d06f70bbe1325076d7d50a4549
+Merge: ce6b2e8 c6efede
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 25 14:20:08 2025 -0600
+
+    merge main into formatting
+
+commit e1b0edd993d615b29009d625a47b936eb69f00c0
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 25 13:39:19 2025 -0600
+
+    list empty doestnt work
+
+commit c6efedeb4840dc328f5e86bd4ba2abeaf4a11e9c
+Merge: e510add 2972f17
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Tue Mar 25 12:59:08 2025 -0600
+
+    Merge branch 'forking' into 'main'
+    
+    Forking and IPC and preemption
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+16
+
+commit 2972f170fdc0aa34d0cbc3fe13934358759a5310
+Merge: 118bde7 e510add
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Tue Mar 25 12:58:56 2025 -0600
+
+    Merge branch 'main' into 'forking'
+    
+    # Conflicts:
+    #   Makefile
+    #   kernel/dispatcher.c
+    #   kernel/main.c
+
+commit 118bde7382d6725eadbbc736687347a7c3e5af8f
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 25 12:56:29 2025 -0600
+
+    lowkey ipc test program done
+
+commit 8c6d850170ac1ea79e264b30705692dd7cd3f791
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 25 11:40:36 2025 -0600
+
+    preemption and forking just work man
+
+commit 1971f240c2632858fa4a134d7d85e01a4a8c8806
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 19:00:53 2025 -0600
+
+    pinging done
+
+commit 4a0e9a2f60c9736ebc5247abaec2f4dea450f54a
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 18:42:49 2025 -0600
+
+    ping working from both sides
+
+commit 42adfe7b57c2faf9a3a3de5398b7da44a3e04bd2
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 18:02:37 2025 -0600
+
+    something wrong with checksum computation
+
+commit beade9b5bf6325ac583958cd781fd66bf9151c4e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 16:39:50 2025 -0600
+
+    ready to start testing
+
+commit 0747abbdddb1e5c5b08c67bfb10b6f2a5b5f94cc
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 16:26:47 2025 -0600
+
+    create icmp echo request
+
+commit 9d6ef31036b2a9a300950aa7a023023b7f0a0c36
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 16:12:06 2025 -0600
+
+    i hope this works, i susspect some memory alignment errors tho
+
+commit 9146ee6c84f48564e05f5aa21998b551ee3bc16a
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 15:43:20 2025 -0600
+
+    icmp transmit done
+
+commit f61f34f3dd67db1cfa69679d6cb9f27d24f3e6c3
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 15:03:14 2025 -0600
+
+    ICMP recv done
+
+commit 20db3ed580ebf1cde4bc31cbe86e7ef9a7780d09
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 14:39:04 2025 -0600
+
+    Starting ICMP
+
+commit bf8c10dfbf1fea8e9764e42617f5cbfbea234b40
+Merge: 0108bce 3d41cf0
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 24 13:26:44 2025 -0600
+
+    Merge branch 'IPC' into forking
+
+commit 0108bce1954b5220abf42b254617322183c3b7f4
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 24 13:25:32 2025 -0600
+
+    forking done
+
+commit 6e842b88763ea8e569b6fffb152b4fabc0853a71
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 24 12:41:15 2025 -0600
+
+    oops
+
+commit 609e139bb94aff9fb4856f3930a519e996f6a5fa
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 24 12:38:18 2025 -0600
+
+    fork almost works other than return value
+
+commit 3d41cf08786bcfdf839679aec54c815e46360821
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 24 12:05:39 2025 -0600
+
+    ipc finished (FUCK YOU KEVIN)
+
+commit d37e3f69c037cd9ca87cbc5187e324d27ab417cf
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 24 08:50:09 2025 -0600
+
+    trying to see if enablign unaligned accesses works
+
+commit ce6b2e8bc22f0ba669a29aedb23fa53fa67dffac
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 24 08:48:01 2025 -0600
+
+    enable unaligned memory access
+
+commit e510addab05771db8a19423a8e062aa708c11c0f
+Merge: 4e8a432 63a8b67
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Mon Mar 24 04:43:23 2025 -0600
+
+    Merge branch 'Network' into 'main'
+    
+    Network
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+15
+
+commit 63a8b671b190d073ad8354313938a291a0af10c1
+Merge: ee0218c 4e8a432
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Mon Mar 24 04:43:02 2025 -0600
+
+    Merge branch 'main' into 'Network'
+    
+    # Conflicts:
+    #   kernel/main.c
+
+commit ee0218c3da7cec4fbd61520836f312549b2055bd
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 04:39:57 2025 -0600
+
+    IPV4 done, not tested yet
+
+commit 94f7abe10552bd9a554764fe673fb91ec5bf0abc
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 03:31:30 2025 -0600
+
+    IPV4 transmit done
+
+commit 7135553d068c20037e9ac47bf561b02298095059
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 00:20:45 2025 -0600
+
+    ipv4 header extraction done
+
+commit 122eba64c4587dfacb593a5e6e9e162eb6b0280b
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 24 00:19:33 2025 -0600
+
+    ipv4 header extraction done
+
+commit 8ac05b1b998ec6f775d9af55ae8214387dcaa37e
+Author: kan728 <kan728@usask.ca>
+Date:   Sat Mar 22 05:40:40 2025 -0600
+
+    Added fork test in process0
+
+commit b5bdf2f37542d0105c2970cd121229c7a3af73c1
+Author: kan728 <kan728@usask.ca>
+Date:   Sat Mar 22 05:40:25 2025 -0600
+
+    Made fork called fork not dofork
+
+commit a5e60cff8b0bc1a046a39db4f76abe2243d8d67a
+Author: kan728 <kan728@usask.ca>
+Date:   Sat Mar 22 05:31:56 2025 -0600
+
+    Fixed forking
+
+commit 7c5e12cefa7b3cc453f403753c55d67fa7290dc1
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 22 03:12:59 2025 -0600
+
+    starting ipv4
+
+commit cd90c9f7e671a8cf19b58d6a0430fc547f37c90a
+Author: kan728 <kan728@usask.ca>
+Date:   Sat Mar 22 00:09:30 2025 -0600
+
+    Added fork implementation
+
+commit 7bd2690493df612cbb9f528135573824ea12956c
+Author: kan728 <kan728@usask.ca>
+Date:   Sat Mar 22 00:09:11 2025 -0600
+
+    Added dofork
+
+commit 4e8a432b9b07cb788e07446eb62cb9622e4f948a
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 21 23:47:17 2025 -0600
+
+    removed some debugging prints
+
+commit faa781de7bb265959f68ad067eada48ff85eb5be
+Merge: e8f8e96 97663dd
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 21 23:46:57 2025 -0600
+
+    Merge branch 'vfs' into 'main'
+
+commit 3ce4f8f73c28a3faf3970dca78edcdfa2770f1db
+Author: kan728 <kan728@usask.ca>
+Date:   Fri Mar 21 23:43:48 2025 -0600
+
+    Added syscall stuffs for forking
+
+commit 494978b40a62f63a1ad03cb8ae7ff2012905e500
+Author: kan728 <kan728@usask.ca>
+Date:   Fri Mar 21 23:20:58 2025 -0600
+
+    Initialise all PCB so that in fork dont needa do it dynamicaly
+
+commit 97663dd04f10c37538a0d700c1fc905f7ccb00d3
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 21 23:18:05 2025 -0600
+
+    implemented seek()
+
+commit 92481364fb02e2580b96a3b1193c442e34170c8f
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 21 22:52:11 2025 -0600
+
+    fixed bugs caused by my incompetence
+
+commit e06f29a5ca624acbf1550106dacfdc8450a6a778
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 21 21:20:07 2025 -0600
+
+    added better error reporting
+
+commit 7359ed6f124b7dbb2031c0d2fc8af3cc758cc60c
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 21:13:10 2025 -0600
+
+    updated functions to make use of firsta nd second halves for send and 
+receive
+
+commit 1a41065d5697790f3fb60a1d103346e7f81475f0
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 21:12:47 2025 -0600
+
+    registered the new syscall numbers to the functions (send_end and 
+receive_end)
+
+commit a9a34eac74f7a0b9d6b1c739fde473b7eacb7b43
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 21:10:56 2025 -0600
+
+    split send and receive into a blocking first half and a non-blocking second 
+half
+
+commit 5ce6a90b46b3a3a36a19975968e07f9881815606
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 21:09:48 2025 -0600
+
+    added new error code
+
+commit 7e62a69d1e1151d460dd4461d62bd728b7241570
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 21 20:59:32 2025 -0600
+
+    added check in read()/write() to ensure file is opened in correct mode
+
+commit f117b4aedb49526579d87fcc0b6e67af60af53bd
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 20:36:19 2025 -0600
+
+    fixed a bug i swear im not commit farming i swear
+
+commit 2f902248bea1a40ec173c833368e24bced3b1f31
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 20:31:39 2025 -0600
+
+    set up blocking in the kernel
+
+commit 82db168328704af1ad3fb0eff732096a389a2404
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 21 18:55:31 2025 -0600
+
+    refactored, Bare minimum ARP done
+
+commit 209e95827899240f6852ff82f6921e8c95c0e127
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 21 18:38:41 2025 -0600
+
+    ARP working, our ip now gets cached
+
+commit a5ab32c12a08a86fa0974a48b53b371f6f971e9d
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 21 16:55:40 2025 -0600
+
+    ignore previous commit im trolling, now real stuff added
+
+commit 3acda67164a12c5f75fda2441f4b37428955fb19
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 21 16:54:13 2025 -0600
+
+    GARP and ARP Anouncment done
+
+commit ee7b82d8d8efcae14a0562ac1c68f271de3a2526
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 21 16:09:31 2025 -0600
+
+    diego please
+
+commit e8f8e96b6380dd40d0bdb74536b32e62f580457c
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 21 15:56:55 2025 -0600
+
+    no unaligned access
+
+commit 69202f2a85cdfc7b07bcba9ef181c6621e736bac
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 21 15:56:19 2025 -0600
+
+    aligned memory access
+
+commit 5e7329f9cb6e285eef652cbf130022a76606b4f5
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 21 13:12:05 2025 -0600
+
+    yield
+
+commit 00a61e39b4dc2a1178ecea7979c896defa26bcd8
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 13:11:03 2025 -0600
+
+    fixed macro not reading defined numbers correctly
+
+commit d181f3159c247b46878d3440cec15099a93babf6
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 13:09:23 2025 -0600
+
+    added a guard case to ensure the ready queue doesnt get corrupted
+
+commit 91e10dc259d4c51177b29674a0289d14d52e3ca6
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 13:08:43 2025 -0600
+
+    added syscalls and IPC test to the processes
+
+commit 575271285dcd5f70ba24b4b6ab3f212cdf2e86e4
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 21 12:40:57 2025 -0600
+
+    Registered the IPC syscalls so they can be called
+
+commit 5f364a94a6b1baf8d212085ee6f575f71291dbb8
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 21 09:18:43 2025 -0600
+
+    comments
+
+commit 2a375c00e96d0ec591fbdc3135cd35b50f839cd2
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 21 08:56:21 2025 -0600
+
+    c style comments
+
+commit 2ca5d591b7557df9a1147649cf836ae458bcf274
+Merge: 0c006f9 65c2ca4
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Mar 21 08:25:24 2025 -0600
+
+    Merge remote-tracking branch 'origin/main' into intr_refactor
+
+commit c4f713104b7a90acf285d950f1acb5fc42212599
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Fri Mar 21 08:22:26 2025 -0600
+
+    man who even car
+
+commit 44e96b7f6760b06eb1df5c0e995de6931ff4f0d6
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Fri Mar 21 08:20:20 2025 -0600
+
+    made the header file actually accurate
+
+commit 7a8f1e192a76d7024b9737b7fb381e6d691880e9
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 21 03:14:40 2025 -0600
+
+    arp anouncments working
+
+commit ada779fd6362962925fb1287473161d689c16bab
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 21 01:42:57 2025 -0600
+
+    Add case in vfs_write() where file buffer needs to be expanded
+
+commit 437ad77d336d418f4dcdf2bfa070c58288e4c37c
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 21 01:42:23 2025 -0600
+
+    tweaked write_file() to create a new file if it does not exist
+
+commit 75b976979e8acbf55deeb7a20d12bd25cfda4740
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 21 00:41:16 2025 -0600
+
+    ARP transmit done, need to test and debug now
+
+commit 771d4fa419683a61bba39d6d792c7c5d41f39dbe
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 21 00:14:19 2025 -0600
+
+    write_file() base case done
+
+commit 8c6fd43d88d39d6ec228b33a13ef26c186ae3c74
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Mar 20 22:16:01 2025 -0600
+
+    vfs_open() seems to be working as intended
+
+commit b545f8cf11166fb0e0171399ab1eba7a7a46d414
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 20 22:13:25 2025 -0600
+
+    arp recv done
+
+commit 5ae9558320fc3a766cb6f8e45aa0022dc8c26280
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Mar 20 21:25:33 2025 -0600
+
+    fixed all compiler warnings
+
+commit 3fc5e6ca295bca24ef2df3ce2b318e79283b0b3e
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 20 20:52:10 2025 -0600
+
+    changed to use new kmemcpy
+
+commit d1e205aa32c71e9d6d8eb8c25cefa5138539cd5d
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 20 20:49:26 2025 -0600
+
+    added numbers for IPC syscalls
+
+commit b3847cbb82e0d9af8d3b1ac8cbf14b41e0192fac
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 20 17:22:39 2025 -0600
+
+    fixed compile issues
+
+commit 4dd81acdfaf0b54ef295f59a6b12b4a161ac5cc0
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 20 17:22:20 2025 -0600
+
+    added rules for making the srr_ipc file
+
+commit fa6c9c2361acd52bf94f97dd22a376ae6638cbdf
+Merge: 19799b8 b944836
+Author: Diego Cabrera Pell (efm473) <efm473@mail.usask.ca>
+Date:   Thu Mar 20 20:48:57 2025 -0600
+
+    Merge branch 'main' into 'IPC'
+    
+    Getting new proc structure changes into IPC
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+14
+
+commit b94483634e58876bef2cf76dca7d0ad025c3eae3
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Thu Mar 20 23:23:40 2025 +0000
+
+    memcpy fix
+
+commit 3061ce7d2bb61424a25ba6a8209c970f9caef2d7
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Thu Mar 20 23:09:35 2025 +0000
+
+    memcpy
+
+commit 19799b84071ea18d31d7a242342fa61a8582463e
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 20 17:09:32 2025 -0600
+
+    fixed spacing on a line
+
+commit d1aefe30fafdb80688d0d2cf991b3f3724d425ea
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 20 17:09:02 2025 -0600
+
+    implemented get_pcb, wake, and block
+
+commit 504c8c4accdac90ac4c588b1bd98909ef43a271c
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 20 17:08:20 2025 -0600
+
+    removed implementation of some helper functions
+
+commit 459bace77906c7cca5313d3a217f8369e6d87b1f
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 20 17:06:07 2025 -0600
+
+    moved relevant function implementation to dispatcher.c
+
+commit ade40df42b825c2c6de5dc062884c1ea3c46943f
+Merge: 0a8737a 775a112
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 20 16:26:50 2025 -0600
+
+    Merge remote-tracking branch 'origin/main' into IPC
+
+commit 775a112354c7856b8fdb70027eb80d922bb2a9a3
+Merge: 65c2ca4 0c006f9
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Thu Mar 20 16:03:27 2025 -0600
+
+    Merge branch 'intr_refactor' into 'main'
+    
+    preemption :fire:
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+13
+
+commit 0c006f9bee8864b9407bef1dc23af8131863d4b3
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 20 14:22:28 2025 -0600
+
+    done with interrupts for now
+
+commit 9ceb755ccb571099dd884af9bb92cd247f6eb516
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Mar 20 14:06:18 2025 -0600
+
+    no idea how i merged everything right
+
+commit 1cd783290b5b82fe777a6506f24e4d7331f1609c
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 20 13:33:38 2025 -0600
+
+    need to refactor to get rid of the stack hole
+
+commit 8a4b9f619c373cef8e106f54be520e5552e8f949
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Mar 19 01:20:02 2025 -0600
+
+    completed implementation of vfs level open
+
+commit 579d072d2c2ab6e36a323ffd3773ebd530325bba
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 20 12:51:08 2025 -0600
+
+    being naked is no longer allowed with your buddies
+
+commit 92c7ade319851b8c53ab9d076f3b8f7e683fdcff
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 23:04:53 2025 -0600
+
+    added new files to Makefile and got everything to compile
+
+commit 9ab37b5ce556698230d155ea45bc9099baf330e8
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 14 17:56:23 2025 -0600
+
+    something's cooked -AD
+
+commit 439dbaca2b3435dbcb62bde0805253ac9a345fa2
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 19:56:30 2025 -0600
+
+    backlog upates
+
+commit f2cb9220c1ecd47f4bf0a06e827fff23b1e6d517
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 19:47:23 2025 -0600
+
+    works with different syscalls and looks nice
+
+commit 66c4db82c58095f505762b991f2155466352dca1
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 19:05:01 2025 -0600
+
+    cut down and cleaned up svc code
+
+commit fb4effd635d1b5b0db6cd517f4dc1ff181d724a3
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 18:53:21 2025 -0600
+
+    i think syscalls just work completely now
+
+commit 20503e51915bc233287984e047caea97a300ca55
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 18:18:11 2025 -0600
+
+    syscalls work except for arguments
+
+commit 0afd29709694147f47969fdcc79eef4556f27944
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 18 16:07:31 2025 -0600
+
+    i fucking hate all of you and this stupid fucking architecture
+
+commit b6e5aa85ea6675e0bdd842818ddf56eb8c4c5689
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 17 23:55:29 2025 -0600
+
+    finished dispatcher other than syscall handlers
+
+commit 23b400a156d409d7bef1db5721968eea9575979d
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 17 23:23:32 2025 -0600
+
+    attempts to fix it
+
+commit f05f2d82a87f090a141ea273aa6b21d43183d775
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 23:06:43 2025 -0600
+
+    dispatcher & fixing makefile accordingly
+
+commit 7855582dbfcd779e940bc5842da9e5754bd0572f
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Sat Mar 15 06:48:47 2025 +0000
+
+    just waiting on svc and syscalls now
+
+commit af9b49d87ff9192fbee1869460b6f5a489356d7c
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Thu Mar 13 23:13:26 2025 -0600
+
+    initial commit
+
+commit 459067c128606646f76a72b4a4205142feb8c269
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 23:00:51 2025 -0600
+
+    praise
+
+commit 5125f6217ea94539922ad1435d1bda8aacc72f92
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 22:45:40 2025 -0600
+
+    r0-3 changed to pointer
+
+commit 1bbda8f8426cc0d3ffe72fd826b01b7d8eb99bbe
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 22:34:12 2025 -0600
+
+    fixing compilation errors
+
+commit a98c5fb824b71174572270a91cd9eaad9c5bc8db
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 22:30:06 2025 -0600
+
+    hawk too
+
+commit 83d24be4c6bc9295ac81476297a9d4ebc377d499
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 22:06:18 2025 -0600
+
+    rearranging pcb attribute ordering to make context switching easier
+
+commit 831c01ece6096162df853f918f1d6b7655528817
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 21:53:08 2025 -0600
+
+    fixed kernel stack
+
+commit 070423e0b14a5f4e6777de0d7da20e6461146d8c
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 21:45:32 2025 -0600
+
+    refactoring PCB to hold state for context switching
+
+commit 4e742b918dcb9cb90c8e798da23f2963a9721365
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 20 05:37:18 2025 -0600
+
+    Ethernet Layer Done
+
+commit 01bc663eced54e6030cdc8e294c45a07c17dd505
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 20 05:26:33 2025 -0600
+
+    VERY LONG AND SPECFIC HARDWARE BUG FUXIED
+
+commit 2fbbc50ff752a03a8c08eda8e19c5d935d7b08e3
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 19 16:21:54 2025 -0600
+
+    extracts ethernet frame header from packet
+
+commit b08926c80010385515215c2f4dd31f9eed9c9c0b
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 19 05:52:55 2025 -0600
+
+    getting ready for ethernet layer
+
+commit e5819ed520d75c49722f1bde1510a1c88bbfcb3e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 19 00:08:31 2025 -0600
+
+    small farm but realized transmit wont work without sending packet len in 
+flags
+
+commit 0eb5b579568769babd2236e5bb2ebaeeb2af1577
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Wed Mar 19 05:48:43 2025 +0000
+
+    memset is not included in the api
+
+commit bf1b9b1690681bbab4699b3e96de74903e440e09
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 18 01:16:08 2025 -0600
+
+    prep for merge
+
+commit a38faeb6ea433ea4ebae57ae3b525d83be107a98
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 18 00:54:37 2025 -0600
+
+    LIGHT WORK
+
+commit 48ed6279ad0d40bd5fc8e09312de855e8d90c920
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 18 00:45:28 2025 -0600
+
+    BROOOOOOOO
+
+commit 5def6a42414b736cc7ecc09f870e22b9db5d3261
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 19:12:21 2025 -0600
+
+    polling never let me down
+
+commit 7c4312e7f911d50bc9c368ef316837dd24fee0f1
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 19:00:31 2025 -0600
+
+    interrupts are cooked, switching to polling
+
+commit 4cef402313f8286929d143971660c9052b019ff4
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 17:21:11 2025 -0600
+
+    fixed dma descriptor setup now interrupt just isnt firing
+
+commit 2d5dee66b1572384c926302ecd4f88e5eaa50ca0
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 16:22:55 2025 -0600
+
+    i might have found the issue
+
+commit d7c3aa02db16bb662d6f5bde6e8f5711aeebad7e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 15:43:16 2025 -0600
+
+    ok i can see something now
+
+commit 70876043a15398eee0e34f1b2353522bf117b3a9
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 04:37:03 2025 -0600
+
+    amatuer mistake
+
+commit 6306dea34a2344de882017012dde0d5a115dec73
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 03:57:59 2025 -0600
+
+    working on current bug, something prob wrong with creating ALE entries or 
+setting port mac addrs
+
+commit 3231aac438784c14ed43a734dc85fe588bbe2ad4
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 02:07:45 2025 -0600
+
+    Board is going super sayian
+
+commit 7d7d216e09ec2f065253d58606cc9e887fb091ca
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 01:45:37 2025 -0600
+
+    making movements
+
+commit a496733ddfe3736762471f65022a2fc116a40251
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 01:27:56 2025 -0600
+
+    Added PHY autonegotiating
+
+commit 39aeb6c3eaaceb591cf6a4d44f555d3582162bac
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Mar 16 18:56:23 2025 -0600
+
+    LAN8710A PHY driver started, added read and write capabilites
+
+commit 855313be58010bcd7e4969a03d6d469fed298aee
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Mar 16 17:08:58 2025 -0600
+
+    I found the secret
+
+commit 86c3afe5d7569ad157f08609039aa38857c1961e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Mar 16 15:44:02 2025 -0600
+
+    i think i need to write a new driver for PHY
+
+commit 249bc3781eab9adb6d7978f6c5a141af8cb6df0d
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Mar 16 00:51:24 2025 -0600
+
+    adding check to see if phy is plugged in
+
+commit b56865a6329d1678ad9c60cb1be333524b815873
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 18:48:24 2025 -0600
+
+    fixed all the halting runtime errors
+
+commit 7d63f0fb7afe9337963d35ab128d1eb664edcad9
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 18:05:28 2025 -0600
+
+    let the debugging begin
+
+commit 22795f417017be2c658611015a63b3826f8e7852
+Author: kan728 <kan728@usask.ca>
+Date:   Fri Mar 14 23:09:55 2025 -0600
+
+    lol forgot one change
+
+commit 71eed97805712f657bdbd08646531efe7b11f32b
+Author: kan728 <kan728@usask.ca>
+Date:   Fri Mar 14 23:04:57 2025 -0600
+
+    Adjusted so that each pid is just the proc's index in the process table
+
+commit d26632fcfe9837168872e65a2df516f1ee0fa3f4
+Author: kan728 <kan728@usask.ca>
+Date:   Fri Mar 14 23:02:15 2025 -0600
+
+    Got rid of pid from init process params
+
+commit 36cd7584ec987fbad0f38b346c1340d5002c988b
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 17:07:41 2025 -0600
+
+    mistake
+
+commit 0ba1d9f83258a49f0ce8d67b9a23c109acc8929c
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 17:04:09 2025 -0600
+
+    added debug statments
+
+commit 0aa46301b117a5cb95a81055fb1456147b3d9f54
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 16:49:07 2025 -0600
+
+    cpsw start packet reception
+
+commit e89786c21bddaf53cf1a552e7cb2adf937dc3a75
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 16:43:03 2025 -0600
+
+    cpsw interrupts configed
+
+commit c76b79bea734ee1b2c70049731a524171680195d
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 16:19:27 2025 -0600
+
+    adding interrupt defines
+
+commit 60abc57100345505325ab0b1acb0dd9ba2ea7ea5
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 15:46:28 2025 -0600
+
+    enabling cpdma controllers
+
+commit 382dd7688febae79a731fd53acd9423fa2076328
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 15:31:29 2025 -0600
+
+    allocating buffers for rx channel
+
+commit db0b93ba21c558fdd2f88fac9bcf41bf8e8bc2fe
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 15:06:00 2025 -0600
+
+    added rx and tx channels to eth interface
+
+commit be295ba6fce3be3e244d4ce0fe13ff2a76d7412b
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 07:07:57 2025 -0600
+
+    set descriptor flags
+
+commit 125c1ed98bb595a108f7e7d043d5ae8a47d8878d
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 07:00:21 2025 -0600
+
+    setting tail for channel chains
+
+commit 140269219bc02f0b6708cc9b47da53f89368c001
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 06:40:48 2025 -0600
+
+    CPDMA Descriptor Chains created
+
+commit 171b2a54b46583c009875d15d9750d543d417d51
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 05:54:24 2025 -0600
+
+    slight farm before branching off
+
+commit fe36e7451f9d6689aed3e50bb16df339b7682713
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 23:33:27 2025 -0600
+
+    fixed all compiler errors for cpsw
+
+commit 09882a49aada2c8393a01392731ea7dd647a210f
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Sat Mar 15 06:37:20 2025 +0000
+
+    new biggest mem block is 2048, increased total dynamic mem to 8mb
+
+commit 5d0ed46122427d9b2f2c6388d49f421e2bef98b4
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 23:15:07 2025 -0600
+
+    created data structs for cpdma
+
+commit 0e01373e0fdd4894b93c7d9deee3b3d303d45374
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 16:19:57 2025 -0600
+
+    setting port addrs
+
+commit a5478be63bb001aa40057f40d070fd1b7b98d0eb
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 16:06:40 2025 -0600
+
+    added ale unicast entry
+
+commit 900fa3613c14a6f8c2e4909ba78b2827d974c708
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 15:43:36 2025 -0600
+
+    created multicast ale entry
+
+commit 83c2ff6e1cc628e50b8e9141d01a97dd82c2e5bb
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 14:07:28 2025 -0600
+
+    setting port states
+
+commit 48147c08c681ff81d777970dc8dccde149068d71
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 04:22:31 2025 -0600
+
+    cpsw stats disabled
+
+commit 5675bd82c39649ac0b3adb4ae934ca14511d3e60
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 04:17:39 2025 -0600
+
+    config mdio
+
+commit 2c18d1e1e954c0e39c71a2aa17628a988c23504f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 04:08:13 2025 -0600
+
+    ale configured
+
+commit 69296c36cdcd16851be3046b707a8f1fb2c55429
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 03:55:17 2025 -0600
+
+    inited cpdma descriptors after reset
+
+commit 9b9f5543b2b1e038b38d9f00b3d4e2c9944f8d8c
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 03:39:16 2025 -0600
+
+    software reset cpsw
+
+commit 0ff3c017cf4c62cd5e18fdc162b837c169f47ea4
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 03:15:02 2025 -0600
+
+    enabled cpsw clocks
+
+commit 4eee6838d4f9d3530e4d0665f8cf39bf7cb441a5
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 02:56:22 2025 -0600
+
+    cpsw pinuxing done
+
+commit bcbd277d0d026c8bdb74b6924058dd9c047c3c47
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 02:36:46 2025 -0600
+
+    cpsw selects gmii/mii interface
+
+commit b907340735ba9d52f135c0b89b8cd4a84d866797
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 01:24:49 2025 -0600
+
+    added all registers only missing interrupt registers
+
+commit 65d32de6daa5282be0e3f574168618fb09e49f86
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 00:56:20 2025 -0600
+
+    Added RX and TX channel discriptor pointers
+
+commit e8a1b9c05e215513757386da7c90ba275b08e661
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 00:39:08 2025 -0600
+
+    added Software reset registers
+
+commit cbc4cab6d69817aa00294a450cd11b756026857e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 00:19:45 2025 -0600
+
+    adding control module registers
+
+commit c6c358ab6ca9defbbd8185f764e00ce02b5cdccd
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 13 23:58:22 2025 -0600
+
+    starting cpsw driver
+
+commit 7a4384ca6b5c5adb7ce5ff3f9fce4e11f4a4f0cb
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 20 10:57:45 2025 -0600
+
+    preemption kinda works?
+
+commit 65c2ca47ab62bb46e657ed43bfa99ab79e487329
+Merge: 88dc737 24be87b
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Thu Mar 20 06:01:36 2025 -0600
+
+    Merge branch 'Network' into 'main'
+    
+    Network
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+12
+
+commit 24be87b1b304a0d5047c0997b8b352b41ed35916
+Merge: b16b0aa 88dc737
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Thu Mar 20 06:00:57 2025 -0600
+
+    Merge branch 'main' into 'Network'
+    
+    # Conflicts:
+    #   kernel/main.c
+
+commit b16b0aae07efbda6bbb83325d28c4b44add3ee9f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 20 05:59:08 2025 -0600
+
+    merge prep
+
+commit b8381dbbd47d46a5eec07991186f67806c46f2a7
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 20 05:37:18 2025 -0600
+
+    Ethernet Layer Done
+
+commit 82957b8868fcf76ef31aaf70e279b0865b333ce8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 20 05:26:33 2025 -0600
+
+    VERY LONG AND SPECFIC HARDWARE BUG FUXIED
+
+commit 68ea9d2a017288dbbac065039564e1ed8b57ff05
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Mar 20 01:27:30 2025 -0600
+
+    this is broken....but will fix in a bit
+
+commit 8801a3fd22fc6546d996757ab44e0cb84a56ec2d
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Mar 20 00:23:33 2025 -0600
+
+    initial crack at vfs_close()
+
+commit 1ec45180fd03292873b9c247fa45fe149e844fb9
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Mar 19 21:38:16 2025 -0600
+
+    read_file() done...tests pending
+
+commit 7c3c942d081f5aa81f09e411ef790455cc6fa6f9
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Mar 19 21:15:27 2025 -0600
+
+    did vfs_close()....not tested
+
+commit 160b224528fde9161760aec837aad97d4e520049
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 20:55:22 2025 -0600
+
+    moving order of things in dispatcher
+
+commit b9d319c449df95ac60897751721d4623c1004590
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 20:36:27 2025 -0600
+
+    made it so that interrupts are actually disabled in the kernel
+
+commit 88dc73752ce565b118deb0006c10ba3e2b658bfb
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 19:56:30 2025 -0600
+
+    backlog upates
+
+commit 37a4dc946d688365f9255d27512f2f54a1404505
+Merge: 5e76730 1451d6a
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Wed Mar 19 19:53:31 2025 -0600
+
+    Merge branch 'obliteration' into 'main'
+    
+    syscalls finished
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+11
+
+commit 1451d6a44bfa363669143c4e38329466020195ce
+Merge: 831896d 5e76730
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Wed Mar 19 19:51:42 2025 -0600
+
+    Merge branch 'main' into 'obliteration'
+    
+    # Conflicts:
+    #   Makefile
+    #   kernel/main.c
+
+commit 831896de7ee838cfb2fa9f12cd395bc3cfb0266d
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 19:47:23 2025 -0600
+
+    works with different syscalls and looks nice
+
+commit 1da36c8a09fbb16cf86f255528e870d61c7ce50b
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 19:05:01 2025 -0600
+
+    cut down and cleaned up svc code
+
+commit cdbe1235fe98aba2e98b6ba0edd17d131f7c6431
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 18:53:21 2025 -0600
+
+    i think syscalls just work completely now
+
+commit a0e232aa516b17f65aa9db1c1e0156992b3884ba
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Mar 19 18:18:11 2025 -0600
+
+    syscalls work except for arguments
+
+commit 5b11c5bc46514b0fd5d52dcd02a50eca3ef3fb9f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 19 16:21:54 2025 -0600
+
+    extracts ethernet frame header from packet
+
+commit 78d7fc872a532804b627e1151edcb9653e601f61
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 19 05:52:55 2025 -0600
+
+    getting ready for ethernet layer
+
+commit 7ff890afa64ed3b11631d2ed62c73f285d9e0f8f
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Mar 19 01:20:02 2025 -0600
+
+    completed implementation of vfs level open
+
+commit a5420c3f5e4e997bfdc4c6f1ad494e6fc8813c77
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Mar 19 00:17:44 2025 -0600
+
+    changed get_mountpoint to return pointer instead
+
+commit a8d5f408e6b02e940a0b9c1ec033b9d4559ab5d2
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Mar 19 00:08:31 2025 -0600
+
+    small farm but realized transmit wont work without sending packet len in 
+flags
+
+commit 6579192ec6de96d7f18630e377b4d1dd12026eeb
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 23:51:23 2025 -0600
+
+    implemented get_mountpoint()...testing pending
+
+commit 5e7673085209f88c3c738f9aeb831c905bb62d9f
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Wed Mar 19 05:48:43 2025 +0000
+
+    memset is not included in the api
+
+commit 6805052c861400baa0a89d0f694b30c19ee3ea2c
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 23:26:02 2025 -0600
+
+    added build for string.c
+
+commit 6f4f5d9629de462cb82d49c74fb6b40321c7f797
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 23:25:50 2025 -0600
+
+    added use of strcpy
+
+commit 81c6132a5f71ee624f6d0fbf419ab5d3eb3d2664
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 23:25:32 2025 -0600
+
+    replaced size_t with int
+
+commit e78d37b32b7d6738db2d67d34efe256516a596df
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 23:18:52 2025 -0600
+
+    implemented string functions
+
+commit d236998149145eb8b531af2ed214a452c2922d9a
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 23:08:57 2025 -0600
+
+    function prototypes for string functions
+
+commit 887d41045707f6446ef6983b0d087012571d3654
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 23:04:53 2025 -0600
+
+    added new files to Makefile and got everything to compile
+
+commit 20c5bb45b98d73d73f58950397df246fc1219697
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 18 16:07:31 2025 -0600
+
+    i fucking hate all of you and this stupid fucking architecture
+
+commit 6a93f6866724b95fee146aaf7a6711e316364ddd
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 02:05:48 2025 -0600
+
+    implemented vfs_mount()
+
+commit de0cb10867dc71a8db1d31a96cd25ba731134e12
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 01:48:02 2025 -0600
+
+    added stubs for fat12 ops
+
+commit a505a3da9ea956be69fcda2bfb6412dd921c7a9c
+Merge: 3be132b d8fa047
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Tue Mar 18 01:16:44 2025 -0600
+
+    Merge branch 'Network' into 'main'
+    
+    Network
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+10
+
+commit d8fa047d017882550f45130c8face8fabd6c9085
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 18 01:16:08 2025 -0600
+
+    prep for merge
+
+commit 306af02343b740e06f0689e1f127919f294ec0bf
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 01:07:41 2025 -0600
+
+    stubs for vfs
+
+commit 76f00b7b61941e18f2a8c9d2abb5cfcbb1b7989a
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 01:07:16 2025 -0600
+
+    added missing arg type
+
+commit 68853a32ae51dcff05abc0e790e9a7b215ce8c65
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 18 00:54:37 2025 -0600
+
+    LIGHT WORK
+
+commit 27c58b6706c4e747cd8a26a03ad536387bde201c
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Mar 18 00:45:28 2025 -0600
+
+    BROOOOOOOO
+
+commit a6f9217e49fd175c9c5d4e333cde9d38b1743022
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Mar 18 00:40:21 2025 -0600
+
+    finalized structs and consts for vfs
+
+commit ff18da0119b4ec10667246884de7c00464972102
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 17 23:55:29 2025 -0600
+
+    finished dispatcher other than syscall handlers
+
+commit 7cc56dc86f7fb24bb50551cfc6af56078d798615
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Mar 17 23:23:32 2025 -0600
+
+    attempts to fix it
+
+commit a6134d5f7ddbee9e6ac11287a1a13c58f5075130
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 23:06:43 2025 -0600
+
+    dispatcher & fixing makefile accordingly
+
+commit 49264050191769dd7e623bdb440ba005242eff3a
+Merge: 4d85ad5 1a54a09
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 23:01:52 2025 -0600
+
+    Merge remote-tracking branch 'origin/dispatcher' into obliteration
+
+commit 4d85ad520f0bbf561b29ab13dedc0d7ab00e236c
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 23:00:51 2025 -0600
+
+    praise
+
+commit faa4efc4c56c08fbde90bda47f02b469e9ae98e8
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 22:45:40 2025 -0600
+
+    r0-3 changed to pointer
+
+commit 419ff9d938a8232d11b072a93f97ff6a0d9a9f0f
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 22:34:12 2025 -0600
+
+    fixing compilation errors
+
+commit 25a90e9d4e9f83d1f1f8e136f3af18b9bcff77b8
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 22:30:06 2025 -0600
+
+    hawk too
+
+commit 33c065dc746d0e05401c887d999e586a7ccd1ae3
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 22:06:18 2025 -0600
+
+    rearranging pcb attribute ordering to make context switching easier
+
+commit af3d1394cf034ed9a389b3f6f2f2b5a8875f521f
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 21:53:08 2025 -0600
+
+    fixed kernel stack
+
+commit 01fe19e11da1b3424717703ed80afbed43e58879
+Author: Emily <job346@usask.ca>
+Date:   Mon Mar 17 21:45:32 2025 -0600
+
+    refactoring PCB to hold state for context switching
+
+commit 3be132b5ea5e8a04a5aa97616beefd507b1ea58e
+Merge: 61f380c 850c5f7
+Author: Abdullah Abdullah (kan728) <kan728@mail.usask.ca>
+Date:   Mon Mar 17 21:30:51 2025 -0600
+
+    Merge branch 'pidindex' into 'main'
+    
+    Pidindex
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+9
+
+commit 84101dfb72ccba7182cf3ccf9ac36ad2abfbf15f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 19:12:21 2025 -0600
+
+    polling never let me down
+
+commit 7b565c67a049de8469beb105158f0576196331dc
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 19:00:31 2025 -0600
+
+    interrupts are cooked, switching to polling
+
+commit d29763f76dd4f7d33e8dc7072323a66a7793c77e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 17:21:11 2025 -0600
+
+    fixed dma descriptor setup now interrupt just isnt firing
+
+commit 2d1ad831b4f6be980aa0d784c2b0fbcd1b97f4f1
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 16:22:55 2025 -0600
+
+    i might have found the issue
+
+commit 988219f14ba6654675b38ee29f5cee52092cc6a6
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 15:43:16 2025 -0600
+
+    ok i can see something now
+
+commit 227647d2ef0da44fcdfa22d549bc0b08ddc2ee28
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 04:37:03 2025 -0600
+
+    amatuer mistake
+
+commit 7bf3406d9da758bc894965cebdf40a91ad8bc80e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 03:57:59 2025 -0600
+
+    working on current bug, something prob wrong with creating ALE entries or 
+setting port mac addrs
+
+commit b1ffa67ff74c41811ecabc09f09b60b5f034edf1
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 02:07:45 2025 -0600
+
+    Board is going super sayian
+
+commit 230a53d6554a0179d7c68fea1ca5224b4e34fbf8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 01:45:37 2025 -0600
+
+    making movements
+
+commit e7f0e270d96654e885ca7d8cc5e2a2850ce33610
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Mar 17 01:27:56 2025 -0600
+
+    Added PHY autonegotiating
+
+commit 9acfce7f12f698e512ef0566ac7e8ba73e262065
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sun Mar 16 22:45:04 2025 -0600
+
+    write file finally working man
+
+commit a71b413449306acb103aa4674f613afca2d2c909
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sun Mar 16 22:44:47 2025 -0600
+
+    added prototype for write file
+
+commit 6dc1bdcc724b4b879bb5ba83ffbb949bd4c31bb8
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sun Mar 16 20:51:39 2025 -0600
+
+    fixed complier errors + warnings
+
+commit 3c653509b2861c61afdb3a0431d870c8e0a0da73
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sun Mar 16 20:46:54 2025 -0600
+
+    first stab at write_file
+
+commit 771a7aa02babacd222baabca396c46b960d3847e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Mar 16 18:56:23 2025 -0600
+
+    LAN8710A PHY driver started, added read and write capabilites
+
+commit 39cfdb026afd4369fbf9df15e573337fbb50cbe8
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sun Mar 16 18:11:13 2025 -0600
+
+    fat12_set_next should be working right....idk man
+
+commit ba28afa5326468d4e68da25355d5cf0f3d891c59
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Mar 16 17:08:58 2025 -0600
+
+    I found the secret
+
+commit 9bb8723bebc221e0cbc4b8d87137bb47d19fdb3f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Mar 16 15:44:02 2025 -0600
+
+    i think i need to write a new driver for PHY
+
+commit 4497e3ddf509fa08c9e494e48253a728f1c5638e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Mar 16 00:51:24 2025 -0600
+
+    adding check to see if phy is plugged in
+
+commit 9adebbcfb5897c1f9e6da412d637eaf0f206302e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 18:48:24 2025 -0600
+
+    fixed all the halting runtime errors
+
+commit cc631b886d3cdc5e72863f68d76c32b2b34d4495
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 18:05:28 2025 -0600
+
+    let the debugging begin
+
+commit 61f380c067f7d003745a044e9302bac923eb6c7f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 17:07:41 2025 -0600
+
+    mistake
+
+commit fcae4a46e93fa795a5233ef6fbcda84f0354d4fb
+Merge: 448acb2 e40bb68
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Sat Mar 15 17:05:03 2025 -0600
+
+    Merge branch 'Network' into 'main'
+    
+    Network
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+8
+
+commit e40bb6877f6877a5bd954b467317868af4323ec0
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 17:04:09 2025 -0600
+
+    added debug statments
+
+commit 53c3b0f702c6cb032410102b1cad505c5b0a0913
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 16:49:07 2025 -0600
+
+    cpsw start packet reception
+
+commit a857ba0825cd29ace37a8afbe8539131b0ce18f8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 16:43:03 2025 -0600
+
+    cpsw interrupts configed
+
+commit 797591718101678bcdc27df75fc071197d7afcac
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 16:19:27 2025 -0600
+
+    adding interrupt defines
+
+commit 3079a48d65fc83ae5f8042fc0fea2c3ea3a1a5f5
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 15:46:28 2025 -0600
+
+    enabling cpdma controllers
+
+commit d17431b4c8f1fe6fe21ddc78c6d87e4f424f2c16
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 15:31:29 2025 -0600
+
+    allocating buffers for rx channel
+
+commit 1c154e0877d444310f7c90197dc9c5729592200a
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sat Mar 15 15:13:58 2025 -0600
+
+    refactored fat12_find() to take pointer to dirEntry as arg
+
+commit d26f0ff6eb99a835c18f8281bd0b867384abac27
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 15:06:00 2025 -0600
+
+    added rx and tx channels to eth interface
+
+commit 74282aa701ad64fe8841f0eb33b72f559ea34684
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sat Mar 15 11:49:48 2025 -0600
+
+    fixed folder name issue
+
+commit 84739bebd1a64bf23dc264ed05bcc90dcbabb408
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sat Mar 15 11:29:56 2025 -0600
+
+    marking cluster as used
+
+commit c472a561b0ac871330c20624cc8feeae8bb07bca
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sat Mar 15 11:11:39 2025 -0600
+
+    create seems to be working now
+
+commit e624d82667b82eba90cc97ef1ccf9e0cb9da636d
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 07:07:57 2025 -0600
+
+    set descriptor flags
+
+commit 937d19625e074c20cd96647d9fde01499576354b
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 07:00:21 2025 -0600
+
+    setting tail for channel chains
+
+commit af4433cbeb0c0db13cc9d70239414852987c7176
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 06:40:48 2025 -0600
+
+    CPDMA Descriptor Chains created
+
+commit 448acb2be9eaeb0ddf6a3a0e301dc523beecd495
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Mar 15 05:54:24 2025 -0600
+
+    slight farm before branching off
+
+commit 599a8f6a39993db9a18fcfe9438cf533d1ea7cdc
+Merge: cf53e43 02fadd3
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Sat Mar 15 05:47:37 2025 -0600
+
+    Merge branch 'Network' into 'main'
+    
+    fixed all compiler errors for cpsw
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+7
+
+commit 0a8737ac6d375e64ee2b82da924e0c423a5a815a
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Sat Mar 15 01:20:38 2025 -0600
+
+    implemented reply (untested)
+
+commit d8f714dfec81869df2b2c9f8c831039ca13376a2
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Sat Mar 15 01:10:42 2025 -0600
+
+    implemented receive (untested)
+
+commit 70902730df097657ad949594b661e7a061984a4a
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Sat Mar 15 00:51:20 2025 -0600
+
+    send will now wake up the receigver if needed
+
+commit 1a54a092f02e66f4b65a18ebc46a74c44dc384e3
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Sat Mar 15 06:48:47 2025 +0000
+
+    just waiting on svc and syscalls now
+
+commit cf53e43c43dd9fd4ee7345d7d307a2ad5093dbb3
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Sat Mar 15 06:37:20 2025 +0000
+
+    new biggest mem block is 2048, increased total dynamic mem to 8mb
+
+commit 02fadd35e080f0788a906755ce26c4d03bad0bd1
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 23:33:27 2025 -0600
+
+    fixed all compiler errors for cpsw
+
+commit b2c68189ce8c8336fa1cd6505e2dfbd1e4af4f78
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 14 23:21:55 2025 -0600
+
+    added deadlock error code
+
+commit 323738d28c123a84308aa45219a05d6c0af3e164
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 14 23:21:40 2025 -0600
+
+    updated stubs and added a stub to check if there is mail
+
+commit a16ed7ca2e31b84d80eaad4298f565de4949e15b
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 14 23:21:12 2025 -0600
+
+    added some helper function stubs
+
+commit 7f10b5aab0c68bec09b9a7ad752134044084f0a9
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Fri Mar 14 23:20:43 2025 -0600
+
+    implemented send ipc call
+
+commit 2262d953b9542234636bae7f55d62dfba7eb0ca7
+Merge: afb002c e007506
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Fri Mar 14 23:16:52 2025 -0600
+
+    Merge branch 'Network' into 'main'
+    
+    Network
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+5
+
+commit e007506c2d4e0aac2540a397508a17d00d9483ec
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 23:15:07 2025 -0600
+
+    created data structs for cpdma
+
+commit 850c5f7ccefe4e2acbf8193d89f3a90e364cad0b
+Author: kan728 <kan728@usask.ca>
+Date:   Fri Mar 14 23:09:55 2025 -0600
+
+    lol forgot one change
+
+commit da01413fd49ab63c6f5f8ce558ec0b8e2914b93e
+Author: kan728 <kan728@usask.ca>
+Date:   Fri Mar 14 23:04:57 2025 -0600
+
+    Adjusted so that each pid is just the proc's index in the process table
+
+commit 89a45d9f635b6689519ff9facbd137fcc5bf7ccd
+Author: kan728 <kan728@usask.ca>
+Date:   Fri Mar 14 23:02:15 2025 -0600
+
+    Got rid of pid from init process params
+
+commit 9fb8683106b561e142be83ebf42266ebac87011b
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 14 17:56:23 2025 -0600
+
+    something's cooked -AD
+
+commit 94741bd68a891a13fb488c1fb3790ff9ae06008f
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 14 17:05:51 2025 -0600
+
+    helper function split filenames -AD
+
+commit babc8ec21b36afd9c324f26a4e5e5dfbbca47716
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 16:19:57 2025 -0600
+
+    setting port addrs
+
+commit 61e592af6540bd577d5d74d6691a9d0b5e40a8be
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Fri Mar 14 16:12:40 2025 -0600
+
+    Added file attributes -AD
+
+commit 7bedb27f72d1a48ede1a7f74d1dd3e1fce75025f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 16:06:40 2025 -0600
+
+    added ale unicast entry
+
+commit f54349b8927375107ab74f0d2a3fd69c978b21c8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 15:43:36 2025 -0600
+
+    created multicast ale entry
+
+commit 6a9fe8d8057911f5931422e25afd429bb8863921
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 14:07:28 2025 -0600
+
+    setting port states
+
+commit a98e692ab6a4c71fc91909cefd23c00e0b001f4f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 04:22:31 2025 -0600
+
+    cpsw stats disabled
+
+commit 42606d05de872a354b3e20cf9996a86cfa1f99f4
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 04:17:39 2025 -0600
+
+    config mdio
+
+commit 13abbafa80cffa0f6fb634184f780350598041c9
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 04:08:13 2025 -0600
+
+    ale configured
+
+commit 1174668235cdc44dda21a853aae71f99918a1113
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 03:55:17 2025 -0600
+
+    inited cpdma descriptors after reset
+
+commit 81fe6841bfc552e65e5bb5aff5f0c3636a4f10db
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 03:39:16 2025 -0600
+
+    software reset cpsw
+
+commit d357c67e3eee4c16eb8930249cc55bf33918151b
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 03:15:02 2025 -0600
+
+    enabled cpsw clocks
+
+commit 2f8b87d97049aae0e7b04e28456fad9d70be5c91
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 02:56:22 2025 -0600
+
+    cpsw pinuxing done
+
+commit eeb59ad7663693e8f7133a8cd545101d9ef968e6
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 02:36:46 2025 -0600
+
+    cpsw selects gmii/mii interface
+
+commit 679692495eb22f1e0a77c29c4a27138f05e68c59
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 01:24:49 2025 -0600
+
+    added all registers only missing interrupt registers
+
+commit 2935d15cadad87d62f90936c356ee069cc6fdaf2
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 00:56:20 2025 -0600
+
+    Added RX and TX channel discriptor pointers
+
+commit 4fb861f35f6328bd5d067179c23bdb10d01ddea8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 00:39:08 2025 -0600
+
+    added Software reset registers
+
+commit 0728343da17f01be79854dbc433008a8378ce912
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Mar 14 00:19:45 2025 -0600
+
+    adding control module registers
+
+commit a436528fc840f3fd77886ed83cf0a3c3a2493e3f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 13 23:58:22 2025 -0600
+
+    starting cpsw driver
+
+commit 255a3ead3427767e570f33094e5ed173f183b0e4
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Mar 13 23:24:20 2025 -0600
+
+    reverted
+
+commit 67014b310ef05f52a8403c43095c6ff23a7cd6aa
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Mar 13 23:04:16 2025 -0600
+
+    stub for create entry
+
+commit ab484c03bdca31007441a0b72c3820ceba692b7d
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Mar 13 22:15:04 2025 -0600
+
+    moved fat12.c
+
+commit f0e1a84596e70416da96024c941758758bdcd8e9
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Mar 13 22:14:18 2025 -0600
+
+    fixed compile errors
+
+commit 772bb8b62a0eeb3b2c635fad767ee394e1547824
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Thu Mar 13 23:13:26 2025 -0600
+
+    initial commit
+
+commit afb002cd5268a4b75fe61bd75695b97f9d1ae007
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 13 22:39:37 2025 -0600
+
+    made error codes for syscalls
+
+commit 0182f062f65997398c764b5f9dae7342cf2966b2
+Author: kan728 <kan728@usask.ca>
+Date:   Thu Mar 13 22:39:23 2025 -0600
+
+    Fixed everything
+
+commit 019e645e087f9c9d775b415cce53b5b2ec7c13fd
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Mar 13 22:26:23 2025 -0600
+
+    fixing compiler errors
+
+commit 1ac2935e9724f89317cd9f13dbb06558ff8c56dc
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 13 22:24:12 2025 -0600
+
+    fixed typo
+
+commit 8b91e0461577c44a72a4c1972e895b5c8e0114c2
+Author: kan728 <kan728@usask.ca>
+Date:   Thu Mar 13 22:18:01 2025 -0600
+
+    Added mailbox to proc struct
+
+commit 96bb7295f6a83105f0e52f1d2ed73f93bb896b1d
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 13 21:54:26 2025 -0600
+
+    added function stubs
+
+commit 41d66f7a296d49e30d1e1244cd7a4890ab2144cb
+Author: Diego Cabrera Pell <diegocabrerapell@gmail.com>
+Date:   Thu Mar 13 18:15:49 2025 -0600
+
+    bringing IPC header from the dead kernel branch cause it got missed
+
+commit ca8ceaa66c0a54e3fc4247330c94a278dfbd435f
+Merge: 356e2ff 236b271
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Thu Mar 13 16:55:12 2025 -0600
+
+    Merge branch 'kernel-obliteration' into 'main'
+    
+    merged methinks
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+4
+
+commit 236b27151fc82e453826abc53978967fe7fc51ce
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 13 16:52:22 2025 -0600
+
+    merged methinks
+
+commit 356e2ffd80c9e860541d006071cdeed18d6c656c
+Merge: ca9168c 7c9472f
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Thu Mar 13 16:37:58 2025 -0600
+
+    Merge branch 'idt' into 'main'
+    
+    Idt
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+3
+
+commit 7c9472f40de44e7b944d49a8451ed7b87912d883
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Thu Mar 13 22:13:48 2025 +0000
+
+    basic implementation based on current task struct
+
+commit b6a6b5896630c83131a8b04cbc160310a5534ac5
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 13 15:06:33 2025 -0600
+
+    syscalls mostly work
+
+commit 4ef616ce67a28b31ea8a7cb662c96e2d7b5f7e3e
+Author: Emily Hartz-Kuzmicz (job346) <job346@mail.usask.ca>
+Date:   Thu Mar 13 14:35:07 2025 -0600
+
+    nevermind man
+
+commit fee1705d11aad549b241b09691f598655430c233
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Thu Mar 13 20:31:39 2025 +0000
+
+    working on syscalls
+
+commit 863d00a7318667d9a8ce8702642085f946016a17
+Author: Emily Hartz-Kuzmicz (job346) <job346@mail.usask.ca>
+Date:   Thu Mar 13 14:31:07 2025 -0600
+
+    extern global process table
+
+commit 198342d830927c99dd2156550fc584e71f9ced28
+Author: Emily Hartz-Kuzmicz (job346) <job346@mail.usask.ca>
+Date:   Thu Mar 13 14:27:38 2025 -0600
+
+    extern current PCB
+
+commit 71a3245a96525beb63b4372a6c2b32f268c145dc
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 13 10:44:39 2025 -0600
+
+    misc comments mostly
+
+commit 7386efca3dada06e5364f36d33fee041f2b4807e
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 13 10:14:20 2025 -0600
+
+    comments and refactoring
+
+commit 92bdc155d835580248f5e0f1def121e4ecc5a5b4
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 13 10:01:09 2025 -0600
+
+    finished syscall handler, next is just stubs
+
+commit 5e26fced6c58c94b51834280ac36777719b4ca36
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 13 09:37:43 2025 -0600
+
+    much nicer way to do syscalls
+
+commit fb94f4393d2ac46cd8effebeba4244329af6d8fa
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Mar 13 09:21:30 2025 -0600
+
+    syscalls work except for return values
+
+commit ca9168cec2b2a09bbdc12997fad753a0c47b1e48
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Wed Mar 12 16:58:55 2025 -0600
+
+    error checking that i forgor
+
+commit de8f17abb50be7835b1108383ca34ffccdee8293
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Wed Mar 12 18:04:15 2025 +0000
+
+    syscall stubs
+
+commit f9da1632c411089cf4a26a0aaec7a4503ed2ae93
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Wed Mar 12 17:29:02 2025 +0000
+
+    kinda farming
+
+commit 1bf429d8eb316464a461bfdd856708095803cdf2
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 11 16:56:14 2025 -0600
+
+    done svc vector
+
+commit a724ffcf440ff22068d241975f5d8114ae886b6d
+Author: kevinzhang3 <kzhang366@gmail.com>
+Date:   Tue Mar 11 21:19:32 2025 +0000
+
+    backlog updated
+
+commit 296260a8aca7587daf2e941e46f45cd7554156a0
+Merge: 99931d1 deaf2aa
+Author: Alexei Doell (cka067) <cka067@mail.usask.ca>
+Date:   Tue Mar 11 15:13:47 2025 -0600
+
+    Merge branch 'kevinbrick' into 'main'
+    
+    fixed allocator init
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+2
+
+commit deaf2aa334dd72be78eae5a51547bb604bc974f0
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Tue Mar 11 15:13:19 2025 -0600
+
+    fixed allocator init
+
+commit 99931d1651ccd768dc90ea2424c4bff57069b245
+Merge: cc53995 e520bbf
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Mon Mar 10 16:29:28 2025 -0600
+
+    Merge branch 'Fusion' into 'main'
+    
+    Fusion
+    
+    See merge request 
+cmpt-432-winter2025/cmpt-432-implementation-teams/cmpt432-implementation-team00!
+1
+
+commit e520bbfff79e548d8d049e2a56e241a9f3ac2aac
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 23 21:46:03 2025 -0600
+
+    kernel semi ported, only mem init not working yet
+
+commit 70ba2429498f120559664e137940b510fb92f2f5
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 23 21:20:11 2025 -0600
+
+    UART PRINT WORKS MAN IM GONNA CRY THANK YOU AARON
+
+commit 5d9adbbf6433b50678034501f2d1a82379a5ac63
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sun Feb 23 21:08:35 2025 -0600
+
+    Fixed fat table buffer size -AD
+
+commit 41befa5f4d045b3b578735e09291cf87da6db030
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 23 17:09:52 2025 -0600
+
+    found the issue, its in our fat12 getnextcluster function
+
+commit 6a54ab12aeda520d2b73c70c0ea418e434f40309
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 23 16:30:48 2025 -0600
+
+    adjusted stack
+
+commit 4a92261ae75119a01009205256d93ef389e353a8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 23 16:09:59 2025 -0600
+
+    hold on hold on
+
+commit 957d5bd0fdd1ae254a37db5faa1dffeac324e0f3
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 23 16:02:47 2025 -0600
+
+    attempting bandaid solution
+
+commit a0689098e49eaf3336219f41fbb83ba2ab7c5f77
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 23 15:52:31 2025 -0600
+
+    found the issue, no clue how to fix it
+
+commit a10f7615dd9a2f200451f910337c1b462b637286
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sun Feb 23 00:38:11 2025 -0600
+
+    stack overflow fixed *face palms* -AD
+
+commit 3b7536bf1ac25f217f7f0f688ca9f41aaf06da11
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sat Feb 22 23:22:26 2025 -0600
+
+    Refactored fat12 api to be more user friendly -AD
+
+commit 4ef2dcccb88dc1629261f6e9d0f6092384ef397a
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 21 18:39:05 2025 -0600
+
+    dude bootloader is done, some small issues with our gpio (uart/leds)
+
+commit 3d6e0690a19b26673d0d44922ebafc1c67e2e0a3
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 21 18:01:11 2025 -0600
+
+    making strides, i think its jumping to kernel now but the uart print causes 
+another fault
+
+commit 079a9d834c4e47f81c89a1dd71811a7c565396ae
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 21 17:09:00 2025 -0600
+
+    so close yet so far
+
+commit ef29811b4b9d492a5a51c0de802104a69197de42
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 21 15:58:45 2025 -0600
+
+    tried to enable clocks but that didint fix anyhting
+
+commit 0dee31633a7c81f3bf5c3efecde9c3987ef92653
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 21 00:52:53 2025 -0600
+
+    attempting to jump to kernel
+
+commit dbd7b85701f2c2dc24d00894d34fbb52f50fffc4
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 21 00:34:09 2025 -0600
+
+    loading test kernel using FAT
+
+commit db14d61f88c8051c86a4f1818fc11ea0e2f53db0
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Thu Feb 20 23:53:08 2025 -0600
+
+    Fixed testing fat12. -NP
+
+commit 6ab916e5508ee3e28d601926cccea11edb75e900
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Feb 20 23:26:33 2025 -0600
+
+    commented out a bunch of buffers in main that caused stack overflow -AD
+
+commit ad2297a9fe793c505ff5886a6643d16dca3fc8ba
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 20 22:52:48 2025 -0600
+
+    whole lot of embbeded ** happening rn
+
+commit 01bb7c5b7a1cc74cfb56d80cb132be460f14e082
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 20 22:22:16 2025 -0600
+
+    added id for exception types
+
+commit 9750c2cc5cac44a3f2e3e21107ccd7500d00640a
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 20 22:01:52 2025 -0600
+
+    added general exception handler
+
+commit 6170ed6ff8ea97359836bb15de8c575d74f2a2d7
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Thu Feb 20 21:22:11 2025 -0600
+
+    er im cooked. -NP
+
+commit 7f2b5296413977cb4d2edd8bd44c9cc3911a0374
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Thu Feb 20 16:02:07 2025 -0600
+
+    Implemented fat12_read_file. -NP
+
+commit 29b55d3709006a007c133cbfa29514198c2dc46e
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Thu Feb 20 15:37:07 2025 -0600
+
+    Added FAT12 entry values definitions. -NP
+
+commit 653c9e32915b1d987f57cf94684502dba5924e22
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Feb 20 14:22:41 2025 -0600
+
+    Added lines to create test file to put on the sd card
+
+commit d19511bfa28b697e5a6b7d8cbc961084205ee003
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Feb 20 14:21:55 2025 -0600
+
+    Took out test code that wrote to block 1 and added test code for find_file
+
+commit a74fd1c29ad68885d5781edb2c033dc3dc4d2a6b
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Thu Feb 20 14:21:29 2025 -0600
+
+    find_file finally working -AD
+
+commit 94d9b989c425ebb7ecc69999dba343127cd63d32
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Feb 19 23:41:14 2025 -0600
+
+    marwan noah pls help.....
+
+commit 3b698f74ceab99f9073d38422409c4997354ec41
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Feb 19 20:38:56 2025 -0600
+
+    got compare filesnames working -AD
+
+commit 27d62b3fa29d848f742ae7453ad785344af9f665
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Feb 19 19:26:19 2025 -0600
+
+    Got root dir parsing working
+
+commit 8606bd153b6a297e49b982489e47a74757fbaa17
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Wed Feb 19 19:21:43 2025 -0600
+
+    Added dir entry struct -AD
+
+commit c1e673cbdb8ca103b2bb181ccdb00f3cb563e28b
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Feb 18 13:47:47 2025 -0600
+
+    got stub for find_file in there
+
+commit d0ef246717a254ff87838885315f46d97ffcebc5
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Feb 18 13:00:54 2025 -0600
+
+    Moved header file to correct dir
+
+commit 358cffc529b99923d695b2ead4bd86e0cd8107ab
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Tue Feb 18 11:54:32 2025 -0600
+
+    Updated design plan for fat 12 ops
+
+commit 46750601ff38ef032fedaa77d26ccaacc38a62e4
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Mon Feb 17 23:06:34 2025 -0600
+
+    init fat12. -NP
+
+commit 19c949e82b3df015b713c69a08ed92a33b33c2e7
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Mon Feb 17 19:40:55 2025 -0600
+
+    Added extended block sector for FAT12. -NP
+
+commit 6f961f50ed7fd497d6e42d493af9e14915db0db5
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Mon Feb 17 19:23:29 2025 -0600
+
+    Dibs on FAT. -NP
+
+commit 4e3cb662705b474af091b0a1a88ece3ce6e64095
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Feb 15 04:00:06 2025 -0600
+
+    someone tell me why all my bugs just get fixed by adding a random print 
+statment
+
+commit 9429c6571c7cd26a25ae3163916368eec80e5d2f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Feb 15 03:32:26 2025 -0600
+
+    someone take the board away from me
+
+commit 803789fc2e6f3acb8c6472823567ddcaa0f85549
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 14 02:49:21 2025 -0600
+
+    we need to clean up our code before we move onto kernel phase
+
+commit 075146dce6f186c98aee0f29a9c06877c02570dd
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 14 02:36:15 2025 -0600
+
+    it actually works, mb my code is super messy but the sd card driver is done
+
+commit 90a735ee51cb1e16b04d98226c9d3aa0c9cb78ed
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 14 02:24:43 2025 -0600
+
+    mmc write and read functions semi working i think, needs more testing
+
+commit c28057f2909f290ea6887599cf549f77dfa7fbd8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 14 00:11:02 2025 -0600
+
+    sd card driver initalization done!
+
+commit d1f7f47972d26effb68eec8f4e221452bbbd627e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 14 00:06:03 2025 -0600
+
+    i think its finally done, the initing...
+
+commit c782060599f6cecf5a52600cda629a3c9b0b485e
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 13 23:19:23 2025 -0600
+
+    sd power on function down and working, this is so long and tedious
+
+commit 1b20d3a7dea53b2d3baedd56c71fdc2e573bf807
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Thu Feb 13 22:37:23 2025 -0600
+
+    Master Marwy said done printf for now. -NP
+
+commit 54ccdb2c57dd6b662684c8999cc1d610427993eb
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 13 22:24:18 2025 -0600
+
+    completed id of card, checks if card is compliant with standard version 2.0
+
+commit 1481fd2f65fd73d458be649f604797920acf10f3
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Thu Feb 13 22:12:40 2025 -0600
+
+    Fixed printf int format specifier. -NP
+
+commit 9879958d6382bd79c584381572c5862e00abf3b9
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 13 21:33:37 2025 -0600
+
+    mmc send cmd function finished
+
+commit 4b38c8e4ec394cee22d391a54223e9bf4bd7f4ad
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 13 21:11:17 2025 -0600
+
+    fixed the bug, cna now send cmds to the mmc card
+
+commit 75cc80fd2e712946b381abebd6fe4fcb462b010b
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 13 15:44:59 2025 -0600
+
+    fixed the need to use the print statments to work
+
+commit 355a7c41c3cf19afd961cfb977fdd34f7c88911b
+Author: Noah Phonsavath <root@LAPTOP-O5KM9O8H.>
+Date:   Thu Feb 13 12:39:43 2025 -0600
+
+    Added itoa, testing, float implementation, and refactoring to follow. -NP
+
+commit 6a3d0c4025bac6442b5421cb416e43a208f7faef
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 13 04:18:05 2025 -0600
+
+    this is actually kinda crazy, if any of the print statments get removed it 
+breaks
+
+commit bbe64b61c7c8e9ee2e2bb2e63ddabb7edec8f0e8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 13 04:09:29 2025 -0600
+
+    DONT TOUCH THE MMC INITSEQUENCE CODE, IF ANYTHING CHANGES IT BREAKS EVEN 
+THE PRINT STATMENTS
+
+commit 22c54f593000c2b2055426b3ef006f9ff90578f0
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 13 01:57:11 2025 -0600
+
+    i think the long process of initing the mmc is over, no clue if it works tho
+
+commit 801c94dd37f17ce288c2ab3780cf509b4c5b4f72
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 13 01:05:18 2025 -0600
+
+    mmc host bus config fone
+
+commit 8191eabdd8eae10ac37488b380523f305450e619
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Wed Feb 12 22:09:22 2025 -0600
+
+    Think the char issue is fixed... idk -NP
+
+commit e8fb9b610e7b13a56d2e8221f2c1bc809e0cc6a2
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Wed Feb 12 21:59:37 2025 -0600
+
+    uart0_printf WIP, weird issue with char as well. -NP
+
+commit cd465f832d0faf0db41f2936143bef62808883ca
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Feb 12 01:53:11 2025 -0600
+
+    sd card wake up confgi set
+
+commit 1b5a3a05e09f93300ad5f911f79f2447e56cbbe5
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Feb 12 01:29:17 2025 -0600
+
+    set hardware capabilites
+
+commit a84b682ad7686b949f2552229d295e9c94b278b3
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Feb 12 00:58:40 2025 -0600
+
+    software reset working
+
+commit cb522a27f5ac254f9213dc6456a97def00ccdd61
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Feb 11 23:37:16 2025 -0600
+
+    starting mmc driver init
+
+commit c0536a5327be38753908ef22f131f398f02b2666
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Feb 11 15:15:08 2025 -0600
+
+    starting mem map for mmc
+
+commit 2a6bee8cf12e47c71c79a67c6c1060476eb9d0b2
+Author: root <root@LAPTOP-O5KM9O8H.>
+Date:   Tue Feb 11 13:02:21 2025 -0600
+
+    Added variable argument list defines needed for printf function later. -NP
+
+commit d67f9e3c139cf981ff2388bb8e36d30a94045dfd
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Tue Feb 11 00:41:29 2025 -0600
+
+    added core pll init, didnt test it yet if it dosent work comment it out
+
+commit 33d57a7fa0cabd0e29f0455c3d95e66565eae699
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Tue Feb 11 00:30:20 2025 -0600
+
+    Edit BACKLOG.txt
+
+commit df32af68afb0b865e21de294c871c6a3a0538d6d
+Author: Noah Phonsavath (nop028) <noah.phonsavath@usask.ca>
+Date:   Mon Feb 10 20:24:37 2025 -0600
+
+    Updated BACKLOG.txt. -NP
+
+commit 169f7ea19b1efdb738c741a6dc951eb34a3f352b
+Author: root <root@LAPTOP-O5KM9O8H.>
+Date:   Mon Feb 10 20:23:22 2025 -0600
+
+    Added uart0 test and doc. -NP
+
+commit 8c3d2cf1ed1c27c9c9eb5a337c48861e80bb9819
+Author: root <root@LAPTOP-O5KM9O8H.>
+Date:   Mon Feb 10 16:48:28 2025 -0600
+
+    Added uart0 tests and uart0_putsln. -NP
+
+commit 81808cb567dd04217887619d13125bd7258558a3
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Mon Feb 10 16:21:47 2025 -0600
+
+    Edit boot.ld
+
+commit 09112b627d42b5beb0bcb97b0b27bb6ba4df4f86
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Feb 10 16:12:05 2025 -0600
+
+    HEADER ALIGNEMENT AND VECTOR TABLE BUG FIXED
+
+commit de388badc80cb7c8a0046b8b6d2a7c722b47b3d2
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Feb 10 11:30:23 2025 -0600
+
+    updated linker
+
+commit 9ef563e5776dc95bc8f4d406ab506f9d99ec9487
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Feb 10 11:28:23 2025 -0600
+
+    bandaid sloution for our printing strings issue
+
+commit 14332c263bb9d13b91230b4cd6a09d8b09e059c0
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Feb 10 11:05:29 2025 -0600
+
+    taking credit for my achievements
+
+commit c2f36356ffd7741b9d5f72e15939dddf1393c58f
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Mon Feb 10 11:04:57 2025 -0600
+
+    Edit BACKLOG.txt
+
+commit c4e7ab166daaa9d80a28cd016f913c57df4c56bc
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Feb 10 10:53:34 2025 -0600
+
+    forgot to call helpers
+
+commit 7f532fe1897ab3754359bd2b8621cd9a98714626
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Feb 10 10:52:45 2025 -0600
+
+    emif init
+
+commit cf202ef018ad1c8c9d88ad86b2587c9e8270a8c8
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Mon Feb 10 10:40:08 2025 -0600
+
+    ddr init ?
+
+commit 1a510dde9c45699f73459710831e5aa158ff8daf
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Mon Feb 10 00:24:28 2025 -0600
+
+    redeemtion
+
+commit 521d641c79c4627713d8fdd919e49bd669a44b9f
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 9 21:56:48 2025 -0600
+
+    clock initing done
+
+commit 02a995afab9fbcb4f59ab4d46506bd1b48dc02ba
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 9 21:42:36 2025 -0600
+
+    think i got all the code down for clock init gotta test it now
+
+commit bcbc8ec38bbceb6e97278bc355ed2a996fbbaa1b
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 9 20:53:02 2025 -0600
+
+    startinf clock inits
+
+commit 3427ce53cfdf1654f4534e28ca174be3a640ee62
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sun Feb 9 01:30:55 2025 -0600
+
+    created memmap for the 4 clocks we need to init
+
+commit f3caaac8e2040c37123a4c24fcefa313a5402b33
+Author: Noah Phonsavath <nphonsavath@gmail.com>
+Date:   Sat Feb 8 22:04:16 2025 -0600
+
+    uart0 print string. -NP
+
+commit 3c2ee179b13bbcb9b59bf4c57ba0db767c4a19ab
+Author: Aaron DSouza (aad921) <aad921@mail.usask.ca>
+Date:   Sat Feb 8 18:32:29 2025 -0600
+
+    Edit BACKLOG.txt
+
+commit bd45a3ae5405ea8bf5bcd62bed41e33447555ca5
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sat Feb 8 18:28:51 2025 -0600
+
+    Refactored uart.c to use register helper functions
+
+commit 89efe9cef18601955e8b82c05475351427ae3ec0
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sat Feb 8 18:28:33 2025 -0600
+
+    Function headers for r/w helper functions
+
+commit 05cfd7ce79540b32d5525232c33ec948ed2169b6
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sat Feb 8 18:27:54 2025 -0600
+
+    Wrote out assembly for reg r/w helper functions
+
+commit 3649576293882448414eda5ce229cf320cb03635
+Author: Aaron DSouza (aad921) <aad921@mail.usask.ca>
+Date:   Sat Feb 8 13:46:37 2025 -0600
+
+    Edit BACKLOG.txt
+
+commit 3e4212da1f59610cecc50e21bdd30358aed066a7
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Sat Feb 8 04:06:49 2025 -0600
+
+    Edit BACKLOG.txt
+
+commit ec53520840fc49e04057f9c331c0693535eeda63
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Sat Feb 8 04:03:11 2025 -0600
+
+    Read BACKLOG.txt
+
+commit 74f1065ed5529ff503f018671001b5b7ba6d3a64
+Author: Marwan Ahmed Mostafa (mam024) <mam024@mail.usask.ca>
+Date:   Sat Feb 8 03:59:55 2025 -0600
+
+    Read BACKLOG.txt to see what we have to do next
+
+commit e5b272afecfc61a11b5d3735bd420172a81627e0
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Feb 8 02:13:11 2025 -0600
+
+    Clean up
+
+commit 148640a129f3ba353d6434f5b70a6d80add33230
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Feb 8 01:49:06 2025 -0600
+
+    UART input working now
+
+commit 9c16ad48cd3e41a2d998e1ad3c262ba12ceb9d32
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Sat Feb 8 01:04:55 2025 -0600
+
+    fixing
+
+commit f7115935be43721593fda201a7a430d95cd631d8
+Author: Aaron DSouza <aad921@usask.ca>
+Date:   Sat Feb 8 00:37:00 2025 -0600
+
+    put_ch working get_ch not quite. See comments -AD
+
+commit 9b06571805e8ba59255fd467d33c83ce14157a7a
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 7 23:17:07 2025 -0600
+
+    opps
+
+commit a68686e09fdb0bb65d3f3f01566fb75878648fda
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 7 23:13:53 2025 -0600
+
+    cleaned up dir
+
+commit 8ff933193289ad16b6478ceb402afa3845fb53f8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 7 22:43:51 2025 -0600
+
+    THANK YOU ALEXEI FOR FIXING THE VECTOR TABLE I GOT TIMER INTERRUPTS TO WORK 
+NOW
+
+commit a58d00449d7384f4a0584e7ac1ce00a07617dca1
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Feb 7 12:38:39 2025 -0600
+
+    i give up man
+
+commit bc3c12cfa80d0d69c479663f53bac9d2dfa1e038
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Feb 7 09:15:00 2025 -0600
+
+    oops
+
+commit 51532f8260ce42474a53b10a45c5bf59aea95ff2
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Feb 7 09:14:50 2025 -0600
+
+    fixed vector base address
+
+commit 770ba0ecc77c195d2e8b60afaf4363c11cbbc0e2
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Fri Feb 7 08:51:18 2025 -0600
+
+    refactored so much i hope it works :rofl:
+
+commit b6e85a0833d0522f4bfd020da4565e77f3ddcc97
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Fri Feb 7 02:20:29 2025 -0600
+
+    Should have done my 317 assignment instead of waisting 7 hours on this, 
+interrupts not workinggit add .git add .git add .git add .git add .git add .git 
+add .
+
+commit c843bc5670928fdaeb369f08c4989a732e2feab0
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 23:23:15 2025 -0600
+
+    looking a littile better now
+
+commit 97fe083ef39bba43974f59d0bda0b6b97f12e089
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 22:27:14 2025 -0600
+
+    i think i got interrupts set up, just no way to test yet
+
+commit a844a31fa651f806f5cd174b75234de59e5153fe
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 21:43:54 2025 -0600
+
+    created init interrupt function that unmasks all interrupts
+
+commit b6e82330f3c869ddbb8b8e46b716b4b26fa16305
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 20:37:48 2025 -0600
+
+    setup vector table
+
+commit 60e6a4d0baacf5b03a97083323cc632d4b9ae141
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 18:49:46 2025 -0600
+
+    got img to boot off fat instead of RAW
+
+commit 7bc36dc95c9a397c242537ad3032f105ea38cf85
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 15:34:16 2025 -0600
+
+    set stack pointer for IRQ and FRQ
+
+commit 4628693e63405577444b8a6fda7afed2319174ae
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 15:24:00 2025 -0600
+
+    all registers done
+
+commit bd60e06e9b1dc19f712096552757bd9fd9aa51cf
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 15:00:35 2025 -0600
+
+    need to add constants then try writing to thx
+
+commit 18abed73859d1f1375cdc2ac8cb0e8f6951958e2
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 14:13:15 2025 -0600
+
+    reverted led.c
+
+commit 8c1dc60367cfbc0fdcc1456a446dd974b5577e25
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 14:01:31 2025 -0600
+
+    halfway through uart init
+
+commit 1c8249ee436da78a23c66585ba5eb8b9f74e9a52
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 13:52:58 2025 -0600
+
+    documentation on cpu modes
+
+commit 2eb7d31e039b21f89bbd393d0c031930fa9059bc
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 13:23:53 2025 -0600
+
+    added offsets need for interrupts
+
+commit 89bfe09e07409ece50826bb3ccf20ccff14cb8a4
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 13:00:10 2025 -0600
+
+    gonna attempt interrupts rn this manual is so nice
+
+commit 43fbb2aa117d7a9933bb039753ebfed079c970ef
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 12:30:59 2025 -0600
+
+    reverting change to LEDon function by readding LEDstatus, wasnt working 
+without it when tested
+
+commit aa1cd652e10ba13d3d37870a96f550cb2ba37ef3
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 11:25:28 2025 -0600
+
+    beginning uart setup
+
+commit 0dbd43d67343bbdfb0ffee8c8b2455ef01678c9c
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 10:33:13 2025 -0600
+
+    buddy lives another day...
+
+commit 79ad30df7b9d3236eb33ac48932324733be8555d
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 10:27:47 2025 -0600
+
+    dont even need a main function
+
+commit 49d9cd6a2ab7b2c0f9f9878e9bd2d79e7e0e4b0e
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 10:25:00 2025 -0600
+
+    i fixed the sp.........
+
+commit c9ea3bea0ebcd60699dd66da02480c897bb7e3f7
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 10:07:46 2025 -0600
+
+    yall dont fw encapsulation like me
+
+commit a32299f5f200dc3a7c5430886ac6d7d29940e8ce
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 09:53:34 2025 -0600
+
+    put branch back cause it feels wrong
+
+commit 7c9940945d2ae5dd2be8ee2d74ae8fbf2953dabb
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 09:35:21 2025 -0600
+
+    no branch needed due to way linker was setup
+
+commit 177609cd5185818f1834775516d867002921faeb
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 09:35:10 2025 -0600
+
+    bx instruction works
+
+commit dc9000ede300484d2009294dd39321c7adc10906
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 09:08:55 2025 -0600
+
+    fixed up marwans led functions a bit
+
+commit 40ea43996ef59197136ae7c459e81d5f5bc81cc9
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Thu Feb 6 08:34:57 2025 -0600
+
+    changed image layout in linker
+
+commit ee6454e101071fad833ebb8cce71eada1529f53d
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 01:57:25 2025 -0600
+
+    bootloader now preforms light show
+
+commit 9da72143bc2b0269654759bbee2cd0dedffbe4fc
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 01:43:27 2025 -0600
+
+    added change for led off function
+
+commit 0333e50e23e8d095d917912c960ed2481ac0b9e8
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 01:38:58 2025 -0600
+
+    can now turn on a chosen led
+
+commit 8e33a845d550a6dba65669a0740c749efd6c97a2
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Thu Feb 6 01:21:44 2025 -0600
+
+    super refactor, i think it works better now aswell
+
+commit 4cae322ce82730bbaa9c4a9efa28f404767a783a
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 23:22:58 2025 -0600
+
+    volatile writes work but cannot adjust sp
+
+commit bafd721cfb1f14b086e8a4a61667d8ccdcd6ce84
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 22:50:03 2025 -0600
+
+    assembly doesn't work
+
+commit ae9dd185d427691027449e40835290b8a0e25e16
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 22:32:23 2025 -0600
+
+    header making script works fr now
+
+commit 8c889497e1cc0d91bd1315f3140dfcdd05d7dddf
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Feb 5 22:29:44 2025 -0600
+
+    fix img file creation
+
+commit 6514321946e78b0ee9c742ca254045eccfb34e10
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 21:36:32 2025 -0600
+
+    gitignore for img files
+
+commit f4868f8227285c1f679584c25d97217675a8ede1
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Feb 5 22:20:15 2025 -0600
+
+    added img creation in makefile
+
+commit 26d0a7a3c1b1bbae3db825762f768b6a9c8df6a6
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 21:15:02 2025 -0600
+
+    labeled writes
+
+commit 9c4817786be453b14d171cc5b9b6ea6b124a8e7b
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 20:52:18 2025 -0600
+
+    NOAH AND AARON PLEASE MAN
+
+commit a159fc06e01698de0940e793aa8412851cdcc5a9
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 18:54:19 2025 -0600
+
+    marwan please
+
+commit e64b0565c03e5a56d0ca7c0abe141d03ac0bc5be
+Author: alexeidoell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 14:50:15 2025 -0600
+
+    fixed stack loaction
+
+commit 9bac7d4b849fe3d8adc1c8ce055488f8a713e345
+Author: Marwan <marwanmo475@gmail.com>
+Date:   Wed Feb 5 14:43:43 2025 -0600
+
+    added comments for set_registers
+
+commit ed0624f23d18b4c79431eb32c1d66310ab0a11d2
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 12:48:56 2025 -0600
+
+    fixed addresses
+
+commit 5558ba0ca2ead94d84cb2ad3271e4d0de9b10456
+Author: Alexei Doell <alexeidoell@gmail.com>
+Date:   Wed Feb 5 12:26:06 2025 -0600
+
+    basic mlo building
+
+commit cc5399586d6d84c06c783a2323cfe0223e25f646
+Author: Dwight Makaroff (dwm138) <makaroff@cs.usask.ca>
+Date:   Tue Jan 14 11:14:11 2025 -0600
+
+    Initial commit
