@@ -144,6 +144,7 @@ static inline KNode* list_last(struct KList *list) {
 }
 
 
+/* All functions below were not used in the current OS but will still be included for future use */
 
 
 static inline void li_go_first(struct KListIter *iter) {
