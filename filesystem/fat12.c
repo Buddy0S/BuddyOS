@@ -1,3 +1,7 @@
+/*
+	CMPT 432 - Implementation Team 00
+*/
+
 #include "mmc.h"
 #include "reg.h"
 #include <stdint.h>
