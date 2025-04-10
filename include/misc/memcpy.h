@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #ifndef MEMCPY_H
 #define MEMCPY_H
 

@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 /*
  * A file for defining error numbers for use in syscalls
  */

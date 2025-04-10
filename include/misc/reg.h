@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #ifndef REG_H
 
 #include <stdint.h>

@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #ifndef LED_H
 #define LED_H
 

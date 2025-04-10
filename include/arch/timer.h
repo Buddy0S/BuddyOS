@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #ifndef TIMER_H
 #define TIMER_H
 

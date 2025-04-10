@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #ifndef MEMORY_H
 #define MEMORY_H
 

@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #ifndef LIST_H_KERNEL
 #define LIST_H_KERNEL
 

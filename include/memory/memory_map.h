@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #ifndef MEMMAP_H
 #define MEMMAP_H
 

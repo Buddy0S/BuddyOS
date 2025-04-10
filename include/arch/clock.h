@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #ifndef CLOCK_H
 #define CLOCK_H
 

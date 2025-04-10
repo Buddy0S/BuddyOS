@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 /* 
  * Defines the FIFO mailbox used for the blocking send, receive, and reply
  * IPC.
