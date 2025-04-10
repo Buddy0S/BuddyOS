@@ -1,9 +1,9 @@
+/* CMPT432 - ImplementationTeam00 */
 #include <stdint.h>
 #include "uart.h"
 #include "memory.h"
 #include "fat12.h"
 #include "vfs.h"
-#include "mmc.h"
 #include "net.h"
 #include "proc.h"
 #include "syscall.h"

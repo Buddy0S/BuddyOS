@@ -1,3 +1,4 @@
+/* CMPT432 - ImplementationTeam00 */
 #include <stddef.h>
 #include <stdint.h>
 #include "list.h"

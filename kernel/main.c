@@ -1,10 +1,7 @@
+/* CMPT432 - ImplementationTeam00 */
 #include <stdint.h>
-#include "srr_ipc.h"
-#include "syscall.h"
-#include "reg.h"
 #include "uart.h"
 #include "memory.h"
-#include "list.h"
 #include "proc.h"
 #include "fat12.h"
 #include "vfs.h"
