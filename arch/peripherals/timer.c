@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #include "timer.h"
 #include <stdint.h>
 #include "reg.h"

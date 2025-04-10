@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #include "clock.h"
 #include "reg.h"
 #include <stdint.h>
