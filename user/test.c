@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #include <stdint.h>
 #include "../arch/uart.h"
 #include "../include/misc/reg.h"

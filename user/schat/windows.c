@@ -1,3 +1,5 @@
+/* CMPT432 - ImplementationTeam00 */
+
 #define _WIN32_WINNT 0x0A00  // Windows 10/11
 
 #include "socketAB.h"

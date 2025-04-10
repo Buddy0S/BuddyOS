@@ -1,3 +1,4 @@
+## CMPT432 - ImplementationTeam00
 
 windows: windows.c schat.c socketAB.h
 	g++ windows.c schat.c -lws2_32 -I./ -o schat.exe
