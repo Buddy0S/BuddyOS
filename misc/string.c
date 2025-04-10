@@ -1,3 +1,4 @@
+/* CMPT432 - ImplementationTeam00 */
 #include "string.h"
 
 int strlen(const char *str) {
