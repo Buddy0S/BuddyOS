@@ -411,16 +411,16 @@ void cpsw_setup_cpdma_descriptors(){
   /* Create Descriptor Chains */
   for (int i = 0; i < num_descriptors - 1; i++){
     
- 	  /* Set Next Descriptor */
-	  rx_cur = (cpdma_hdp*)((uint32_t) rx_start + (i * sizeof(cpdma_hdp)));
-    rx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) rx_cur + sizeof(cpdma_hdp));
+     /* Set Next Descriptor */
+     rx_cur = (cpdma_hdp*)((uint32_t) rx_start + (i * sizeof(cpdma_hdp)));
+     rx_cur->next_descriptor = (cpdma_hdp*)((uint32_t) rx_cur + sizeof(cpdma_hdp));
 
-	  /* Set Flags */
-    rx_cur->flags = RX_INIT_FLAGS;
+     /* Set Flags */
+     rx_cur->flags = RX_INIT_FLAGS;
 
-	  /* Allocate Packet Buffers */
-	  rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
-	  rx_cur->buffer_length = MAX_PACKET_SIZE;
+     /* Allocate Packet Buffers */
+     rx_cur->buffer_pointer = kmalloc(MAX_PACKET_SIZE);
+     rx_cur->buffer_length = MAX_PACKET_SIZE;
 
   }
 
@@ -644,29 +644,29 @@ int cpsw_recv(){
 
   if (!status){
     //uart0_printf("No Packets\n");
-	  return -1;
+    return -1;
   }
 
   while (!(start->flags & BIT(29))){
     
     //uart0_printf("\nPacket Recieved\n");
 
-	  process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
+    process_packet((uint8_t*)start->buffer_pointer,start->buffer_length & 0xFFF);
 
-	  start->flags = RX_INIT_FLAGS;
-	  start->buffer_length = MAX_PACKET_SIZE;
+    start->flags = RX_INIT_FLAGS;
+    start->buffer_length = MAX_PACKET_SIZE;
 	
     REG(RX0_CP) = (uint32_t) start;
 
-	  start = start->next_descriptor;
+    start = start->next_descriptor;
 
-	  // End of queue
-	  if (start == 0){   
-	    eoq = 1;
+    // End of queue
+    if (start == 0){   
+      eoq = 1;
       //uart0_printf("End of queue reached\n");
       cpsw_start_recieption();	    
-	    break;
-	  }
+      break;
+    }
 
   }
 
