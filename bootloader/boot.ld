@@ -1,3 +1,7 @@
+/*
+	CMPT432 - Implementation Team 00
+*/
+
 MEMORY
 {
   sram   (rwx)  : ORIGIN = 0x402F0400, LENGTH = 0x0000FC00

@@ -1,3 +1,7 @@
+/*
+	CMPT432 - Implementation Team 00
+*/
+
 #include <stdint.h>
 #include "interrupts.h"
 #include "memcpy.h"
@@ -104,41 +108,41 @@ typedef void (*KernelStart)();
 
 int main(void) { 
 
-  initClocks();
+	initClocks();
 
-  init_interrupts();
+	init_interrupts();
 
-  init_ddr();
+	init_ddr();
 
-  initLED();
+	initLED();
 
-  uart0_init();
+	uart0_init();
 
-  uart0_printf("Bootloader Started\n");
-  initTimer();
+	uart0_printf("Bootloader Started\n");
+	initTimer();
 
-  enable_interrupts();
+	enable_interrupts();
 
-  mmc.init();
-    
-  uint32_t __attribute__((aligned(4))) buffer[256];
+	mmc.init();
 
-  uart0_printf("Attempting to load Kernel......\n");
-  fat12_init(0, buffer);
-	
+	uint32_t __attribute__((aligned(4))) buffer[256];
+
+	uart0_printf("Attempting to load Kernel......\n");
+	fat12_init(0, buffer);
+
 	fat12_read_file("KERNEL.BIN", (uint32_t *)0x80000000, buffer);
 
-  /*jump to kernel*/
-  uint32_t* kernel = (uint32_t*)0x80000000;
-  KernelStart kernelStart = (KernelStart)kernel;
+	/*jump to kernel*/
+	uint32_t* kernel = (uint32_t*)0x80000000;
+	KernelStart kernelStart = (KernelStart)kernel;
 
-  uart0_printf("Jumping to kernel \n");
+	uart0_printf("Jumping to kernel \n");
 
-  kernelStart();
+	kernelStart();
 
-  uart0_printf("Kernel Exited\n"); 
+	uart0_printf("Kernel Exited\n"); 
 
-  while (1);
+	while (1);
 }
 
 
