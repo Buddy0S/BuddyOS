@@ -1,3 +1,7 @@
+/*
+	CMPT 432 - Implementation Team 00
+*/
+
 #include <stdint.h>
 #include "vfs.h"
 #include "memory.h"
